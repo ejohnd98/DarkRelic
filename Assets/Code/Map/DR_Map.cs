@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DR_Map : MonoBehaviour
+public class DR_Map
 {
     public const int MAX_MAP_SIZE = 50;
 
@@ -27,5 +27,31 @@ public class DR_Map : MonoBehaviour
             }
         }
         return NewMap;
+    }
+
+    public bool AddActor(DR_Actor Actor, Vector2Int pos){
+        DR_Cell Cell = Cells[pos.y, pos.x];
+        if(Cell.IsTraversable() && Cell.Actor == null){
+            Cell.Actor = Actor;
+            Actor.Position = pos;
+            return true;
+        }
+        return false;
+    }
+
+    public bool MoveActorRelative(DR_Actor Actor, Vector2Int posChange){
+        return MoveActor(Actor, Actor.Position + posChange);
+    }
+
+    public bool MoveActor(DR_Actor Actor, Vector2Int pos){
+        DR_Cell FromCell = Cells[Actor.Position.y, Actor.Position.x];
+        DR_Cell ToCell = Cells[pos.y, pos.x];
+        if(ToCell.IsTraversable() && ToCell.Actor == null){
+            FromCell.Actor = null;
+            ToCell.Actor = Actor;
+            Actor.Position = pos;
+            return true;
+        }
+        return false;
     }
 }
