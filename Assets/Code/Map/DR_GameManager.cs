@@ -50,6 +50,7 @@ public class DR_GameManager : MonoBehaviour
 
         turnSystem = new TurnSystem();
         turnSystem.UpdateEntityLists(CurrentMap);
+        UpdateVisuals();
 
         CurrentState = GameState.RUNNING;
     }
@@ -72,8 +73,12 @@ public class DR_GameManager : MonoBehaviour
                     //advance game
 
                     //reduce debts
-                    turnSystem.RecoverDebts(1);
-                    turnSystem.UpdateEntityLists(CurrentMap);
+                    int limit = 50;
+                    while(!turnSystem.CanEntityAct() && limit-- > 0){
+                        turnSystem.RecoverDebts(1);
+                        turnSystem.UpdateEntityLists(CurrentMap);
+                    }
+                    UpdateVisuals();
                 }
                 break;
             }
@@ -108,21 +113,19 @@ public class DR_GameManager : MonoBehaviour
             break;
         }
 
-        
-        
-
-        UpdateVisuals();
-
-
         // Camera Movement
         Vector3 DesiredPos = MainCamera.transform.position;
         DesiredPos.x = PlayerActor.Position.x;
         DesiredPos.y = PlayerActor.Position.y;
 
         Vector3 Direction = DesiredPos - MainCamera.transform.position;
-        float LerpAmount = Mathf.Clamp01(Time.deltaTime * 4.0f / Direction.magnitude);
+        float LerpAmount = Time.deltaTime * 1f + Mathf.Clamp01(Time.deltaTime * 4.0f / Direction.magnitude);
 
         MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, DesiredPos, LerpAmount);
+    }
+
+    private void LateUpdate() {
+        
     }
 
     // TODO: IMPROVE THIS MESS

@@ -162,7 +162,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RenderShadows: 1
+  m_RenderShadows: 0
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
   m_CameraType: 0
@@ -275,6 +275,8 @@ MonoBehaviour:
   FloorTexture: {fileID: 1062414449, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   PlayerTexture: {fileID: -1282016797, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   CellObj: {fileID: 2981893753497814314, guid: a111716a7249b3a45a002a8bff83ed16, type: 3}
+  CellObjects: []
+  EntityObjects: []
   MainCamera: {fileID: 519420031}
 --- !u!4 &1484776820
 Transform:

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TurnComponent : DR_Component
 {
-    public int ActionDebt = 10;
+    public int ActionDebt = 1;
     int CurrentDebt = 0;
 
     public bool CanTakeTurn(){
