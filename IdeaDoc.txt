@@ -1,0 +1,4 @@
+Component Ideas:
+	Memory component
+		keeps track of actors this entity has seen
+		mainly used by player, but can be used by enemies

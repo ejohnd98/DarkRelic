@@ -4,69 +4,169 @@ using UnityEngine;
 
 public class DR_GameManager : MonoBehaviour
 {
+    enum GameState {
+        RUNNING,
+        WAITING_FOR_INPUT,
+
+        INVALID
+    }
+
+    GameState CurrentState = GameState.INVALID;
+
     public DR_Map CurrentMap;
     public Texture2D DebugMap;
-
 
     //Temp renderer stuff
     public Sprite WallTexture, FloorTexture, PlayerTexture;
     public GameObject CellObj;
-    public GameObject[,] CellObjects;
+    public List<GameObject> CellObjects;
+    public List<GameObject> EntityObjects;
 
     //Temp Camera 
     public Camera MainCamera;
 
     //Temp Player
     DR_Actor PlayerActor;
-    GameObject PlayerObj;
+
+    TurnSystem turnSystem;
 
     void Start()
     {
         if(DebugMap != null){
             CurrentMap = DR_Map.CreateMapFromImage(DebugMap);
         }
+        CellObjects = new List<GameObject>();
+        EntityObjects = new List<GameObject>();
 
-        CellObjects = new GameObject[CurrentMap.MapSize.y,CurrentMap.MapSize.x];
+        PlayerActor = CreateActor(PlayerTexture, "Player");
+        PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
+        
+        CurrentMap.AddActor(PlayerActor, new Vector2Int(24,28));
 
-        //separate out into renderer class eventually:
-        for (int y = 0; y < CurrentMap.MapSize.y; y++){
-            for (int x = 0; x < CurrentMap.MapSize.x; x++){
-                int Index1D = y*CurrentMap.MapSize.x + x;
-                GameObject NewCell = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
-                NewCell.GetComponent<SpriteRenderer>().sprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                CellObjects[y,x] = NewCell;
-            }
-        }
+        Vector3 DesiredPos = MainCamera.transform.position;
+        DesiredPos.x = PlayerActor.Position.x;
+        DesiredPos.y = PlayerActor.Position.y;
+        MainCamera.transform.position = DesiredPos;
 
-        PlayerActor = new DR_Actor(new Vector2Int(24,28), PlayerTexture);
-        CurrentMap.Cells[24,28].Actor = PlayerActor;
+        turnSystem = new TurnSystem();
+        turnSystem.UpdateEntityLists(CurrentMap);
 
-        PlayerObj = Instantiate(CellObj,new Vector3(28, 24, -1),Quaternion.identity, transform);
-        PlayerObj.GetComponent<SpriteRenderer>().sprite = PlayerTexture;
-
+        CurrentState = GameState.RUNNING;
     }
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.W)){
-            CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.up);
-        }else if(Input.GetKeyDown(KeyCode.S)){
-            CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.down);
-        }else if(Input.GetKeyDown(KeyCode.D)){
-            CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.right);
-        }else if(Input.GetKeyDown(KeyCode.A)){
-            CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.left);
+        switch(CurrentState){
+            case GameState.RUNNING:{
+                if (turnSystem.CanEntityAct()){
+                    if (turnSystem.IsPlayerTurn()){
+                        CurrentState = GameState.WAITING_FOR_INPUT;
+                        break;
+                    }
+
+                    //AI TURN
+                    turnSystem.GetNextEntity().SpendTurn();
+                    turnSystem.PopNextEntity();
+
+                }else{
+                    //advance game
+
+                    //reduce debts
+                    turnSystem.RecoverDebts(1);
+                    turnSystem.UpdateEntityLists(CurrentMap);
+                }
+                break;
+            }
+
+            case GameState.WAITING_FOR_INPUT:{
+
+                //TODO change into an action based system (have struct representing an action)
+                if (turnSystem.IsPlayerTurn()){
+                    bool hasMoved = false;
+                    if(Input.GetKeyDown(KeyCode.W)){
+                        hasMoved = CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.up);
+                    }else if(Input.GetKeyDown(KeyCode.S)){
+                        hasMoved = CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.down);
+                    }else if(Input.GetKeyDown(KeyCode.D)){
+                        hasMoved = CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.right);
+                    }else if(Input.GetKeyDown(KeyCode.A)){
+                        hasMoved = CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.left);
+                    }
+
+                    if (hasMoved){
+                        PlayerActor.GetComponent<TurnComponent>().SpendTurn();
+                        turnSystem.PopNextEntity();
+                    }
+                }else{
+                    CurrentState = GameState.RUNNING;
+                    break;
+                }
+                break;
+            }
+
+            default:
+            break;
         }
 
-        //figure out how to keep gameobjects in sync with board:
-        Vector3 PlayerPos = PlayerObj.transform.position;
-        PlayerPos.x = PlayerActor.Position.x;
-        PlayerPos.y = PlayerActor.Position.y;
-        PlayerObj.transform.position = PlayerPos;
+        
+        
 
-        Vector3 CamPos = MainCamera.transform.position;
-        CamPos.x = PlayerActor.Position.x;
-        CamPos.y = PlayerActor.Position.y;
-        MainCamera.transform.position = CamPos;
+        UpdateVisuals();
+
+
+        // Camera Movement
+        Vector3 DesiredPos = MainCamera.transform.position;
+        DesiredPos.x = PlayerActor.Position.x;
+        DesiredPos.y = PlayerActor.Position.y;
+
+        Vector3 Direction = DesiredPos - MainCamera.transform.position;
+        float LerpAmount = Mathf.Clamp01(Time.deltaTime * 4.0f / Direction.magnitude);
+
+        MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, DesiredPos, LerpAmount);
+    }
+
+    // TODO: IMPROVE THIS MESS
+    void UpdateVisuals(){
+        // Clear old visuals
+        foreach(GameObject obj in CellObjects){
+            Destroy(obj);
+        }
+        CellObjects.Clear();
+        foreach(GameObject obj in EntityObjects){
+            Destroy(obj);
+        }
+        EntityObjects.Clear();
+
+        // Add new visuals
+        for(int y = 0; y < CurrentMap.MapSize.y; y++){
+            for(int x = 0; x < CurrentMap.MapSize.x; x++){
+                GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
+                NewCellObj.GetComponent<SpriteRenderer>().sprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
+                CellObjects.Add(NewCellObj);
+            }
+        }
+
+        foreach(DR_Entity Entity in CurrentMap.Entities){
+            SpriteComponent spriteComponent = Entity.GetComponent<SpriteComponent>();
+            if (spriteComponent == null){
+                continue;
+            }
+
+            GameObject NewEntityObj = Instantiate(CellObj, Entity.GetPosFloat(-1.0f), Quaternion.identity, transform);
+            NewEntityObj.GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
+            EntityObjects.Add(NewEntityObj);
+        }  
+    }
+
+    //move into other class
+    DR_Actor CreateActor(Sprite Sprite, string Name, int maxHealth = 10){
+        DR_Actor NewActor = new DR_Actor();
+
+        NewActor.Name = Name;
+        NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
+        NewActor.AddComponent<HealthComponent>(new HealthComponent(maxHealth));
+        NewActor.AddComponent<TurnComponent>(new TurnComponent());
+        
+        return NewActor;
     }
 }

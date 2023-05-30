@@ -9,6 +9,8 @@ public class DR_Map
     public DR_Cell[,] Cells;
     public Vector2Int MapSize;
 
+    public List<DR_Entity> Entities;
+
     public static DR_Map CreateMapFromImage(Texture2D MapTexture){
         DR_Map NewMap = new DR_Map();
 
@@ -26,6 +28,9 @@ public class DR_Map
                 NewMap.Cells[y,x].bBlocksMovement = Pixels[Index1D].r < 0.5;
             }
         }
+
+        NewMap.Entities = new List<DR_Entity>();
+
         return NewMap;
     }
 
@@ -34,9 +39,25 @@ public class DR_Map
         if(Cell.IsTraversable() && Cell.Actor == null){
             Cell.Actor = Actor;
             Actor.Position = pos;
+            Entities.Add(Actor);
             return true;
         }
         return false;
+    }
+
+    public void RemoveActor(DR_Actor Actor){
+        DR_Cell Cell = Cells[Actor.Position.y, Actor.Position.x];
+        Cell.Actor = null;
+        Entities.Remove(Actor);
+    }
+
+    public DR_Actor RemoveActorAtPosition(Vector2Int pos){
+        DR_Cell Cell = Cells[pos.y, pos.x];
+        DR_Actor RemovedActor = Cell.Actor;
+        Cell.Actor = null;
+        Entities.Remove(RemovedActor);
+
+        return RemovedActor;
     }
 
     public bool MoveActorRelative(DR_Actor Actor, Vector2Int posChange){

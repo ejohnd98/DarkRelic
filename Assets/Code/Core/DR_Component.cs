@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DR_Actor : DR_Entity
+public abstract class DR_Component
 {
-
+    public DR_Entity Entity;
 }
