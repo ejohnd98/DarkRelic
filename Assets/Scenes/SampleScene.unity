@@ -274,6 +274,7 @@ MonoBehaviour:
   WallTexture: {fileID: 1551168614, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   FloorTexture: {fileID: 1062414449, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   PlayerTexture: {fileID: -1282016797, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
+  EnemyTexture: {fileID: 161887637, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   CellObj: {fileID: 2981893753497814314, guid: a111716a7249b3a45a002a8bff83ed16, type: 3}
   CellObjects: []
   EntityObjects: []

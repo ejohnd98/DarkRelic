@@ -17,7 +17,7 @@ public class DR_GameManager : MonoBehaviour
     public Texture2D DebugMap;
 
     //Temp renderer stuff
-    public Sprite WallTexture, FloorTexture, PlayerTexture;
+    public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture;
     public GameObject CellObj;
     public List<GameObject> CellObjects;
     public List<GameObject> EntityObjects;
@@ -40,8 +40,9 @@ public class DR_GameManager : MonoBehaviour
 
         PlayerActor = CreateActor(PlayerTexture, "Player");
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
-        
         CurrentMap.AddActor(PlayerActor, new Vector2Int(24,28));
+
+        CurrentMap.AddActor(CreateActor(EnemyTexture, "TestEnemy"), new Vector2Int(24,29));
 
         Vector3 DesiredPos = MainCamera.transform.position;
         DesiredPos.x = PlayerActor.Position.x;
