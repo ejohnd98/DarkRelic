@@ -30,6 +30,9 @@ public class DR_GameManager : MonoBehaviour
 
     TurnSystem turnSystem;
 
+    static KeyCode[] KeyDirections = {KeyCode.UpArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.LeftArrow};
+    static Vector2Int[] Directions = {Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left};
+
     void Start()
     {
         if(DebugMap != null){
@@ -58,63 +61,123 @@ public class DR_GameManager : MonoBehaviour
 
     void Update()
     {
-        switch(CurrentState){
-            case GameState.RUNNING:{
-                if (turnSystem.CanEntityAct()){
-                    if (turnSystem.IsPlayerTurn()){
-                        CurrentState = GameState.WAITING_FOR_INPUT;
-                        break;
-                    }
+        switch (CurrentState)
+        {
+            case GameState.RUNNING:
+                {
+                    if (turnSystem.CanEntityAct())
+                    {
+                        if (turnSystem.IsPlayerTurn())
+                        {
+                            CurrentState = GameState.WAITING_FOR_INPUT;
+                            break;
+                        }
 
-                    //AI TURN
-                    turnSystem.GetNextEntity().SpendTurn();
-                    turnSystem.PopNextEntity();
+                        //AI TURN
 
-                }else{
-                    //advance game
-
-                    //reduce debts
-                    int limit = 50;
-                    while(!turnSystem.CanEntityAct() && limit-- > 0){
-                        turnSystem.RecoverDebts(1);
-                        turnSystem.UpdateEntityLists(CurrentMap);
-                    }
-                    UpdateVisuals();
-                }
-                break;
-            }
-
-            case GameState.WAITING_FOR_INPUT:{
-
-                //TODO change into an action based system (have struct representing an action)
-                if (turnSystem.IsPlayerTurn()){
-                    bool hasMoved = false;
-                    if(Input.GetKeyDown(KeyCode.W)){
-                        hasMoved = CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.up);
-                    }else if(Input.GetKeyDown(KeyCode.S)){
-                        hasMoved = CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.down);
-                    }else if(Input.GetKeyDown(KeyCode.D)){
-                        hasMoved = CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.right);
-                    }else if(Input.GetKeyDown(KeyCode.A)){
-                        hasMoved = CurrentMap.MoveActorRelative(PlayerActor, Vector2Int.left);
-                    }
-
-                    if (hasMoved){
-                        PlayerActor.GetComponent<TurnComponent>().SpendTurn();
+                        turnSystem.GetNextEntity().SpendTurn();
+                        Debug.Log(turnSystem.GetNextEntity().Entity.Name + " did nothing");
                         turnSystem.PopNextEntity();
+
                     }
-                }else{
-                    CurrentState = GameState.RUNNING;
+                    else
+                    {
+                        //advance game
+
+                        //reduce debts
+                        int limit = 50;
+                        while (!turnSystem.CanEntityAct() && limit-- > 0)
+                        {
+                            turnSystem.RecoverDebts(1);
+                            turnSystem.UpdateEntityLists(CurrentMap);
+                        }
+                        UpdateVisuals();
+                    }
                     break;
                 }
-                break;
-            }
+
+            case GameState.WAITING_FOR_INPUT:
+                {
+
+                    //TODO change into an action based system (have struct representing an action)
+                    if (turnSystem.IsPlayerTurn())
+                    {
+                        bool keyPressed = false;
+
+                        Vector2Int interactPos = Vector2Int.zero;
+                        for (int i = 0; i < 4; i++)
+                        {
+                            if (Input.GetKeyDown(KeyDirections[i]))
+                            {
+                                keyPressed = true;
+                                interactPos = PlayerActor.Position + Directions[i];
+                            }
+                        }
+
+                        if (Input.GetKeyDown(KeyCode.Space)){
+                            keyPressed = true;
+                            interactPos = PlayerActor.Position;
+                        }
+
+                        if (keyPressed)
+                        {
+                            List<DR_Action> possibleActions = InteractionSystem.GetPotentialActions(PlayerActor, CurrentMap, interactPos);
+
+                            // Just do first action for now
+                            if (possibleActions.Count > 0)
+                            {
+                                switch (possibleActions[0])
+                                {
+
+                                    case MoveAction moveAction:
+                                        {
+                                            Debug.Log(PlayerActor.Name + " moved");
+                                            CurrentMap.MoveActor(PlayerActor, moveAction.pos);
+                                            break;
+                                        }
+
+                                    case AttackAction attackAction:
+                                        {
+                                            DamageSystem.HandleAttack(attackAction.target, attackAction.attacker);
+                                            break;
+                                        }
+
+                                    case WaitAction waitAction:
+                                        {
+                                            Debug.Log(PlayerActor.Name + " did nothing");
+                                            break;
+                                        }
+
+                                    default:
+                                        {
+                                            Debug.LogWarning("WAITING_FOR_INPUT: Player tried to perform an unknown action!");
+                                            break;
+                                        }
+                                }
+
+                                PlayerActor.GetComponent<TurnComponent>().SpendTurn();
+                                turnSystem.PopNextEntity();
+                                UpdateVisuals();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        CurrentState = GameState.RUNNING;
+                        break;
+                    }
+                    break;
+                }
 
             default:
-            break;
+                break;
         }
 
-        // Camera Movement
+        UpdateCamera();
+    }
+
+    void UpdateCamera()
+    {
         Vector3 DesiredPos = MainCamera.transform.position;
         DesiredPos.x = PlayerActor.Position.x;
         DesiredPos.y = PlayerActor.Position.y;
@@ -123,10 +186,6 @@ public class DR_GameManager : MonoBehaviour
         float LerpAmount = Time.deltaTime * 1f + Mathf.Clamp01(Time.deltaTime * 4.0f / Direction.magnitude);
 
         MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, DesiredPos, LerpAmount);
-    }
-
-    private void LateUpdate() {
-        
     }
 
     // TODO: IMPROVE THIS MESS

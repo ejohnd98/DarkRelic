@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class DamageSystem
 {
-    // later change from
-    public static void HandleAttack(DR_Actor Attacker, DR_Actor Victim){
-
-        HealthComponent VictimHealth = Victim.GetComponent<HealthComponent>();
-
-        if(VictimHealth != null){
-            VictimHealth.currentHealth--;
-            if(!VictimHealth.IsAlive()){
-                Debug.Log(Attacker.Name + " killed " + Victim.Name);
+    public static void HandleAttack(HealthComponent target, DR_Entity attacker){
+        if(target != null){
+            Debug.Log(attacker.Name + " attacked " + target.Entity.Name);
+            target.currentHealth--;
+            if(!target.IsAlive()){
+                Debug.Log(attacker.Name + " killed " + target.Entity.Name);
             }
         }
     }
