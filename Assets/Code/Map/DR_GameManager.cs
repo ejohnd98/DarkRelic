@@ -91,7 +91,7 @@ public class DR_GameManager : MonoBehaviour
                             turnSystem.RecoverDebts(1);
                             turnSystem.UpdateEntityLists(CurrentMap);
                         }
-                        UpdateVisuals();
+                        UpdateVisuals(false);
                     }
                     break;
                 }
@@ -157,7 +157,7 @@ public class DR_GameManager : MonoBehaviour
 
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
                                 turnSystem.PopNextEntity();
-                                UpdateVisuals();
+                                UpdateVisuals(false);
                             }
                         }
                     }
@@ -189,25 +189,28 @@ public class DR_GameManager : MonoBehaviour
     }
 
     // TODO: IMPROVE THIS MESS
-    void UpdateVisuals(){
+    void UpdateVisuals(bool updateTiles = true){
         // Clear old visuals
-        foreach(GameObject obj in CellObjects){
-            Destroy(obj);
+        if (updateTiles){
+            foreach(GameObject obj in CellObjects){
+                Destroy(obj);
+            }
+            CellObjects.Clear();
+
+            // Add new visuals
+            for(int y = 0; y < CurrentMap.MapSize.y; y++){
+                for(int x = 0; x < CurrentMap.MapSize.x; x++){
+                    GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
+                    NewCellObj.GetComponent<SpriteRenderer>().sprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
+                    CellObjects.Add(NewCellObj);
+                }
+            }
         }
-        CellObjects.Clear();
+        
         foreach(GameObject obj in EntityObjects){
             Destroy(obj);
         }
         EntityObjects.Clear();
-
-        // Add new visuals
-        for(int y = 0; y < CurrentMap.MapSize.y; y++){
-            for(int x = 0; x < CurrentMap.MapSize.x; x++){
-                GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
-                NewCellObj.GetComponent<SpriteRenderer>().sprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                CellObjects.Add(NewCellObj);
-            }
-        }
 
         foreach(DR_Entity Entity in CurrentMap.Entities){
             SpriteComponent spriteComponent = Entity.GetComponent<SpriteComponent>();
