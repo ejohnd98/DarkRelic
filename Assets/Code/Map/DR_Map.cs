@@ -9,6 +9,10 @@ public class DR_Map
     public DR_Cell[,] Cells;
     public Vector2Int MapSize;
 
+    //Could make this better:
+    public bool[,] IsVisible;
+    public bool[,] IsKnown;
+
     public List<DR_Entity> Entities;
 
     public static DR_Map CreateMapFromImage(Texture2D MapTexture){
@@ -21,13 +25,20 @@ public class DR_Map
         Color[] Pixels = MapTexture.GetPixels();
         //Create test map
         NewMap.Cells = new DR_Cell[Height,Width];
+        NewMap.IsVisible = new bool[Height,Width];
+        NewMap.IsKnown = new bool[Height,Width];
+
         for (int y = 0; y < Height; y++){
             for (int x = 0; x < Width; x++){
                 int Index1D = y*Width + x;
                 NewMap.Cells[y,x] = new DR_Cell();
                 NewMap.Cells[y,x].bBlocksMovement = Pixels[Index1D].r < 0.5;
+
+                NewMap.IsVisible[y,x] = false;
             }
         }
+
+        
 
         NewMap.Entities = new List<DR_Entity>();
 
@@ -45,7 +56,7 @@ public class DR_Map
         return false;
     }
 
-    public void RemoveActor(DR_Actor Actor){
+    public void RemoveActor(DR_Entity Actor){
         DR_Cell Cell = Cells[Actor.Position.y, Actor.Position.x];
         Cell.Actor = null;
         Entities.Remove(Actor);
@@ -74,5 +85,29 @@ public class DR_Map
             return true;
         }
         return false;
+    }
+
+    public void ClearVisible(){
+        for (int y = 0; y < MapSize.y; y++){
+            for (int x = 0; x < MapSize.x; x++){
+                IsVisible[y,x] = false;
+            }
+        }
+    }
+
+    public bool ValidPosition(Vector2Int pos){
+        return ValidPosition(pos.x, pos.y);
+    }
+
+    public bool ValidPosition(int x, int y){
+        return (x >= 0 && x < MapSize.x && y >= 0 && y < MapSize.y);
+    }
+
+    public bool BlocksSight(int x, int y){
+        if (!ValidPosition(x, y)){
+            return true;
+        }
+
+        return Cells[y,x].BlocksSight();
     }
 }

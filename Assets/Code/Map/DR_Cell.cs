@@ -10,4 +10,8 @@ public class DR_Cell
     public bool IsTraversable(){
         return !bBlocksMovement && Actor == null;
     }
+
+    public bool BlocksSight(){
+        return bBlocksMovement;
+    }
 }

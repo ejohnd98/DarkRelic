@@ -17,7 +17,7 @@ public class DR_GameManager : MonoBehaviour
     public Texture2D DebugMap;
 
     //Temp renderer stuff
-    public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture;
+    public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture, FogTexture;
     public GameObject CellObj;
     public List<GameObject> CellObjects;
     public List<GameObject> EntityObjects;
@@ -54,6 +54,7 @@ public class DR_GameManager : MonoBehaviour
 
         turnSystem = new TurnSystem();
         turnSystem.UpdateEntityLists(CurrentMap);
+        SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
         UpdateVisuals();
 
         CurrentState = GameState.RUNNING;
@@ -139,6 +140,10 @@ public class DR_GameManager : MonoBehaviour
                                     case AttackAction attackAction:
                                         {
                                             DamageSystem.HandleAttack(attackAction.target, attackAction.attacker);
+                                            //NOT GOOD:
+                                            if (!attackAction.target.IsAlive()){
+                                                CurrentMap.RemoveActor(attackAction.target.Entity);
+                                            }
                                             break;
                                         }
 
@@ -157,7 +162,8 @@ public class DR_GameManager : MonoBehaviour
 
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
                                 turnSystem.PopNextEntity();
-                                UpdateVisuals(false);
+                                SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+                                UpdateVisuals(true);
                             }
                         }
                     }
@@ -189,6 +195,7 @@ public class DR_GameManager : MonoBehaviour
     }
 
     // TODO: IMPROVE THIS MESS
+    // Make it only add objects within the camera
     void UpdateVisuals(bool updateTiles = true){
         // Clear old visuals
         if (updateTiles){
@@ -201,7 +208,14 @@ public class DR_GameManager : MonoBehaviour
             for(int y = 0; y < CurrentMap.MapSize.y; y++){
                 for(int x = 0; x < CurrentMap.MapSize.x; x++){
                     GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
-                    NewCellObj.GetComponent<SpriteRenderer>().sprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
+                    Sprite CellSprite = FogTexture;
+                    if (CurrentMap.IsVisible[y, x]){
+                        CellSprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
+                    }else if (CurrentMap.IsKnown[y, x]){
+                        CellSprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
+                        NewCellObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
+                    }
+                    NewCellObj.GetComponent<SpriteRenderer>().sprite = CellSprite;
                     CellObjects.Add(NewCellObj);
                 }
             }
@@ -213,6 +227,9 @@ public class DR_GameManager : MonoBehaviour
         EntityObjects.Clear();
 
         foreach(DR_Entity Entity in CurrentMap.Entities){
+            if (!CurrentMap.IsVisible[Entity.Position.y, Entity.Position.x]){
+                continue;
+            }
             SpriteComponent spriteComponent = Entity.GetComponent<SpriteComponent>();
             if (spriteComponent == null){
                 continue;
