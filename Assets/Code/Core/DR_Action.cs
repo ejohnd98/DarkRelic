@@ -27,6 +27,16 @@ public class AttackAction : DR_Action {
     }
 }
 
+public class DoorAction : DR_Action {
+    public DoorComponent target;
+    public DR_Entity opener;
+
+    public DoorAction (DoorComponent target, DR_Entity opener = null){
+        this.target = target;
+        this.opener = opener;
+    }
+}
+
 public class WaitAction : DR_Action {
 }
 

@@ -5,13 +5,26 @@ using UnityEngine;
 public class DR_Cell
 {
     public bool bBlocksMovement = false;
-    public DR_Actor Actor;
+    public DR_Entity Actor;
+    public DR_Entity Prop;
 
-    public bool IsTraversable(){
-        return !bBlocksMovement && Actor == null;
+    public bool BlocksMovement(){
+        if(bBlocksMovement || Actor != null){
+            return true;
+        }
+
+        if(Prop != null && Prop.GetComponent<PropComponent>().blocksMovement){
+            return true;
+        }
+
+        return bBlocksMovement;
     }
 
     public bool BlocksSight(){
+        if(Prop != null && Prop.GetComponent<PropComponent>().blocksSight){
+            return true;
+        }
+
         return bBlocksMovement;
     }
 }

@@ -11,13 +11,15 @@ public class DR_GameManager : MonoBehaviour
         INVALID
     }
 
+    public static DR_GameManager instance;
+
     GameState CurrentState = GameState.INVALID;
 
     public DR_Map CurrentMap;
     public Texture2D DebugMap;
 
     //Temp renderer stuff
-    public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture, FogTexture;
+    public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture, FogTexture, OpenDoorTexture, ClosedDoorTexture;
     public GameObject CellObj;
     public List<GameObject> CellObjects;
     public List<GameObject> EntityObjects;
@@ -26,12 +28,21 @@ public class DR_GameManager : MonoBehaviour
     public Camera MainCamera;
 
     //Temp Player
-    DR_Actor PlayerActor;
+    DR_Entity PlayerActor;
 
     TurnSystem turnSystem;
 
     static KeyCode[] KeyDirections = {KeyCode.UpArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.LeftArrow};
     static Vector2Int[] Directions = {Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left};
+
+    private void Awake() {
+        if (instance != null){
+            Debug.LogError("There are multiple game managers!");
+            Destroy(this);
+        }else{
+            instance = this;
+        }
+    }
 
     void Start()
     {
@@ -147,6 +158,13 @@ public class DR_GameManager : MonoBehaviour
                                             break;
                                         }
 
+                                    case DoorAction doorAction:
+                                        {
+                                            doorAction.target.ToggleOpen();
+                                            Debug.Log(PlayerActor.Name + " opened " + doorAction.target.Entity.Name);
+                                            break;
+                                        }
+
                                     case WaitAction waitAction:
                                         {
                                             Debug.Log(PlayerActor.Name + " did nothing");
@@ -227,23 +245,38 @@ public class DR_GameManager : MonoBehaviour
         EntityObjects.Clear();
 
         foreach(DR_Entity Entity in CurrentMap.Entities){
-            if (!CurrentMap.IsVisible[Entity.Position.y, Entity.Position.x]){
+            bool isVisible = CurrentMap.IsVisible[Entity.Position.y, Entity.Position.x];
+            bool isKnown = CurrentMap.IsKnown[Entity.Position.y, Entity.Position.x];
+            if (!isVisible && !isKnown){
                 continue;
             }
+            
+            bool isProp = Entity.HasComponent<PropComponent>();
+
+            if (!isVisible && (!isProp || !isKnown)){
+                continue;
+            }
+
             SpriteComponent spriteComponent = Entity.GetComponent<SpriteComponent>();
             if (spriteComponent == null){
                 continue;
             }
 
-            GameObject NewEntityObj = Instantiate(CellObj, Entity.GetPosFloat(-1.0f), Quaternion.identity, transform);
+            // TODO: make proper system to determine z depth for each entity
+            GameObject NewEntityObj = Instantiate(CellObj, Entity.GetPosFloat(isProp ? -0.9f : -1.0f), Quaternion.identity, transform);
             NewEntityObj.GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
+
+            if (!isVisible && isKnown){
+                NewEntityObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
+            }
+
             EntityObjects.Add(NewEntityObj);
         }  
     }
 
     //move into other class
-    DR_Actor CreateActor(Sprite Sprite, string Name, int maxHealth = 10){
-        DR_Actor NewActor = new DR_Actor();
+    public DR_Entity CreateActor(Sprite Sprite, string Name, int maxHealth = 10){
+        DR_Entity NewActor = new DR_Entity();
 
         NewActor.Name = Name;
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
@@ -251,5 +284,24 @@ public class DR_GameManager : MonoBehaviour
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
         
         return NewActor;
+    }
+
+    public DR_Entity CreateProp(Sprite Sprite, string Name){
+        DR_Entity NewProp = new DR_Entity();
+
+        NewProp.Name = Name;
+        NewProp.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
+        NewProp.AddComponent<PropComponent>(new PropComponent());
+        
+        return NewProp;
+    }
+
+    public DR_Entity CreateDoor(Sprite OpenSprite, Sprite ClosedSprite){
+        DR_Entity NewProp = CreateProp(ClosedSprite, "Door");
+
+        NewProp.AddComponent<DoorComponent>(new DoorComponent(OpenSprite, ClosedSprite));
+        NewProp.GetComponent<DoorComponent>().SetOpen(false);
+        
+        return NewProp;
     }
 }

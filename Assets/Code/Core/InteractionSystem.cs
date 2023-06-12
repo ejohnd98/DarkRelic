@@ -21,8 +21,15 @@ public class InteractionSystem
             }
         }
 
-        if (targetCell.IsTraversable()){
+        if (!targetCell.BlocksMovement()){
             actionList.Add(new MoveAction(pos));
+        }
+
+        if (targetCell.Prop != null){
+            DoorComponent target = targetCell.Prop.GetComponent<DoorComponent>();
+            if (target != null){
+                actionList.Add(new DoorAction(target, entity));
+            }
         }
 
         return actionList;

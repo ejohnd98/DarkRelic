@@ -295,6 +295,8 @@ MonoBehaviour:
   PlayerTexture: {fileID: -1282016797, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   EnemyTexture: {fileID: 161887637, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   FogTexture: {fileID: -1364335424, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
+  OpenDoorTexture: {fileID: -810473197, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
+  ClosedDoorTexture: {fileID: 610824086, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   CellObj: {fileID: 2981893753497814314, guid: a111716a7249b3a45a002a8bff83ed16, type: 3}
   CellObjects: []
   EntityObjects: []
