@@ -15,14 +15,17 @@ public class DR_GameManager : MonoBehaviour
 
     GameState CurrentState = GameState.INVALID;
 
+    public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
-    public Texture2D DebugMap;
+    public Texture2D DebugMap, DebugMap2;
 
     //Temp renderer stuff
-    public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture, FogTexture, OpenDoorTexture, ClosedDoorTexture;
+    public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture, FogTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture;
     public GameObject CellObj;
     public List<GameObject> CellObjects;
     public List<GameObject> EntityObjects;
+
+    public bool debug_disableFOV = false;
 
     //Temp Camera 
     public Camera MainCamera;
@@ -33,7 +36,7 @@ public class DR_GameManager : MonoBehaviour
     TurnSystem turnSystem;
 
     static KeyCode[] KeyDirections = {KeyCode.UpArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.LeftArrow};
-    static Vector2Int[] Directions = {Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left};
+    public Vector2Int[] Directions = {Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left};
 
     private void Awake() {
         if (instance != null){
@@ -46,23 +49,37 @@ public class DR_GameManager : MonoBehaviour
 
     void Start()
     {
-        if(DebugMap != null){
-            CurrentMap = DR_Map.CreateMapFromImage(DebugMap);
-        }
-        CellObjects = new List<GameObject>();
-        EntityObjects = new List<GameObject>();
+        // Create Dungeon
+        CurrentDungeon = new DR_Dungeon();
+        CurrentDungeon.name = "Testing Dungeon";
+
+        
+        // Create Map, Actors
+        DR_Map TestMap = DR_Map.CreateMapFromImage(DebugMap);
+        DR_Map TestMap2 = DR_Map.CreateMapFromImage(DebugMap2);
 
         PlayerActor = CreateActor(PlayerTexture, "Player");
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
-        CurrentMap.AddActor(PlayerActor, new Vector2Int(24,28));
 
-        CurrentMap.AddActor(CreateActor(EnemyTexture, "TestEnemy"), new Vector2Int(24,29));
+        TestMap.AddActor(PlayerActor, new Vector2Int(24,28));
+        TestMap.AddActor(CreateActor(EnemyTexture, "TestEnemy"), new Vector2Int(24,29));
 
+        // Add map to Dungeon
+        CurrentDungeon.maps.Add(TestMap);
+        CurrentDungeon.maps.Add(TestMap2);
+        UpdateCurrentMap();
+
+        // Init Camera
         Vector3 DesiredPos = MainCamera.transform.position;
         DesiredPos.x = PlayerActor.Position.x;
         DesiredPos.y = PlayerActor.Position.y;
         MainCamera.transform.position = DesiredPos;
 
+        // Init Renderer lists
+        CellObjects = new List<GameObject>();
+        EntityObjects = new List<GameObject>();
+
+        // Create Turn System
         turnSystem = new TurnSystem();
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
@@ -165,6 +182,13 @@ public class DR_GameManager : MonoBehaviour
                                             break;
                                         }
 
+                                    case StairAction stairAction:
+                                        {
+                                            DR_Map dest = CurrentDungeon.GetNextMap(stairAction.stairs.goesDeeper);
+                                            MoveLevels(CurrentMap, dest, stairAction.stairs.goesDeeper);
+                                            break;
+                                        }
+
                                     case WaitAction waitAction:
                                         {
                                             Debug.Log(PlayerActor.Name + " did nothing");
@@ -177,6 +201,8 @@ public class DR_GameManager : MonoBehaviour
                                             break;
                                         }
                                 }
+
+                                LogSystem.instance.AddLog(possibleActions[0]);
 
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
                                 turnSystem.PopNextEntity();
@@ -227,7 +253,7 @@ public class DR_GameManager : MonoBehaviour
                 for(int x = 0; x < CurrentMap.MapSize.x; x++){
                     GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
                     Sprite CellSprite = FogTexture;
-                    if (CurrentMap.IsVisible[y, x]){
+                    if (CurrentMap.IsVisible[y, x] || debug_disableFOV){
                         CellSprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
                     }else if (CurrentMap.IsKnown[y, x]){
                         CellSprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
@@ -247,13 +273,13 @@ public class DR_GameManager : MonoBehaviour
         foreach(DR_Entity Entity in CurrentMap.Entities){
             bool isVisible = CurrentMap.IsVisible[Entity.Position.y, Entity.Position.x];
             bool isKnown = CurrentMap.IsKnown[Entity.Position.y, Entity.Position.x];
-            if (!isVisible && !isKnown){
+            if (!isVisible && !isKnown && !debug_disableFOV){
                 continue;
             }
             
             bool isProp = Entity.HasComponent<PropComponent>();
 
-            if (!isVisible && (!isProp || !isKnown)){
+            if (!isVisible && (!isProp || !isKnown) && !debug_disableFOV){
                 continue;
             }
 
@@ -266,7 +292,7 @@ public class DR_GameManager : MonoBehaviour
             GameObject NewEntityObj = Instantiate(CellObj, Entity.GetPosFloat(isProp ? -0.9f : -1.0f), Quaternion.identity, transform);
             NewEntityObj.GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
 
-            if (!isVisible && isKnown){
+            if (!isVisible && isKnown && !debug_disableFOV){
                 NewEntityObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
             }
 
@@ -303,5 +329,30 @@ public class DR_GameManager : MonoBehaviour
         NewProp.GetComponent<DoorComponent>().SetOpen(false);
         
         return NewProp;
+    }
+
+    public DR_Entity CreateStairs(Sprite spr, bool goesDeeper){
+        DR_Entity NewProp = CreateProp(spr, "Stairs " + (goesDeeper? "Down" : "Up"));
+
+        NewProp.AddComponent<StairComponent>(new StairComponent(goesDeeper));
+        NewProp.GetComponent<PropComponent>().blocksSight = false;
+        
+        return NewProp;
+    }
+
+    public void UpdateCurrentMap(){
+        CurrentMap = CurrentDungeon.GetCurrentMap();
+    }
+
+    public void MoveLevels(DR_Map origin, DR_Map destination, bool goingDeeper){
+        if (origin == destination){
+            return;
+        }
+        origin.RemoveActor(PlayerActor);
+        Vector2Int newPos = destination.GetStairPosition(!goingDeeper);
+        destination.AddActor(PlayerActor, newPos);
+        CurrentDungeon.SetNextMap(goingDeeper);
+        UpdateCurrentMap();
+        UpdateVisuals(true);
     }
 }

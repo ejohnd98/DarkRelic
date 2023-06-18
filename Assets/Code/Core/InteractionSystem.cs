@@ -26,9 +26,14 @@ public class InteractionSystem
         }
 
         if (targetCell.Prop != null){
-            DoorComponent target = targetCell.Prop.GetComponent<DoorComponent>();
-            if (target != null){
-                actionList.Add(new DoorAction(target, entity));
+            DoorComponent door = targetCell.Prop.GetComponent<DoorComponent>();
+            if (door != null){
+                actionList.Add(new DoorAction(door, entity));
+            }
+
+            StairComponent stairs = targetCell.Prop.GetComponent<StairComponent>();
+            if (stairs != null){
+                actionList.Add(new StairAction(stairs));
             }
         }
 

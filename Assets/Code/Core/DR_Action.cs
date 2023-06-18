@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class DR_Action {
+    public bool loggable = false;
+
+    public virtual string GetLogText(){
+        return "";
+    }
 }
 
 public class MoveAction : DR_Action {
@@ -24,6 +29,24 @@ public class AttackAction : DR_Action {
     public AttackAction (HealthComponent target, DR_Entity attacker = null){
         this.target = target;
         this.attacker = attacker;
+        loggable = true;
+    }
+
+    public override string GetLogText(){
+        return attacker.Name + " attacked " + target.Entity.Name + "!";
+    }
+}
+
+public class StairAction : DR_Action {
+    public StairComponent stairs;
+
+    public StairAction (StairComponent stairs){
+        this.stairs = stairs;
+        loggable = true;
+    }
+
+    public override string GetLogText(){
+        return stairs.goesDeeper? "You descended down a set of stairs." : "You climbed up a set of stairs.";
     }
 }
 
@@ -38,5 +61,13 @@ public class DoorAction : DR_Action {
 }
 
 public class WaitAction : DR_Action {
+
+    public WaitAction(){
+        loggable = true;
+    }
+
+    public override string GetLogText(){
+        return "you waited around...";
+    }
 }
 

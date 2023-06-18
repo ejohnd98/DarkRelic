@@ -33,14 +33,23 @@ public class DR_Map
             for (int x = 0; x < Width; x++){
                 int Index1D = y*Width + x;
                 NewMap.Cells[y,x] = new DR_Cell();
-                bool isWall = Pixels[Index1D].r < 0.1f && Pixels[Index1D].g < 0.1f && Pixels[Index1D].b < 0.1f;
+                Color color = Pixels[Index1D];
+                bool isWall = color.r < 0.1f && color.g < 0.1f && color.b < 0.1f;
                 NewMap.Cells[y,x].bBlocksMovement = isWall;
 
-                bool isDoor = Pixels[Index1D].r < 0.1f && Pixels[Index1D].g > 0.9f && Pixels[Index1D].b < 0.1f;
+                bool isDoor = color.r < 0.1f && color.g > 0.9f && color.b < 0.1f;
                 if (isDoor){
                     DR_GameManager gm = DR_GameManager.instance;
                     DR_Entity door = gm.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
                     NewMap.AddProp(door, new Vector2Int(x,y));
+                }
+
+                bool isStairsDeeper = color.r > 0.9f && color.g < 0.1f && color.b < 0.1f;
+                bool isStairsShallower= color.r < 0.1f && color.g < 0.1f && color.b > 0.9f;
+                if (isStairsDeeper || isStairsShallower){
+                    DR_GameManager gm = DR_GameManager.instance;
+                    DR_Entity stairs = gm.CreateStairs(isStairsDeeper? gm.StairsDownTexture : gm.StairsUpTexture, isStairsDeeper);
+                    NewMap.AddProp(stairs, new Vector2Int(x,y));
                 }
 
                 NewMap.IsVisible[y,x] = false;
@@ -135,11 +144,45 @@ public class DR_Map
         return (x >= 0 && x < MapSize.x && y >= 0 && y < MapSize.y);
     }
 
+    public bool BlocksMovement(Vector2Int pos){
+        return BlocksMovement(pos.x, pos.y);
+    }
+
+    public bool BlocksMovement(int x, int y){
+        if (!ValidPosition(x, y)){
+            return true;
+        }
+
+        return Cells[y,x].BlocksMovement();
+    }
+
+    public bool BlocksSight(Vector2Int pos){
+        return BlocksSight(pos.x, pos.y);
+    }
+
     public bool BlocksSight(int x, int y){
         if (!ValidPosition(x, y)){
             return true;
         }
 
         return Cells[y,x].BlocksSight();
+    }
+
+    // Messy temp function to get stair position
+    public Vector2Int GetStairPosition(bool deeper){
+        foreach (DR_Entity entity in Entities){
+            StairComponent stair = entity.GetComponent<StairComponent>();
+            if(stair == null || stair.goesDeeper != deeper){
+                continue;
+            }
+
+            Vector2Int newPos = entity.Position;
+            foreach (Vector2Int dir in DR_GameManager.instance.Directions){
+                if (!BlocksMovement(newPos + dir)){
+                    return newPos + dir;
+                }
+            }
+        }
+        return Vector2Int.zero;
     }
 }
