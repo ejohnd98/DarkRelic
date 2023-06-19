@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="32" height="32" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
+ <tileset firstgid="1" name="Terrain" tilewidth="16" tileheight="16" tilecount="40" columns="8">
+  <image source="TilemapTerrain.png" width="128" height="80"/>
+ </tileset>
+ <tileset firstgid="41" name="Decoration" tilewidth="16" tileheight="16" tilecount="70" columns="14">
+  <image source="TilemapDeco.png" width="224" height="80"/>
+ </tileset>
+ <layer name="Sky" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztzbENACAMA7C8U/r/f3ACUlYPnj1JpnCeLTS33+/3+/1+v9/v9/v9/j8XLsCn4Q==
+  </data>
+ </layer>
+ <layer name="Terrain" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztjrEKgDAMBVMQQQdBcNGv9dN9gRaCCCWLXe7gSKfeMwMAAAAAAOgzmd2z7jGovepu8tL7jw3eLLqut5faP+uGXdfNbCkJWzPa+tG4pef7v6xf/Yz0x/Yf8YoNvA==
+  </data>
+ </layer>
+ <layer name="Deco" width="32" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztzTkOg0AQRNE5FOYA4AizmQgMNkTscP+Qf4SRJhgs1Zde2F3GKKWUUkop9Z8FeCD0tB8hxtPTfok3Ksc/CV5IkSFHYXH3Q4/Bcb9Ggw9adPha3O04cDruj5gwY8GKzfGnUnfsAlHICx0=
+  </data>
+ </layer>
+</map>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.2.2" orientation="orthogonal" renderorder="right-down" width="16" height="4" tilewidth="8" tileheight="8" infinite="0" nextlayerid="2" nextobjectid="1">
+ <tileset firstgid="1" source="DemoTileSetSmall.tsx"/>
+ <layer id="1" name="Terrain" width="16" height="4">
+  <data encoding="csv">
+9,9,9,9,9,6,7,9,9,9,9,10,12,12,12,12,
+9,9,1,2,9,9,9,9,9,9,9,6,4,4,5,12,
+9,9,6,7,9,9,9,1,2,9,9,9,9,9,10,12,
+2,9,9,9,9,1,14,15,13,2,9,9,9,9,6,4
+</data>
+ </layer>
+</map>

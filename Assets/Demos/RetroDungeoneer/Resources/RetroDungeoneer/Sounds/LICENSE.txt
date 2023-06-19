@@ -1,0 +1,121 @@
+===================
+Sounds by Ogrebane:
+===================
+https://opengameart.org/content/monster-sound-pack-volume-1
+(CC0 - Public Domain)
+	MonsterDeath.ogg
+	Aggro1.ogg
+	Aggro2.ogg
+
+https://opengameart.org/content/teleport-spell
+(CC0 - Public Domain)
+	Confuse.ogg
+
+=================
+Sounds by HaelDB:
+=================
+https://opengameart.org/content/male-gruntyelling-sounds
+(CC0 - Public Domain)
+	PlayerDeath.ogg
+	PlayerFallYell.ogg
+
+==================
+Sounds by qubodup:
+==================
+https://opengameart.org/content/9-wet-snow-steps
+(CC0 - Public Domain)
+	FootStep.ogg
+	
+https://opengameart.org/content/insect-or-alien-scream
+(CC0 - Public Domain)
+	Teleport.ogg
+
+https://opengameart.org/content/click
+(CC0 - Public Domain)
+	PointerSelect.ogg
+
+=========================
+Sounds by Independent.nu:
+=========================
+https://opengameart.org/content/37-hitspunches
+(CC0 - Public Domain)
+	MonsterAttack.ogg
+
+=======================
+Sounds by artisticdude:
+=======================
+https://opengameart.org/content/rpg-sound-pack
+(CC0 - Public Domain)
+	Inventory.ogg
+
+https://opengameart.org/content/rpg-sound-pack
+(CC0 - Public Domain)
+	Drink.ogg
+	Slime.ogg
+	
+https://opengameart.org/content/swishes-sound-pack
+(CC0 - Public Domain)
+	BowShoot.ogg
+
+==================
+Sounds by Vehicle:
+==================
+https://opengameart.org/content/fantasy-sound-effects-tinysized-sfx
+(CC0 - Public Domain)
+	MenuOpen.ogg
+	MenuClose.ogg
+
+====================
+Sounds by Anthousai:
+====================
+https://freesound.org/people/Anthousai/sounds/398781/
+(CC0 - Public Domain)
+	Stairs.ogg
+
+===============
+Sounds by bart:
+===============
+https://opengameart.org/content/ticking-clock
+(CC0 - Public Domain)
+	SelectOption.ogg
+	
+https://opengameart.org/content/space-ship-shield-sounds
+(CC0 - Public Domain)
+	Portal.ogg
+	Teleport.ogg
+
+===================
+Sounds by Listener:
+===================
+https://opengameart.org/content/win-sound-effect
+(CC0 - Public Domain)
+	LevelUp.ogg
+
+=========================
+Sounds by Julien Matthey:
+=========================
+https://opengameart.org/content/fireball-1
+(CC0 - Public Domain)
+	Fireball.ogg
+
+====================
+Sounds by rolar_dnb:
+====================
+https://freesound.org/people/rolar_dnb/sounds/335725/
+(CC0 - Public Domain)
+	Lightning.ogg (heavily edited)
+	
+=================
+Sounds by IgnasD:
+=================	
+https://opengameart.org/content/jumping-man-sounds
+(CC0 - Public Domain)
+	Jump.ogg
+	
+===================
+Sounds by Ali_6868:
+===================
+https://freesound.org/people/Ali_6868/sounds/384915/
+(CC0 - Public Domain)
+	BowHit.ogg
+	

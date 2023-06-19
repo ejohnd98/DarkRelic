@@ -2,8 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DR_GameManager : MonoBehaviour
+public class DR_GameManager : RB.IRetroBlitGame
 {
+    private readonly SpriteSheetAsset spriteSheet = new SpriteSheetAsset();
+
+    public Vector2i GAME_SIZE = new Vector2i(640, 360);
+
     enum GameState {
         RUNNING,
         WAITING_FOR_INPUT,
@@ -21,14 +25,14 @@ public class DR_GameManager : MonoBehaviour
 
     //Temp renderer stuff
     public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture, FogTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture;
-    public GameObject CellObj;
-    public List<GameObject> CellObjects;
-    public List<GameObject> EntityObjects;
+    //public GameObject CellObj;
+    //public List<GameObject> CellObjects;
+    //public List<GameObject> EntityObjects;
 
     public bool debug_disableFOV = false;
 
     //Temp Camera 
-    public Camera MainCamera;
+    //public Camera MainCamera;
 
     //Temp Player
     DR_Entity PlayerActor;
@@ -38,31 +42,58 @@ public class DR_GameManager : MonoBehaviour
     static KeyCode[] KeyDirections = {KeyCode.UpArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.LeftArrow};
     public Vector2Int[] Directions = {Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left};
 
-    private void Awake() {
+    // Query hardware. Initialize "retro game hardware"
+    public RB.HardwareSettings QueryHardware()
+    {
+        var hw = new RB.HardwareSettings
+        {
+            // Set your display size
+            DisplaySize = GAME_SIZE,
+            // Set tilemap maximum size, default is 256, 256. Keep this close to your minimum required size to save on memory
+            MapSize = new Vector2i(256, 256),
+
+            // Set tilemap maximum layers, default is 8. Keep this close to your minimum required size to save on memory
+            MapLayers = 8
+        };
+
+        return hw;
+    }
+
+    /// Initialize game here.
+    public bool Initialize()
+    {
         if (instance != null){
             Debug.LogError("There are multiple game managers!");
-            Destroy(this);
+            return false;
         }else{
             instance = this;
         }
-    }
 
-    void Start()
-    {
-        // Create Dungeon
+        // You can load a spritesheet here
+        spriteSheet.Load("16x16_tileset");
+        spriteSheet.grid = new SpriteGrid(new Vector2i(16, 16));
+
+        RB.SpriteSheetSet(spriteSheet);
+
+        // GAME START
+                // Create Dungeon
         CurrentDungeon = new DR_Dungeon();
         CurrentDungeon.name = "Testing Dungeon";
 
-        
+        DebugMap = Resources.Load("DebugMap1") as Texture2D;
+        DebugMap2 = Resources.Load("DebugMap2") as Texture2D;
+
         // Create Map, Actors
-        DR_Map TestMap = DR_Map.CreateMapFromImage(DebugMap);
-        DR_Map TestMap2 = DR_Map.CreateMapFromImage(DebugMap2);
+        DR_Map TestMap = DR_Map.CreateTestMap();
+        DR_Map TestMap2 = DR_Map.CreateTestMap();
+
+
 
         PlayerActor = CreateActor(PlayerTexture, "Player");
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
 
-        TestMap.AddActor(PlayerActor, new Vector2Int(24,28));
-        TestMap.AddActor(CreateActor(EnemyTexture, "TestEnemy"), new Vector2Int(24,29));
+        TestMap.AddActor(PlayerActor, new Vector2Int(2,2));
+        TestMap.AddActor(CreateActor(EnemyTexture, "TestEnemy"), new Vector2Int(7,5));
 
         // Add map to Dungeon
         CurrentDungeon.maps.Add(TestMap);
@@ -70,25 +101,26 @@ public class DR_GameManager : MonoBehaviour
         UpdateCurrentMap();
 
         // Init Camera
-        Vector3 DesiredPos = MainCamera.transform.position;
-        DesiredPos.x = PlayerActor.Position.x;
-        DesiredPos.y = PlayerActor.Position.y;
-        MainCamera.transform.position = DesiredPos;
+        //Vector3 DesiredPos = MainCamera.transform.position;
+        //DesiredPos.x = PlayerActor.Position.x;
+        //DesiredPos.y = PlayerActor.Position.y;
+        //MainCamera.transform.position = DesiredPos;
 
         // Init Renderer lists
-        CellObjects = new List<GameObject>();
-        EntityObjects = new List<GameObject>();
+        //CellObjects = new List<GameObject>();
+        //EntityObjects = new List<GameObject>();
 
         // Create Turn System
         turnSystem = new TurnSystem();
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-        UpdateVisuals();
 
         CurrentState = GameState.RUNNING;
+
+        return true;
     }
 
-    void Update()
+    public void Update()
     {
         switch (CurrentState)
         {
@@ -120,7 +152,6 @@ public class DR_GameManager : MonoBehaviour
                             turnSystem.RecoverDebts(1);
                             turnSystem.UpdateEntityLists(CurrentMap);
                         }
-                        UpdateVisuals(false);
                     }
                     break;
                 }
@@ -202,12 +233,11 @@ public class DR_GameManager : MonoBehaviour
                                         }
                                 }
 
-                                LogSystem.instance.AddLog(possibleActions[0]);
+                                //LogSystem.instance.AddLog(possibleActions[0]);
 
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
                                 turnSystem.PopNextEntity();
                                 SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-                                UpdateVisuals(true);
                             }
                         }
                     }
@@ -222,53 +252,38 @@ public class DR_GameManager : MonoBehaviour
             default:
                 break;
         }
-
-        UpdateCamera();
     }
 
-    void UpdateCamera()
+
+    public void Render()
     {
-        Vector3 DesiredPos = MainCamera.transform.position;
-        DesiredPos.x = PlayerActor.Position.x;
-        DesiredPos.y = PlayerActor.Position.y;
-
-        Vector3 Direction = DesiredPos - MainCamera.transform.position;
-        float LerpAmount = Time.deltaTime * 1f + Mathf.Clamp01(Time.deltaTime * 4.0f / Direction.magnitude);
-
-        MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, DesiredPos, LerpAmount);
-    }
-
-    // TODO: IMPROVE THIS MESS
-    // Make it only add objects within the camera
-    void UpdateVisuals(bool updateTiles = true){
-        // Clear old visuals
-        if (updateTiles){
-            foreach(GameObject obj in CellObjects){
-                Destroy(obj);
-            }
-            CellObjects.Clear();
-
-            // Add new visuals
-            for(int y = 0; y < CurrentMap.MapSize.y; y++){
-                for(int x = 0; x < CurrentMap.MapSize.x; x++){
-                    GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
-                    Sprite CellSprite = FogTexture;
-                    if (CurrentMap.IsVisible[y, x] || debug_disableFOV){
-                        CellSprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                    }else if (CurrentMap.IsKnown[y, x]){
-                        CellSprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                        NewCellObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
-                    }
-                    NewCellObj.GetComponent<SpriteRenderer>().sprite = CellSprite;
-                    CellObjects.Add(NewCellObj);
-                }
-            }
-        }
+        RB.Clear(new Color32(10, 5, 10, 255));
+        RB.SpriteSheetSet(spriteSheet);
         
-        foreach(GameObject obj in EntityObjects){
-            Destroy(obj);
+        Vector2i centerOfScreen = GAME_SIZE/2;
+        Vector2i playerScreenPos = new Vector2i(PlayerActor.Position) * 16;
+        playerScreenPos.y *= -1;
+        Vector2i renderOffset = centerOfScreen - playerScreenPos;
+
+        for(int y = 0; y < CurrentMap.MapSize.y; y++){
+            for(int x = 0; x < CurrentMap.MapSize.x; x++){
+                bool isVisible = CurrentMap.IsVisible[y,x];
+                bool isKnown = CurrentMap.IsKnown[y,x];
+                bool isWall = CurrentMap.Cells[y,x].bBlocksMovement;
+
+                if (!isVisible && !isKnown){
+                    continue;
+                }
+
+                if (!isVisible && isKnown){
+                    //how to draw with tint???
+                }
+                Vector2i renderPos = new Vector2i(x, y);
+                renderPos.y *= -1;
+                renderPos *= 16;
+                RB.DrawSprite(isWall? 3 : 1, renderOffset + renderPos); 
+            }
         }
-        EntityObjects.Clear();
 
         foreach(DR_Entity Entity in CurrentMap.Entities){
             bool isVisible = CurrentMap.IsVisible[Entity.Position.y, Entity.Position.x];
@@ -288,15 +303,26 @@ public class DR_GameManager : MonoBehaviour
                 continue;
             }
 
-            // TODO: make proper system to determine z depth for each entity
-            GameObject NewEntityObj = Instantiate(CellObj, Entity.GetPosFloat(isProp ? -0.9f : -1.0f), Quaternion.identity, transform);
-            NewEntityObj.GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
+            Vector2i renderPos = new Vector2i(Entity.Position);
+            renderPos.y *= -1;
+            renderPos *= 16;
+
+            if (isProp){
+                if (Entity.HasComponent<DoorComponent>()){
+                    RB.DrawSprite(Entity.GetComponent<DoorComponent>().IsOpen()? 20 : 18, renderOffset + renderPos); 
+                }
+                if (Entity.HasComponent<StairComponent>()){
+                    RB.DrawSprite(Entity.GetComponent<StairComponent>().goesDeeper? 17 : 16, renderOffset + renderPos); 
+                }
+                
+            }else{
+                RB.DrawSprite(Entity.HasComponent<PlayerComponent>()? 32 : 37, renderOffset + renderPos); 
+            }
+            
 
             if (!isVisible && isKnown && !debug_disableFOV){
-                NewEntityObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
+                //NewEntityObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
             }
-
-            EntityObjects.Add(NewEntityObj);
         }  
     }
 
@@ -353,6 +379,5 @@ public class DR_GameManager : MonoBehaviour
         destination.AddActor(PlayerActor, newPos);
         CurrentDungeon.SetNextMap(goingDeeper);
         UpdateCurrentMap();
-        UpdateVisuals(true);
     }
 }

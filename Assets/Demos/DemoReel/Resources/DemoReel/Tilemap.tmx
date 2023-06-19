@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.0" orientation="orthogonal" renderorder="right-down" width="81" height="23" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
+ <tileset firstgid="1" source="DemoTileset.tsx"/>
+ <layer name="Clouds" width="81" height="23">
+  <data encoding="base64" compression="zlib">
+   eJzt1UEOgCAMRFFOp+70/qexO4gJRgkwBf5LukbptISAWk6rS/0RYpvVbnUMfoancz0i60jNOhvkPK/m3fzNj8e+zDoDqa//6LE/wBM51SrdmapdS17erfAGQkcxf8x81OMuWu4QerkG3iEAQKkb2l4RcQ==
+  </data>
+ </layer>
+ <layer name="Decoration" width="81" height="23">
+  <data encoding="base64" compression="zlib">
+   eJztlTkOAjEMRecmdEAFVEDFTsEqsd7/KPMo0iCROMxkooH/pFfmR7ZsuSiEEEIIIYQQQuSi05LMHFjq6GIP+zX+6zLbjrU3AxziqMa/XWZTLHGFa9zgtqZca2/GOMFpRHZovl1mU+xwjwc84gnPEe8/1WPtzQznuDD+Z5lvl9kUF7ziDe/4wKfxra+e2N5YSbH7qfHteo56vtn93Ph2PUc9qeY7Jb5db2M9L0J3NNWd/SVCd7Tqnf0HQne0yp0V4p0SryYf5A==
+  </data>
+ </layer>
+ <layer name="Terrain" width="81" height="23">
+  <data encoding="base64" compression="zlib">
+   eJztk9EOgjAMRfsroC8QfRD1gX2dn26XbXFpxmxhJGjuSW5qpGHdSSECAAAAAAAAAAAAAAC05Ez06rh24ffuPPi8W6hFpvh8WvHOPck9yYycIWaMfVaX6Q4y0pPvc1xnjltweef/51DVZ6d3Wmfv4317Re+FPp408S41syR36Q4yTrgt9UmXFoe5v5nse3Di3iHUKn4H811r5VHOvzXStybyfDn/N5dah9YdLM2Rcq3Mf4RYd0HjcO0OLuV5AE9WhzWPGodbdvCfHJa+KW1a7uAvOHwD1tFkCg==
+  </data>
+ </layer>
+ <layer name="Water" width="81" height="23" opacity="0.5">
+  <data encoding="base64" compression="zlib">
+   eJzt0sEJADAIA0AnKY7a0esOggi9gzyFEIwAAAAAAAB+k5XTDL0d6/ZO990qww8y4wEsHgYL
+  </data>
+ </layer>
+</map>

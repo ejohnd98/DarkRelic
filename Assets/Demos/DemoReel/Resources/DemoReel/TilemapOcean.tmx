@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="49" height="25" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
+ <tileset firstgid="1" source="DemoTileset.tsx"/>
+ <layer name="Terrain" width="49" height="25">
+  <data encoding="base64" compression="zlib">
+   eJztVjEOwzAI9DdTN0PbdGma/6/1UEsIgTkcHClShltaG7iDmFtSSsuFNBV8C24nzFHjbgWfgvWgHJFc3v+4FK9gDlIOT56qgcb7UXAvmElsSac9c9DLgffPumP1o/7fM2tVp4pZiI/W1JrDFocJ1ALtVeX0BM7R+bB6KJ2vnDfgPuUZ+S5451A7T5EF/XifIt8FDwepDl671v+Rb5s0H6iO1p2jOPD4Wi1av1raH8mBvmtaLbwGtPZWv0fse4Qn+m4jMUbse08dqP69ffcgyidafiUSNJfmRT31SH5lddzv0aG1o6Sda3lga+d5fOce34ZAe0Ok7xTdGVR3zw5veaReHvw7Rb/Xlp6oX81J9rs56dpG7yXJI6B+VTrHf6c5vDvNw8PTuz05RsS+cE78AMoA4LQ=
+  </data>
+ </layer>
+ <layer name="Fish" width="49" height="25">
+  <data encoding="base64" compression="zlib">
+   eJzt1IEJADAIA0Gn7f4jdAWFGBX+BqglEiNQ8UzvqedUTc+/gpwAKHBLbmFfeWSlRZ5Aj2q3HF2k77225uv+19YcJn3QBQX7
+  </data>
+ </layer>
+ <layer name="Clouds" width="49" height="25" opacity="0.75">
+  <data encoding="base64" compression="zlib">
+   eJztlMkNACAIBK1O/Wn/1UgBJp6LEHcSfkY5RkIgXogSSSKDzntmpVZ0X4pEBd09y0+z34U9OsOC5z1u5IV0g95hserlCyy6djMni/WRefhXx9Bxf2jN7Bc3Xu0Jjf7uvMG9qUcDD7oRqg==
+  </data>
+ </layer>
+</map>

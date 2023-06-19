@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="64" height="32" tilewidth="16" tileheight="16" infinite="0" nextobjectid="13">
+ <tileset firstgid="1" source="DemoTileset.tsx"/>
+ <layer name="Clouds" width="64" height="32">
+  <data encoding="base64" compression="zlib">
+   eJzt1dENgDAIRdFOp/7p/tPIBCZt4FHwnoTflgYoY0DhsDgtruxEPtwWT3YSTqq/JSJ/zzMr9DPQGTNYw4518tgF3juq+s5GHOUM7TivWJdVT/W96v+T/xpR6C2d7vuu+/v+iroCAADMewHr2g9e
+  </data>
+ </layer>
+ <layer name="Decoration" width="64" height="32">
+  <data encoding="base64" compression="zlib">
+   eJzt0skKwjAURuG+iTt1pYLgsNE6LRzB8f0fxbOU0NhqMIP5PzirNnATblGIiIiIiIiIuGmFHiCgNnWo++aff36fHvVpYPne5H1SNqIxTSzf694nJVV7PKM5lZYzde+TCnOPF7SkFa1pYzlX9z6pMPd4Szva04GOdAozmhfmHp/pQle60Z0eYUb7WNPdffXLPf5mHhex7a7veVx3t4xsHonLMPQAHk0r0v3zkfv9q+R+/xg9AWVqGzs=
+  </data>
+ </layer>
+ <layer name="Terrain" width="64" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztlEEOgjAQRecqQjcQd6zceQyPw1E8ikdzCDY2Y6ijCdTie8lPUxqaee2kIgAAAAAAAAAAAOChERkPOsY0hevZmlb9Ox1j2mQt6FrIzPdAzv84Z1ya104wvW/Ty6t///in5j6I3pNf9ybWP36v+RxSj2/9S55Drmc98dy719+ewxbx1v5JtP6b7n220Xu9evxrz3TPJx1tBnmCf/k61/a//Kn/0vuVvut79s/1xa/53wF/qV40
+  </data>
+ </layer>
+ <objectgroup name="Objects">
+  <object id="4" name="Spawn" x="320" y="271.167" width="32" height="33.4375">
+   <properties>
+    <property name="name" value="Spawn"/>
+   </properties>
+  </object>
+  <object id="6" x="351.333" y="431.667" width="95" height="49.6042">
+   <properties>
+    <property name="name" value="Secret Area"/>
+   </properties>
+  </object>
+  <object id="7" name="Path" x="0.666667" y="391.667">
+   <polyline points="0,0 151,0 245.167,0.833333 263,-32.3333 294.167,-46 391.667,-48 407.333,-48 407.333,-63 423.333,-79.6667 502.333,-79.6667 519.333,-63.6667 519,-48 535,-47.6667 551,-31.6667 568.333,-31.6667 583.333,-16.6667 599.667,-16.6667 614.667,0.333333 1014.67,1"/>
+  </object>
+  <object id="9" name="Light" x="355.167" y="178.667" width="57" height="29.3333">
+   <properties>
+    <property name="name" value="Light"/>
+   </properties>
+   <ellipse/>
+  </object>
+ </objectgroup>
+</map>

@@ -1,0 +1,1 @@
+The RetroBlit prefab can be used to construct a new RetroBlit game from scratch. For most new projects you can just use MyGame sample as a starting point instead.

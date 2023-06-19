@@ -1,0 +1,64 @@
+==============
+Art by Kenney:
+==============
+https://kenney.nl/assets/bit-pack
+(CC0 - Public Domain)
+	armor.png
+	arrow.png
+	bat.png
+	bones.png
+	bow.png
+	bow_elven.png
+	bow_fine.png
+	branches.png
+	dagger.png
+	floor_dirt1.png
+	floor_dirt2.png
+	floor_dirt3.png
+	floor_grass.png
+	fog.png
+	ghost.png
+	gravestone.png
+	helmet.png
+	hero.png
+	large_shield.png
+	pd_armor.png
+	pd_dagger.png
+	pd_helmet.png
+	pd_large_shield.png
+	pd_shield.png
+	pd_short_sword.png
+	pd_sword.png
+	player_ghost.png
+	portal.png
+	potion.png
+	rat.png
+	scroll.png
+	serpentine_sword.png
+	shield.png
+	short_sword.png
+	skeleton.png
+	spider.png
+	stairs_down.png
+	stairs_up.png
+	sword.png
+	thug.png
+	tree1.png
+	tree2.png
+	tree3.png
+	wall_brick1.png
+	wall_brick2.png
+	wall_brick3.png
+	web.png
+	well.png
+
+=================
+Art by usr_share:
+=================
+https://opengameart.org/content/new-original-grafx2-font-collection
+(CC0 - Public Domain)
+	font_kronos.png
+	font_neosans.png
+
+https://opengameart.org/content/the-collection-of-8-bit-fonts-for-grafx2-r2
+	font_hoshi.png

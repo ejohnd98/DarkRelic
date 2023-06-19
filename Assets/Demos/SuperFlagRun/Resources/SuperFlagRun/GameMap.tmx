@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="right-down" width="181" height="32" tilewidth="16" tileheight="16" infinite="0" nextobjectid="1">
+ <tileset firstgid="1" name="Terrain" tilewidth="16" tileheight="16" tilecount="40" columns="8">
+  <image source="TilemapTerrain.png" width="128" height="80"/>
+  <tile id="0">
+   <properties>
+    <property name="ColliderType" type="int" value="2"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="ColliderType" type="int" value="2"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="ColliderType" type="int" value="0"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="ColliderType" type="int" value="2"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="ColliderType" type="int" value="2"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="ColliderType" type="int" value="0"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="ColliderType" type="int" value="0"/>
+   </properties>
+  </tile>
+  <tile id="11">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="13">
+   <properties>
+    <property name="ColliderType" type="int" value="0"/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="15">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="16">
+   <properties>
+    <property name="ColliderType" type="int" value="2"/>
+   </properties>
+  </tile>
+  <tile id="17">
+   <properties>
+    <property name="ColliderType" type="int" value="2"/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="ColliderType" type="int" value="0"/>
+   </properties>
+  </tile>
+  <tile id="19">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="ColliderType" type="int" value="2"/>
+   </properties>
+  </tile>
+  <tile id="22">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="23">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="24">
+   <properties>
+    <property name="ColliderType" type="int" value="0"/>
+   </properties>
+  </tile>
+  <tile id="25">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="26">
+   <properties>
+    <property name="ColliderType" type="int" value="0"/>
+   </properties>
+  </tile>
+  <tile id="27">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="32">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+  <tile id="33">
+   <properties>
+    <property name="ColliderType" type="int" value="1"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="41" name="Decoration" tilewidth="16" tileheight="16" tilecount="70" columns="14">
+  <image source="TilemapDeco.png" width="224" height="80"/>
+ </tileset>
+ <layer name="Sky" width="181" height="32">
+  <data encoding="base64" compression="zlib">
+   eJzt0kERgDAQwMCzU/DvD0zQzoR9REF2zczS511vt7Z0+vVfYprpWkwzXYtppmsxzXQtppmuxTTTtZhmuhbTTNdimulaTDNdi2mmazHNdC2mma7FNNO1mGa6FtNM12Ka6VpMM12LaaZrMc10LaaZrsU007WYZroW00zXYprpWkwzXYtppmsxzXQtppmuxTTTtZje1wNviLZu
+  </data>
+ </layer>
+ <layer name="Background" width="181" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztm0lOxDAQRXMo4ADAihlWzJBeMDTDGTg6f9EoYEWxq1zELuc/6e8cxTRPpSon6TpCCCGEEEIIIYQQQgghrbGFbCM7pTdCiBG7yB6yX3ojTjhADpEj5Bg5QU6L7oiEnCHnyMXEGtbygUvkCrlGbpBb5K7ojkjIPfKAPE6sYS0feEKekRfkFVkjb0V3RELekQ/kc2JNSi0nxBMptZwQT6TU8iWwGgmpF/x/vsKU3lMNjHlMt+tmzGX6PZDqdKtuezrzSnV5yU5LfW7RaU9nXlKnl+i1xmkPXkueG3k589L4TKfbcVry3MjLmVeu0556LC19167TkudGXs68tE73G68lPZZX/3Oc9uB1S2h9/u20pMeS+G+FxXtGdFrP3HXMwmlJj1VixrB4z4hO65m7jlk4LemxSswYFu8Z5fi8dKcldcyipuc4vVKcfXiZMULotJ6pOhY6HKvpKc7P7XQKNc6RuU73//RbeWCqjoUOx2p6zPlNj1id06n9l3b201xn6bT0/i1/SxM6HOtNY87X6nRq/6Wd/bTXWTktvX/L39KEDsd605jzuU6b/WHCff+gnf2011n10tL7t/wtjXS+Sl1fm9OtzJGkPHM5Swj5yzedcIBf
+  </data>
+ </layer>
+ <layer name="Terrain" width="181" height="32">
+  <data encoding="base64" compression="zlib">
+   eJztnGFy2jAQhdWEljRlGprQgab8KDlJj5KjcJQerUepFNh0WVbyysjWWuybecMMthl59Gn1LHl4cc69mMfy3jyKTaZmZEybWpMxbWpNxrSpNRnTptZkTJtakzFtak3GtKk1GdOm1mRMm1qTMW1qTZqYnvm2fPCf1LOqrcrXzrlfwcJz/wQP26KyWvl++uY/qVdVW/VfGpgGlu+9PzP23++nxjVVuMdPTk+/91Xg+dl//mD8fGS99j3WZLqL5SlxvTs6poX3V++tv4/Eb+x3ieO1leJZE9s1mQ79HHidO/f64Nxf6rmbFtcpSZjWLI7nO//d0vcd9d3xeK171cD0Q+Te14djJ3xr4lqam8N8FOaiwHSoYZL6pSlnY54xx5tIvy3ddTIN/ZxiGivwDVwvJlbrYOwGpmv2dV/59r7zHOMYC5iWjt/SqsV06Odj5nhdC/vYn/u7NtNduZkKj11gOreva+dsYHopbMPmcO5bBqkxfmsyLanPWFCrp1SnoUZjpqdWqwPT0hqNtXTXxfT64H3s+CySm/04GD1T56w3U5VmeuycDVmaq9Grjvlmc/DZdUNLw/r0zp3P6QvH1+PAdO38kRLdN8LrlJhpWO/Stl9BlcodW3c6Nrl+rCENTHOqzXSfvsHZmTNmmlvTzeV6jJydw7QWaWaayxga67R07yjFtIa9Ck4xpiGTXDvTeF6O5WHKB2UXmB4iU+fm5px9UAnTl7A9RM7G69KUaWC9q6343ZCxxmofpm+Yd41uBNfh56VYncXnpJieZ6wBllIqK5dkWkvmDs94sCcYY7rrmXcrOAfr0Z2/H/WY2e4+TN/6a2h/3XZcQ7OmlGlaj2FvsRTP0tzclZWHYLpv5i6Zs2GtGa9fcPvkEqYl7X/y59D7fspsMzCNTcXV5Y8uzTTmhOPhnvnNWO2rmZ1z88WQTGvJ3LRGc3MKmLJPuaZjjzL9XVi3uf8WSzHN1eUv5DvMNLcudwkLNZguyXJJpjWwzTGdY7L+dzKnUKZ/MtdzdXtIpmNrzZewEKvpfZ4RgVXpM2pJl2RayvbqAvZj7/5L3jfNZRq4LsU0x0tJD8FHinVJW3Kyj2ampXN/7HjKl7Kb29aSHqoPzeMxbT71P+xvC30=
+  </data>
+ </layer>
+ <layer name="Clouds" width="181" height="32">
+  <data encoding="base64" compression="zlib">
+   eJzt2ksOgzAMRVE219+o+99NM6naAQIc7ODn3CNlhpBjxw6VuiwAAABabm3diUHGo61nW6+L3/FVtXaj9nW2FpY4PetuVfWc/OvN7wy5yYJcY2ZX3gEWZ+JU2SPy4p7oQ+/pmb1mXr2+lceoeRLxXmYf1rwNz1aYKVF7qJAb+OE85HTkHtx7htrmxrcOEGerv5iN/Zhb8EIfAjZZ/odT7feHwr02IqcKeahCrUeyGJk3+gGoJaqnFee50nxTzC+QnecMoEdtlPKlFKuV0j1oUXFfFfekQmEGKMRYHTXQF1nDjDN8ZEz0hwbqlLNX9/TWjXoDwDrFuwA/nvXjLAAAMJcP0psx/g==
+  </data>
+ </layer>
+</map>
