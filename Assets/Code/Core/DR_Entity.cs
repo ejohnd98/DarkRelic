@@ -6,11 +6,30 @@ public class DR_Entity
 {
     public string Name = "Untitled Entity";
     public Vector2Int Position;
+    public int id = -1;
+
+    public bool noLongerValid = false;
 
     public List<DR_Component> ComponentList;
 
     public DR_Entity(){
         ComponentList = new List<DR_Component>();
+        DR_GameManager.instance.entitesCreated++;
+        id = DR_GameManager.instance.entitesCreated;
+    }
+
+    public bool Equals(DR_Entity other){
+        return (id != -1) && (id == other.id);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return base.Equals(obj as DR_Entity);
+    }
+
+    public override int GetHashCode()
+    {
+        return id;
     }
 
     public bool AddComponent<T>(T NewComponent) where T : DR_Component

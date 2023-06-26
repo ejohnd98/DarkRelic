@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class DR_Map
 {
-    public const int MAX_MAP_SIZE = 50;
-
     public DR_Cell[,] Cells;
     public Vector2Int MapSize;
 
@@ -116,16 +114,24 @@ public class DR_Map
         return MoveActor(Actor, Actor.Position + posChange);
     }
 
-    public bool MoveActor(DR_Entity Actor, Vector2Int pos){
+    public bool MoveActor(DR_Entity Actor, Vector2Int pos, bool animate = false){
         DR_Cell FromCell = Cells[Actor.Position.y, Actor.Position.x];
         DR_Cell ToCell = Cells[pos.y, pos.x];
-        if(!ToCell.BlocksMovement() && ToCell.Actor == null){
-            FromCell.Actor = null;
-            ToCell.Actor = Actor;
-            Actor.Position = pos;
-            return true;
+
+        if(ToCell.BlocksMovement() || ToCell.Actor != null){
+            return false;
         }
-        return false;
+        
+        if (animate){
+            MoveAnimComponent moveAnim = Actor.GetComponent<MoveAnimComponent>();
+            moveAnim.SetAnim(pos);
+        }
+
+        FromCell.Actor = null;
+        ToCell.Actor = Actor;
+        Actor.Position = pos;  
+
+        return true;
     }
 
     public void ClearVisible(){

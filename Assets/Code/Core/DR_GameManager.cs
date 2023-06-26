@@ -7,9 +7,12 @@ public class DR_GameManager : MonoBehaviour
     enum GameState {
         RUNNING,
         WAITING_FOR_INPUT,
+        ANIMATING,
 
         INVALID
     }
+
+    public int entitesCreated = 0; //used to give IDs
 
     public static DR_GameManager instance;
 
@@ -18,12 +21,7 @@ public class DR_GameManager : MonoBehaviour
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
     public Texture2D DebugMap, DebugMap2;
-
-    //Temp renderer stuff
-    public Sprite WallTexture, FloorTexture, PlayerTexture, EnemyTexture, FogTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture;
-    public GameObject CellObj;
-    public List<GameObject> CellObjects;
-    public List<GameObject> EntityObjects;
+    public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture;
 
     public bool debug_disableFOV = false;
 
@@ -70,22 +68,15 @@ public class DR_GameManager : MonoBehaviour
         UpdateCurrentMap();
 
         // Init Camera
-        Vector3 DesiredPos = MainCamera.transform.position;
-        DesiredPos.x = PlayerActor.Position.x;
-        DesiredPos.y = PlayerActor.Position.y;
-        MainCamera.transform.position = DesiredPos;
-
-        // Init Renderer lists
-        CellObjects = new List<GameObject>();
-        EntityObjects = new List<GameObject>();
+        UpdateCamera(true);
 
         // Create Turn System
         turnSystem = new TurnSystem();
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-        UpdateVisuals();
+        DR_Renderer.instance.UpdateTiles();
 
-        CurrentState = GameState.RUNNING;
+        SetGameState(GameState.RUNNING);
     }
 
     void Update()
@@ -98,7 +89,7 @@ public class DR_GameManager : MonoBehaviour
                     {
                         if (turnSystem.IsPlayerTurn())
                         {
-                            CurrentState = GameState.WAITING_FOR_INPUT;
+                            SetGameState(GameState.WAITING_FOR_INPUT);
                             break;
                         }
 
@@ -120,15 +111,13 @@ public class DR_GameManager : MonoBehaviour
                             turnSystem.RecoverDebts(1);
                             turnSystem.UpdateEntityLists(CurrentMap);
                         }
-                        UpdateVisuals(false);
                     }
                     break;
                 }
 
             case GameState.WAITING_FOR_INPUT:
                 {
-
-                    //TODO change into an action based system (have struct representing an action)
+                    //TODO make input handler class, and have key presses linger so that you can press arrow keys slightly before allowed
                     if (turnSystem.IsPlayerTurn())
                     {
                         bool keyPressed = false;
@@ -161,7 +150,7 @@ public class DR_GameManager : MonoBehaviour
                                     case MoveAction moveAction:
                                         {
                                             Debug.Log(PlayerActor.Name + " moved");
-                                            CurrentMap.MoveActor(PlayerActor, moveAction.pos);
+                                            CurrentMap.MoveActor(PlayerActor, moveAction.pos, true);
                                             break;
                                         }
 
@@ -207,97 +196,58 @@ public class DR_GameManager : MonoBehaviour
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
                                 turnSystem.PopNextEntity();
                                 SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-                                UpdateVisuals(true);
+                                DR_Renderer.instance.UpdateTiles();
                             }
                         }
                     }
                     else
                     {
-                        CurrentState = GameState.RUNNING;
+                        SetGameState(GameState.RUNNING);
                         break;
                     }
                     break;
                 }
 
+            case GameState.ANIMATING:
+            {
+                if (DR_Renderer.animsActive <= 0){
+                    SetGameState(GameState.RUNNING);
+                }
+                break;
+            }
+
             default:
                 break;
+        }
+
+        if (CurrentState != GameState.ANIMATING && DR_Renderer.animsActive > 0){
+            SetGameState(GameState.ANIMATING);
         }
 
         UpdateCamera();
     }
 
-    void UpdateCamera()
+    void SetGameState(GameState newState){
+        if (CurrentState != newState){
+            Debug.Log("Changed states from " + CurrentState.ToString() + " to " + newState.ToString());
+        }
+        CurrentState = newState;
+    }
+
+    void UpdateCamera(bool forcePos = false)
     {
         Vector3 DesiredPos = MainCamera.transform.position;
         DesiredPos.x = PlayerActor.Position.x;
         DesiredPos.y = PlayerActor.Position.y;
 
+        if (forcePos){
+            MainCamera.transform.position = DesiredPos;
+            return;
+        }
         Vector3 Direction = DesiredPos - MainCamera.transform.position;
-        float LerpAmount = Time.deltaTime * 1f + Mathf.Clamp01(Time.deltaTime * 4.0f / Direction.magnitude);
+        float LerpAmount = Time.deltaTime * 3.0f;
 
-        MainCamera.transform.position = Vector3.Lerp(MainCamera.transform.position, DesiredPos, LerpAmount);
-    }
-
-    // TODO: IMPROVE THIS MESS
-    // Make it only add objects within the camera
-    void UpdateVisuals(bool updateTiles = true){
-        // Clear old visuals
-        if (updateTiles){
-            foreach(GameObject obj in CellObjects){
-                Destroy(obj);
-            }
-            CellObjects.Clear();
-
-            // Add new visuals
-            for(int y = 0; y < CurrentMap.MapSize.y; y++){
-                for(int x = 0; x < CurrentMap.MapSize.x; x++){
-                    GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
-                    Sprite CellSprite = FogTexture;
-                    if (CurrentMap.IsVisible[y, x] || debug_disableFOV){
-                        CellSprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                    }else if (CurrentMap.IsKnown[y, x]){
-                        CellSprite = CurrentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                        NewCellObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
-                    }
-                    NewCellObj.GetComponent<SpriteRenderer>().sprite = CellSprite;
-                    CellObjects.Add(NewCellObj);
-                }
-            }
-        }
-        
-        foreach(GameObject obj in EntityObjects){
-            Destroy(obj);
-        }
-        EntityObjects.Clear();
-
-        foreach(DR_Entity Entity in CurrentMap.Entities){
-            bool isVisible = CurrentMap.IsVisible[Entity.Position.y, Entity.Position.x];
-            bool isKnown = CurrentMap.IsKnown[Entity.Position.y, Entity.Position.x];
-            if (!isVisible && !isKnown && !debug_disableFOV){
-                continue;
-            }
-            
-            bool isProp = Entity.HasComponent<PropComponent>();
-
-            if (!isVisible && (!isProp || !isKnown) && !debug_disableFOV){
-                continue;
-            }
-
-            SpriteComponent spriteComponent = Entity.GetComponent<SpriteComponent>();
-            if (spriteComponent == null){
-                continue;
-            }
-
-            // TODO: make proper system to determine z depth for each entity
-            GameObject NewEntityObj = Instantiate(CellObj, Entity.GetPosFloat(isProp ? -0.9f : -1.0f), Quaternion.identity, transform);
-            NewEntityObj.GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
-
-            if (!isVisible && isKnown && !debug_disableFOV){
-                NewEntityObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
-            }
-
-            EntityObjects.Add(NewEntityObj);
-        }  
+        MainCamera.transform.position = Easings.QuadEaseOut(MainCamera.transform.position, DesiredPos, LerpAmount);
     }
 
     //move into other class
@@ -308,6 +258,7 @@ public class DR_GameManager : MonoBehaviour
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewActor.AddComponent<HealthComponent>(new HealthComponent(maxHealth));
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
+        NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
         
         return NewActor;
     }
@@ -353,6 +304,8 @@ public class DR_GameManager : MonoBehaviour
         destination.AddActor(PlayerActor, newPos);
         CurrentDungeon.SetNextMap(goingDeeper);
         UpdateCurrentMap();
-        UpdateVisuals(true);
+        UpdateCamera(true);
+        DR_Renderer.instance.ClearAllObjects();
+        DR_Renderer.instance.UpdateTiles();
     }
 }

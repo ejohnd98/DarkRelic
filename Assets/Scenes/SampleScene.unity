@@ -322,6 +322,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -391,7 +392,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.039215688, g: 0.015686275, b: 0.03529412, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -408,15 +409,15 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+    x: 0.16666667
+    y: 0.13927856
+    width: 0.6666667
+    height: 0.7214429
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 8
+  orthographic size: 11.25
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -446,6 +447,78 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c88f5cead0c0b2a4eb05b5900433f8d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ComponentVersion: 1
+  m_AssetsPPU: 16
+  m_RefResolutionX: 640
+  m_RefResolutionY: 360
+  m_CropFrame: 3
+  m_GridSnapping: 0
+  m_FilterMode: 0
+  m_UpscaleRT: 0
+  m_PixelSnapping: 0
+  m_CropFrameX: 0
+  m_CropFrameY: 0
+  m_StretchFill: 0
+--- !u!1 &620561196
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 620561198}
+  - component: {fileID: 620561197}
+  m_Layer: 0
+  m_Name: Renderer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &620561197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 620561196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8455768f4ce9ad54389a98db958f0ad1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WallTexture: {fileID: 1551168614, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
+  FloorTexture: {fileID: 1062414449, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
+  FogTexture: {fileID: -1364335424, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
+  CellObj: {fileID: 2981893753497814314, guid: a111716a7249b3a45a002a8bff83ed16, type: 3}
+--- !u!4 &620561198
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 620561196}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.8646972, y: 1.2485952, z: -1.6015778}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &930698960
 GameObject:
@@ -579,20 +652,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bad6cdaed5f5c84fb780b942b7436fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  entitesCreated: 0
   DebugMap: {fileID: 2800000, guid: 0582f64cf1c675048b75abd4ede2c6e7, type: 3}
   DebugMap2: {fileID: 2800000, guid: cdb7a3901af95af4889c058482d276a8, type: 3}
-  WallTexture: {fileID: 1551168614, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
-  FloorTexture: {fileID: 1062414449, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   PlayerTexture: {fileID: -1282016797, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   EnemyTexture: {fileID: 161887637, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
-  FogTexture: {fileID: -1364335424, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   OpenDoorTexture: {fileID: -810473197, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   ClosedDoorTexture: {fileID: 610824086, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   StairsDownTexture: {fileID: 1127527415, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   StairsUpTexture: {fileID: -2067558480, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
-  CellObj: {fileID: 2981893753497814314, guid: a111716a7249b3a45a002a8bff83ed16, type: 3}
-  CellObjects: []
-  EntityObjects: []
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   Directions:
