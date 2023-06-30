@@ -9,11 +9,11 @@ public class MoveAnimComponent : DR_Component
     Vector3 a, b;
     Vector3 currentPos;
     float counter = 0.0f;
-    public float length = 0.15f;
+    public float length = 1.0f;
 
     public void SetAnim(Vector2Int target, float time = 0.15f, bool autoStart = true){
         //temp z
-        a = Entity.GetPosFloat(-1.0f);
+        a = Entity.GetPosFloat(Entity.HasComponent<PropComponent>() ? DR_Renderer.PropDepth : DR_Renderer.ActorDepth);
         b = a;
         b.x = target.x;
         b.y = target.y;
@@ -41,7 +41,7 @@ public class MoveAnimComponent : DR_Component
         if (!isMoving){
             return;
         }
-
+        currentPos = b;
         isMoving = false;
         DR_Renderer.animsActive--;
     }
@@ -52,13 +52,13 @@ public class MoveAnimComponent : DR_Component
         }
 
         counter += time / length;
-        if (counter >= 1.0f){
+        if (counter > 1.0f){
             StopAnim();
         }
-        currentPos = Easings.QuadEaseOut(a,b, counter);
+        currentPos = Easings.QuadEaseOut(a,b, Mathf.Clamp01(counter));
     }
 
-    public Vector3 GetAnimPosition(){
-        return isMoving? currentPos : Entity.GetPosFloat();
+    public Vector3 GetAnimPosition(float depth = 0.0f){
+        return isMoving? currentPos : Entity.GetPosFloat(depth);
     }
 }

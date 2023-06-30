@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Easings
 {
+    public static Vector3 Slerp(Vector3 a, Vector3 b, float time) {
+        return Vector3.Slerp(a, b, time);
+    }
     public static Vector3 QuadEaseOut(Vector3 a, Vector3 b, float time) {
         float val = 1 - (1 - time) * (1 - time);
         val = 1.0f - val;

@@ -7,15 +7,16 @@ public class DR_Renderer : MonoBehaviour
     public static DR_Renderer instance;
     public static int animsActive = 0;
 
+    public static float ActorDepth = -1.0f;
+    public static float PropDepth = -0.5f;
+
     public Sprite WallTexture, FloorTexture, FogTexture;
     public GameObject CellObj;
 
     Dictionary<DR_Entity, GameObject> EntityObjects;
-    //TODO: make cells dictionaries as well (hash can be there position?)
+    //TODO: make cells dictionaries as well (hash can be their position?)
     List<GameObject> CellObjects;
 
-    GameObject[,] CellArray;
-    // Start is called before the first frame update
     void Awake()
     {
         if (instance != null){
@@ -25,12 +26,12 @@ public class DR_Renderer : MonoBehaviour
         instance = this;
         EntityObjects = new Dictionary<DR_Entity, GameObject>();
         CellObjects = new List<GameObject>();
-        CellArray = new GameObject[1,1];
     }
 
     void LateUpdate() {
         //TODO: add a monobehaviour component to the entity objects so they can update the move position theirselves?
         UpdateEntities(Time.deltaTime);
+        //DR_GameManager.instance.UpdateCamera();
     }
 
     // TODO: only update tiles that need updating (don't delete everything everytime, reuse game objects)
@@ -71,7 +72,6 @@ public class DR_Renderer : MonoBehaviour
         EntityObjects.Clear();
     }
 
-    //TODO: turn EntityObjects into a dictionary, so that objects aren't recreated every frame, and animations can work (will call this in update)
     public void UpdateEntities(float deltaTime){
         DR_Map currentMap = DR_GameManager.instance.CurrentMap;
 
@@ -119,9 +119,9 @@ public class DR_Renderer : MonoBehaviour
             MoveAnimComponent moveComponent = Entity.GetComponent<MoveAnimComponent>();
             if (moveComponent != null && moveComponent.isMoving){
                 moveComponent.AnimStep(deltaTime);
-                pos = moveComponent.GetAnimPosition();
+                pos = moveComponent.GetAnimPosition(isProp ? PropDepth : ActorDepth);
             }else{
-                pos = Entity.GetPosFloat(isProp ? -0.9f : -1.0f);
+                pos = Entity.GetPosFloat(isProp ? PropDepth : ActorDepth);
             }
             
             EntityObjects[Entity].transform.position = pos;

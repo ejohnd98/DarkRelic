@@ -234,11 +234,17 @@ public class DR_GameManager : MonoBehaviour
         CurrentState = newState;
     }
 
-    void UpdateCamera(bool forcePos = false)
+    public void UpdateCamera(bool forcePos = false)
     {
         Vector3 DesiredPos = MainCamera.transform.position;
-        DesiredPos.x = PlayerActor.Position.x;
-        DesiredPos.y = PlayerActor.Position.y;
+        if (PlayerActor.HasComponent<MoveAnimComponent>()){
+            DesiredPos.x = PlayerActor.GetComponent<MoveAnimComponent>().GetAnimPosition().x;
+            DesiredPos.y = PlayerActor.GetComponent<MoveAnimComponent>().GetAnimPosition().y;
+        }else{
+            DesiredPos.x = PlayerActor.Position.x;
+            DesiredPos.y = PlayerActor.Position.y;
+        }
+        
 
         if (forcePos){
             MainCamera.transform.position = DesiredPos;
