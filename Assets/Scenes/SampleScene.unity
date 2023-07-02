@@ -409,10 +409,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.16666667
-    y: 0.13927856
-    width: 0.6666667
-    height: 0.7214429
+    x: 0.2290786
+    y: 0.20933978
+    width: 0.54099745
+    height: 0.5797101
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -633,6 +633,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1484776820}
   - component: {fileID: 1484776819}
+  - component: {fileID: 1484776821}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -683,3 +684,16 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1484776821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484776818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d15cf1d05125da04a9238e54c2b23030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  inputPersistLength: 0.25

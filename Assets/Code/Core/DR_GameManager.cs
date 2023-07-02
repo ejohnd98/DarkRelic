@@ -125,14 +125,14 @@ public class DR_GameManager : MonoBehaviour
                         Vector2Int interactPos = Vector2Int.zero;
                         for (int i = 0; i < 4; i++)
                         {
-                            if (Input.GetKeyDown(KeyDirections[i]))
+                            if (DR_InputHandler.GetKeyPressed(KeyDirections[i]))
                             {
                                 keyPressed = true;
                                 interactPos = PlayerActor.Position + Directions[i];
                             }
                         }
 
-                        if (Input.GetKeyDown(KeyCode.Space)){
+                        if (DR_InputHandler.GetKeyPressed(KeyCode.Space)){
                             keyPressed = true;
                             interactPos = PlayerActor.Position;
                         }
