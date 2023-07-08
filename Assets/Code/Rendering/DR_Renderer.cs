@@ -52,7 +52,7 @@ public class DR_Renderer : MonoBehaviour
                     CellSprite = currentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
                 }else if (currentMap.IsKnown[y, x]){
                     CellSprite = currentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                    NewCellObj.GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
+                    NewCellObj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
                 }
                 NewCellObj.GetComponent<SpriteRenderer>().sprite = CellSprite;
                 CellObjects.Add(NewCellObj);
@@ -128,7 +128,7 @@ public class DR_Renderer : MonoBehaviour
             EntityObjects[Entity].GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
 
             if (!isVisible && isKnown && !DR_GameManager.instance.debug_disableFOV){
-                EntityObjects[Entity].GetComponent<SpriteRenderer>().color = new Color(0.5f, 0.5f, 0.5f);
+                EntityObjects[Entity].GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
             }else{
                 EntityObjects[Entity].GetComponent<SpriteRenderer>().color = Color.white;
             }
