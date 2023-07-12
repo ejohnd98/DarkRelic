@@ -53,8 +53,8 @@ public class DR_GameManager : MonoBehaviour
 
         
         // Create Map, Actors
-        DR_Map TestMap = DR_Map.CreateMapFromImage(DebugMap);
-        DR_Map TestMap2 = DR_Map.CreateMapFromImage(DebugMap2);
+        DR_Map TestMap = DR_MapGen.CreateMapFromImage(DebugMap);
+        DR_Map TestMap2 = DR_MapGen.CreateMapFromImage(DebugMap2);
 
         PlayerActor = CreateActor(PlayerTexture, "Player");
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());

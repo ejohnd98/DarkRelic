@@ -13,51 +13,6 @@ public class DR_Map
 
     public List<DR_Entity> Entities;
 
-    public static DR_Map CreateMapFromImage(Texture2D MapTexture){
-        DR_Map NewMap = new DR_Map();
-
-        int Width = MapTexture.width;
-        int Height = MapTexture.height;
-        NewMap.MapSize = new Vector2Int(Width, Height);
-
-        Color[] Pixels = MapTexture.GetPixels();
-        //Create test map
-        NewMap.Cells = new DR_Cell[Height,Width];
-        NewMap.IsVisible = new bool[Height,Width];
-        NewMap.IsKnown = new bool[Height,Width];
-        NewMap.Entities = new List<DR_Entity>();
-
-        for (int y = 0; y < Height; y++){
-            for (int x = 0; x < Width; x++){
-                int Index1D = y*Width + x;
-                NewMap.Cells[y,x] = new DR_Cell();
-                Color color = Pixels[Index1D];
-                bool isWall = color.r < 0.1f && color.g < 0.1f && color.b < 0.1f;
-                NewMap.Cells[y,x].bBlocksMovement = isWall;
-
-                bool isDoor = color.r < 0.1f && color.g > 0.9f && color.b < 0.1f;
-                if (isDoor){
-                    DR_GameManager gm = DR_GameManager.instance;
-                    DR_Entity door = gm.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
-                    NewMap.AddProp(door, new Vector2Int(x,y));
-                }
-
-                bool isStairsDeeper = color.r > 0.9f && color.g < 0.1f && color.b < 0.1f;
-                bool isStairsShallower= color.r < 0.1f && color.g < 0.1f && color.b > 0.9f;
-                if (isStairsDeeper || isStairsShallower){
-                    DR_GameManager gm = DR_GameManager.instance;
-                    DR_Entity stairs = gm.CreateStairs(isStairsDeeper? gm.StairsDownTexture : gm.StairsUpTexture, isStairsDeeper);
-                    NewMap.AddProp(stairs, new Vector2Int(x,y));
-                }
-
-                NewMap.IsVisible[y,x] = false;
-                NewMap.IsKnown[y,x] = false;
-            }
-        }
-
-        return NewMap;
-    }
-
     public bool AddActor(DR_Entity Actor, Vector2Int pos){
         DR_Cell Cell = Cells[pos.y, pos.x];
         if(!Cell.BlocksMovement() && Cell.Actor == null){
