@@ -8,7 +8,8 @@ public class MapGenInfo{
 
     // Possible parameters:
     // - type of generator (cave, ruins, castle, etc)
-    // - required rooms
+    // - required rooms (min/max room size)
+    // - margins between rooms?
     // - loot? enemies?
 }
 
@@ -18,6 +19,11 @@ public class DR_MapGen
         DR_Map NewMap = CreateEmptyMap(mapGenInfo.MapSize);
 
         // do stuff based on map info
+
+        //to start with, draw some random boxes (keep rooms in array)
+        //then connect them randomly (ensure each has at least one connection, and that a few have at least 2)
+        // - place doors at entry points, either as result of tunneling, or as a second pass
+        //do a bfs and place stairs at opposite ends (place stairs a couple cells away from walls though)
 
         return NewMap;
     }
