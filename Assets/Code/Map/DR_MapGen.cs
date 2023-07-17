@@ -38,7 +38,7 @@ public class MapGeneration{
             case MapGenState.PLACING_ROOMS:{
                 int attempts = 0;
                 bool hasPlacedRoom = false;
-                while (!hasPlacedRoom && attempts < 8){
+                while (!hasPlacedRoom && attempts < 6){
                     hasPlacedRoom = PlaceRoom();
                     attempts++;
                 }
@@ -79,9 +79,19 @@ public class MapGeneration{
             }
             case MapGenState.PLACING_PROPS:{
                 MapGenRoom startRoom = rooms[0];
-                MapGenRoom endRoom = rooms[rooms.Count-1];
-
                 Vector2Int startPos = startRoom.pos + startRoom.size/2;
+
+                float roomDist = 0.0f;
+                int endRoomIndex = rooms.Count-1;
+                for (int i=1; i < rooms.Count; i++){
+                    float newDist = Vector2Int.Distance(startPos, rooms[i].pos);
+                    if (newDist > roomDist){
+                        roomDist = newDist;
+                        endRoomIndex = i;
+                    }
+                }
+
+                MapGenRoom endRoom = rooms[endRoomIndex];
                 Vector2Int endPos = endRoom.pos + endRoom.size/2;
 
                 cells[startPos.y, startPos.x].type = MapGenCellType.STAIRS_UP;
@@ -95,7 +105,7 @@ public class MapGeneration{
                             continue;
                         }
                         //randomly don't place some doors
-                        if (Random.Range(0.0f, 1.0f) > 0.6f){
+                        if (Random.Range(0.0f, 1.0f) > 0.95f){
                             continue;
                         }
                         if (CanPlaceDoor(x,y)){
@@ -185,8 +195,8 @@ public class MapGeneration{
     //TODO: make randomness deterministic
     //TODO: return roominfo (size, position, connected rooms?)
     bool PlaceRoom(){
-        int width = Random.Range(5, 9);
-        int height = Random.Range(5, 9);
+        int width = Random.Range(5, 11);
+        int height = Random.Range(5, 12);
         int x = Random.Range(1, mapSize.x-1-width);
         int y = Random.Range(1, mapSize.y-1-height);
 
