@@ -2,30 +2,238 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// This class 
-public class MapGenInfo{
-    public Vector2Int MapSize;
+// Class which creates and stores the current generation progress
+public class MapGeneration{
 
-    // Possible parameters:
-    // - type of generator (cave, ruins, castle, etc)
-    // - required rooms (min/max room size)
-    // - margins between rooms?
-    // - loot? enemies?
+    public MapGenState state = MapGenState.NOT_STARTED;
+    public MapGenCell[,] cells;
+    public List<MapGenRoom> rooms;
+    public Vector2Int mapSize;
+
+    int placedRooms = 0;
+
+    //temp
+    int tunnellingIndex = 0;
+
+    public MapGeneration(Vector2Int size){
+        mapSize = size;
+        cells = new MapGenCell[size.y,size.x];
+        for (int y = 0; y < mapSize.y; y++){
+            for (int x = 0; x < mapSize.x; x++){
+                MapGenCell cell = new MapGenCell(MapGenCellType.NOT_SET);
+                cells[y,x] = cell;
+            }
+        }
+
+        rooms = new List<MapGenRoom>();
+    }
+
+    // perform one step of the generation (for aid in debugging generation progress)
+    public void Step(){
+        switch (state){
+            case MapGenState.NOT_STARTED:{
+                state = MapGenState.PLACING_ROOMS;
+                break;
+            }
+            case MapGenState.PLACING_ROOMS:{
+                int attempts = 0;
+                bool hasPlacedRoom = false;
+                while (!hasPlacedRoom && attempts < 8){
+                    hasPlacedRoom = PlaceRoom();
+                    attempts++;
+                }
+                
+                if (!hasPlacedRoom){
+                    state = MapGenState.PLACING_TUNNELS;
+                }
+                break;
+            }
+            case MapGenState.PLACING_TUNNELS:{
+                //TODO create function to connect any two rooms
+                if (tunnellingIndex + 1 >= rooms.Count){
+                    state = MapGenState.PLACING_PROPS;
+                    break;
+                }
+                MapGenRoom roomA = rooms[tunnellingIndex];
+                MapGenRoom roomB = rooms[tunnellingIndex+1];
+                Vector2Int posA = roomA.pos + roomA.size/2;
+                Vector2Int posB = roomB.pos + roomB.size/2;
+
+                int x = posA.x;
+                int y = posA.y;
+                while(x != posB.x){
+                    int xd = (int)Mathf.Sign(posB.x - x);
+                    cells[y,x].type = MapGenCellType.FLOOR;
+                    x += xd;
+                }
+
+                while(y != posB.y){
+                    int yd = (int)Mathf.Sign(posB.y - y);
+                    cells[y,x].type = MapGenCellType.FLOOR;
+                    y += yd;
+                }
+
+                tunnellingIndex++;
+
+                break;
+            }
+            case MapGenState.PLACING_PROPS:{
+                MapGenRoom startRoom = rooms[0];
+                MapGenRoom endRoom = rooms[rooms.Count-1];
+
+                Vector2Int startPos = startRoom.pos + startRoom.size/2;
+                Vector2Int endPos = endRoom.pos + endRoom.size/2;
+
+                cells[startPos.y, startPos.x].type = MapGenCellType.STAIRS_UP;
+                cells[endPos.y, endPos.x].type = MapGenCellType.STAIRS_DOWN;
+                state = MapGenState.FINISHED;
+
+                // doors
+                for (int y = 0; y < mapSize.y; y++){
+                    for (int x = 0; x < mapSize.x; x++){
+                        if (cells[y,x].type != MapGenCellType.FLOOR){
+                            continue;
+                        }
+                        //randomly don't place some doors
+                        if (Random.Range(0.0f, 1.0f) > 0.6f){
+                            continue;
+                        }
+                        if (CanPlaceDoor(x,y)){
+                            cells[y,x].type = MapGenCellType.DOOR;
+                        }
+                    }
+                }
+
+                break;
+            }
+            case MapGenState.FINISHED:{
+                break;
+            }
+            default:
+            break;
+        }
+
+        //if failed to place rooms 10 times, then move on to tunneling?
+    }
+
+    bool CanPlaceDoor(int x, int y){
+        int floorCount = GetAdjacentTilesOfType(x, y, MapGenCellType.FLOOR);
+        
+        if (floorCount >= 4 && floorCount <= 6 && InGateway(x,y)){
+            return true;
+        }
+        return false;
+    }
+
+    bool InGateway(int x, int y){
+        int wallCount = GetDirectlyAdjacentTilesOfType(x, y, MapGenCellType.WALL) + GetDirectlyAdjacentTilesOfType(x, y, MapGenCellType.NOT_SET);
+        if (wallCount != 2){
+            return false;
+        }
+        if ((IsCellOfType(x+1,y, MapGenCellType.WALL) || IsCellOfType(x+1,y, MapGenCellType.NOT_SET))
+        && (IsCellOfType(x-1,y, MapGenCellType.WALL) || (IsCellOfType(x-1,y, MapGenCellType.NOT_SET)))){
+            return true;
+        }
+
+        if ((IsCellOfType(x,y+1, MapGenCellType.WALL) || IsCellOfType(x,y+1, MapGenCellType.NOT_SET))
+        && (IsCellOfType(x,y-1, MapGenCellType.WALL) || (IsCellOfType(x,y-1, MapGenCellType.NOT_SET)))){
+            return true;
+        }
+
+        return false;
+
+    }
+
+    bool IsCellOfType(int x, int y, MapGenCellType type){
+        if (x < 0 || y < 0 || x > mapSize.x-1 || y > mapSize.y-1){
+            return false;
+        }
+        return cells[y,x].type == type;
+    }
+
+    int GetAdjacentTilesOfType(int x, int y, MapGenCellType type){
+        int count = 0;
+        for (int yd = -1; yd < 2; yd++){
+            for (int xd = -1; xd < 2; xd++){
+                if ((yd == 0 && xd == 0) || x+xd < 0 || y+yd < 0 || x+xd > mapSize.x-1 || y+yd > mapSize.y-1){
+                    continue;
+                }
+                
+                if (IsCellOfType(x+xd, y+yd, type)){
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+    int GetDirectlyAdjacentTilesOfType(int x, int y, MapGenCellType type){
+        int count = 0;
+        Vector2Int[] Directions = {Vector2Int.down, Vector2Int.left, Vector2Int.up, Vector2Int.right};
+        for (int i = 0; i < 4; i++){
+            Vector2Int dir = Directions[i];
+            if (x+dir.x < 0 || y+dir.y < 0 || x+dir.x > mapSize.x-1 || y+dir.y > mapSize.y-1){
+                continue;
+            }
+            if (IsCellOfType(x+dir.x, y+dir.y, type)){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    //TODO: make randomness deterministic
+    //TODO: return roominfo (size, position, connected rooms?)
+    bool PlaceRoom(){
+        int width = Random.Range(5, 9);
+        int height = Random.Range(5, 9);
+        int x = Random.Range(1, mapSize.x-1-width);
+        int y = Random.Range(1, mapSize.y-1-height);
+
+        if (!AreCellsUnset(x, x+width, y, y+height)){
+            return false;
+        }
+
+        PlaceCellType(x, x+width, y, y+height, MapGenCellType.WALL);
+        PlaceCellType(x+1, x+width-1, y+1, y+height-1, MapGenCellType.FLOOR);
+        
+        placedRooms++;
+        MapGenRoom newRoom = new MapGenRoom(new Vector2Int(x,y), new Vector2Int(width, height), placedRooms);
+        rooms.Add(newRoom);
+
+        return true;
+    }
+
+    void PlaceCellType(int x1, int x2, int y1, int y2, MapGenCellType type){
+        for (int y = y1; y < y2; y++){
+            for (int x = x1; x < x2; x++){
+                cells[y,x].type = type;
+            }
+        }
+    }
+
+    bool AreCellsUnset(int x1, int x2, int y1, int y2){
+        for (int y = y1; y < y2; y++){
+            for (int x = x1; x < x2; x++){
+                if (cells[y,x].type != MapGenCellType.NOT_SET){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }
 
 public class DR_MapGen
 {
     public static DR_Map CreateMapFromMapInfo(MapGenInfo mapGenInfo){
-        DR_Map NewMap = CreateEmptyMap(mapGenInfo.MapSize);
+        //TODO: visualize this
+        MapGeneration mapGen = new MapGeneration(mapGenInfo.MapSize);
+        while (mapGen.state != MapGenState.FINISHED){
+            mapGen.Step();
+        }
 
-        // do stuff based on map info
-
-        //to start with, draw some random boxes (keep rooms in array)
-        //then connect them randomly (ensure each has at least one connection, and that a few have at least 2)
-        // - place doors at entry points, either as result of tunneling, or as a second pass
-        //do a bfs and place stairs at opposite ends (place stairs a couple cells away from walls though)
-
-        return NewMap;
+        return CreateMapFromGeneration(mapGen);
     }
 
     public static DR_Map CreateMapFromImage(Texture2D MapTexture){
@@ -70,11 +278,54 @@ public class DR_MapGen
     private static DR_Map CreateEmptyMap (Vector2Int size){
         DR_Map NewMap = new DR_Map();
 
+        // TODO: move this into constructor?
         NewMap.MapSize = size;
         NewMap.Cells = new DR_Cell[size.y,size.x];
         NewMap.IsVisible = new bool[size.y,size.x];
         NewMap.IsKnown = new bool[size.y,size.x];
         NewMap.Entities = new List<DR_Entity>();
+
+        return NewMap;
+    }
+
+    private static DR_Map CreateMapFromGeneration (MapGeneration generation){
+        DR_Map NewMap = CreateEmptyMap(generation.mapSize);
+        DR_GameManager gm = DR_GameManager.instance;
+
+        for (int y = 0; y < NewMap.MapSize.y; y++){
+            for (int x = 0; x < NewMap.MapSize.x; x++){
+                DR_Cell newCell = new DR_Cell();
+                NewMap.Cells[y,x] = newCell;
+                switch (generation.cells[y,x].type){
+                    case MapGenCellType.FLOOR:
+                        newCell.bBlocksMovement = false;
+                        break;
+                    case MapGenCellType.DOOR:
+                        newCell.bBlocksMovement = false;
+                        DR_Entity door = gm.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
+                        NewMap.AddProp(door, new Vector2Int(x,y));
+                        break;
+                    case MapGenCellType.STAIRS_UP:{
+                        DR_Entity stairs = gm.CreateStairs(gm.StairsUpTexture, false);
+                        NewMap.AddProp(stairs, new Vector2Int(x,y));
+                        break;
+                    }
+                    case MapGenCellType.STAIRS_DOWN:{
+                        DR_Entity stairs = gm.CreateStairs(gm.StairsDownTexture, true);
+                        NewMap.AddProp(stairs, new Vector2Int(x,y));
+                        break;
+                    }
+                    case MapGenCellType.NOT_SET:
+                    case MapGenCellType.WALL:
+                    default:
+                        newCell.bBlocksMovement = true;
+                    break;
+                }
+            }
+        }
+
+        //TODO: transfer stuff to NewMap from the generation
+        // Create entities when needed (doors, stairs)
 
         return NewMap;
     }

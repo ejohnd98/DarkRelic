@@ -53,19 +53,28 @@ public class DR_GameManager : MonoBehaviour
 
         
         // Create Map, Actors
-        DR_Map TestMap = DR_MapGen.CreateMapFromImage(DebugMap);
-        DR_Map TestMap2 = DR_MapGen.CreateMapFromImage(DebugMap2);
+        //DR_Map TestMap = DR_MapGen.CreateMapFromImage(DebugMap);
+        //DR_Map TestMap2 = DR_MapGen.CreateMapFromImage(DebugMap2);
 
         PlayerActor = CreateActor(PlayerTexture, "Player");
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
 
-        TestMap.AddActor(PlayerActor, new Vector2Int(24,28));
-        TestMap.AddActor(CreateActor(EnemyTexture, "TestEnemy"), new Vector2Int(24,29));
+        //TestMap.AddActor(PlayerActor, new Vector2Int(24,28));
+        //TestMap.AddActor(CreateActor(EnemyTexture, "TestEnemy"), new Vector2Int(24,29));
+
+        MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35));
 
         // Add map to Dungeon
-        CurrentDungeon.maps.Add(TestMap);
-        CurrentDungeon.maps.Add(TestMap2);
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        
+        MoveLevels(null, CurrentDungeon.maps[0], true);
+        
         UpdateCurrentMap();
+
+
 
         // Init Camera
         UpdateCamera(true);
@@ -305,10 +314,15 @@ public class DR_GameManager : MonoBehaviour
         if (origin == destination){
             return;
         }
-        origin.RemoveActor(PlayerActor);
+
+        if (origin != null){
+            origin.RemoveActor(PlayerActor);
+            CurrentDungeon.SetNextMap(goingDeeper);
+        }
+
         Vector2Int newPos = destination.GetStairPosition(!goingDeeper);
         destination.AddActor(PlayerActor, newPos);
-        CurrentDungeon.SetNextMap(goingDeeper);
+        
         UpdateCurrentMap();
         UpdateCamera(true);
         DR_Renderer.instance.ClearAllObjects();
