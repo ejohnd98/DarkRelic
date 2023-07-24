@@ -96,7 +96,6 @@ public class MapGeneration{
 
                 cells[startPos.y, startPos.x].type = MapGenCellType.STAIRS_UP;
                 cells[endPos.y, endPos.x].type = MapGenCellType.STAIRS_DOWN;
-                state = MapGenState.FINISHED;
 
                 // doors
                 for (int y = 0; y < mapSize.y; y++){
@@ -114,6 +113,42 @@ public class MapGeneration{
                     }
                 }
 
+                state = MapGenState.PLACING_ENEMIES;
+
+                break;
+            }
+            case MapGenState.PLACING_ENEMIES: {
+                //TODO: do anything but this:
+                for (int i=1; i < rooms.Count; i++){
+                    int enemyCount = ((1 + i) / 3); //spawn more enemies in later rooms
+                    if (rooms[i].size.x * rooms[i].size.y > 25 && enemyCount < 3){
+                        enemyCount++;
+                    }
+
+                    if (rooms[i].size.x * rooms[i].size.y < 16 && enemyCount > 1){
+                        enemyCount = 1;
+                    }
+
+                    int placedEnemies = 0;
+                    while (placedEnemies < enemyCount){
+                        int x = rooms[i].pos.x + Random.Range(1, rooms[i].size.x-1);
+                        int y = rooms[i].pos.y + Random.Range(1, rooms[i].size.y-1);
+
+                        // messy retry
+                        int attempts = 10;
+                        while (cells[y,x].type != MapGenCellType.FLOOR && attempts-- > 0){
+                            x = rooms[i].pos.x + Random.Range(1, rooms[i].size.x-1);
+                            y = rooms[i].pos.y + Random.Range(1, rooms[i].size.y-1);
+                        }
+                        if (cells[y,x].type == MapGenCellType.FLOOR){
+                            cells[y,x].type = MapGenCellType.ENEMY;
+                        }
+                        //increment regardless to avoid infinite loops
+                        placedEnemies++;
+                    }
+                }
+
+                state = MapGenState.FINISHED;
                 break;
             }
             case MapGenState.FINISHED:{
@@ -314,6 +349,11 @@ public class DR_MapGen
                         newCell.bBlocksMovement = false;
                         DR_Entity door = gm.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
                         NewMap.AddProp(door, new Vector2Int(x,y));
+                        break;
+                    case MapGenCellType.ENEMY:
+                        newCell.bBlocksMovement = false;
+                        DR_Entity enemy = gm.CreateActor(gm.EnemyTexture, "Generic Enemy", 2);
+                        NewMap.AddActor(enemy, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.STAIRS_UP:{
                         DR_Entity stairs = gm.CreateStairs(gm.StairsUpTexture, false);

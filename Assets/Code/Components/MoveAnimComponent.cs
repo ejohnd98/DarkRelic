@@ -9,9 +9,9 @@ public class MoveAnimComponent : DR_Component
     Vector3 a, b;
     Vector3 currentPos;
     float counter = 0.0f;
-    public float length = 1.0f;
+    public float length = 0.1f;
 
-    public void SetAnim(Vector2Int target, float time = 0.15f, bool autoStart = true){
+    public void SetAnim(Vector2Int target, float time = 0.1f, bool autoStart = true){
         //temp z
         a = Entity.GetPosFloat(Entity.HasComponent<PropComponent>() ? DR_Renderer.PropDepth : DR_Renderer.ActorDepth);
         b = a;

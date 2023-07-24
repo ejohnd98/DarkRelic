@@ -27,11 +27,14 @@ public enum MapGenCellType{
     STAIRS_DOWN
 }
 
+//TODO: create base class to represent a state, then can avoid defining every state in this enum
+// plus, this allows different generation types to have different sets of stages (ie. cave may have an erosion stage)
 public enum MapGenState{
     NOT_STARTED,
     PLACING_ROOMS,
     PLACING_TUNNELS,
     PLACING_PROPS,
+    PLACING_ENEMIES,
     FINISHED
 }
 
