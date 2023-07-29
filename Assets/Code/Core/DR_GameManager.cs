@@ -51,30 +51,19 @@ public class DR_GameManager : MonoBehaviour
         CurrentDungeon = new DR_Dungeon();
         CurrentDungeon.name = "Testing Dungeon";
 
-        
-        // Create Map, Actors
-        //DR_Map TestMap = DR_MapGen.CreateMapFromImage(DebugMap);
-        //DR_Map TestMap2 = DR_MapGen.CreateMapFromImage(DebugMap2);
-
         PlayerActor = CreateActor(PlayerTexture, "Player");
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
 
-        //TestMap.AddActor(PlayerActor, new Vector2Int(24,28));
-        //TestMap.AddActor(CreateActor(EnemyTexture, "TestEnemy"), new Vector2Int(24,29));
-
         MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35));
 
-        // Add map to Dungeon
+        // Add maps to Dungeon
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         
         MoveLevels(null, CurrentDungeon.maps[0], true);
-        
         UpdateCurrentMap();
-
-
 
         // Init Camera
         UpdateCamera(true);
@@ -105,8 +94,28 @@ public class DR_GameManager : MonoBehaviour
                         //AI TURN
 
                         turnSystem.GetNextEntity().SpendTurn();
-                        Debug.Log(turnSystem.GetNextEntity().Entity.Name + " did nothing");
-                        turnSystem.PopNextEntity();
+                        DR_Entity entity = turnSystem.PopNextEntity().Entity;
+                        
+                        DR_Action entityAction = AISystem.DetermineAIAction(entity, CurrentMap);
+
+                        switch (entityAction){
+                            case AttackAction attackAction:
+                                DamageSystem.HandleAttack(attackAction.target, attackAction.attacker);
+                                //NOT GOOD:
+                                if (!attackAction.target.IsAlive()){
+                                    CurrentMap.RemoveActor(attackAction.target.Entity);
+                                }
+                                break;
+                            case WaitAction waitAction:
+                                Debug.Log(entity.Name + " did nothing");
+                                break;
+                            default:
+                            break;
+                        }
+
+                        LogSystem.instance.AddLog(entityAction);
+
+                        //TODO: create system to step through an action (use by both AI and player)
 
                     }
                     else
@@ -327,5 +336,10 @@ public class DR_GameManager : MonoBehaviour
         UpdateCamera(true);
         DR_Renderer.instance.ClearAllObjects();
         DR_Renderer.instance.UpdateTiles();
+    }
+    
+    //  UI FUNCTIONS
+    public DR_Entity GetPlayer(){
+        return PlayerActor;
     }
 }

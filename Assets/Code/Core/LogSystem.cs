@@ -75,7 +75,7 @@ public class LogSystem : MonoBehaviour
             LogObjs.RemoveAt(0);
         }
 
-        LogEntry log = new LogEntry(action.GetLogText(), 2.5f,  GameObject.Instantiate(LogObj, LogParent));
+        LogEntry log = new LogEntry(action.GetLogText(), 1.5f,  GameObject.Instantiate(LogObj, LogParent));
         log.obj.GetComponent<TextMeshProUGUI>().text = log.content;
 
         LogObjs.Add(log);

@@ -62,8 +62,8 @@ public class DoorAction : DR_Action {
 
 public class WaitAction : DR_Action {
 
-    public WaitAction(){
-        loggable = true;
+    public WaitAction(bool logAction = false){
+        loggable = logAction;
     }
 
     public override string GetLogText(){

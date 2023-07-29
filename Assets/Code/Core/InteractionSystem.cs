@@ -10,7 +10,7 @@ public class InteractionSystem
         DR_Cell targetCell = map.Cells[pos.y, pos.x];
 
         if (pos == entity.Position){
-            actionList.Add(new WaitAction());
+            actionList.Add(new WaitAction(true));
             return actionList;
         }
 
