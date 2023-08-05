@@ -29,6 +29,8 @@ public class DR_InputHandler : MonoBehaviour
 
     public static DR_InputHandler instance;
 
+    public Camera cameraObj;
+
     public float inputPersistLength = 0.2f;
 
     KeyCode[] KeysToCheck = {
@@ -36,7 +38,7 @@ public class DR_InputHandler : MonoBehaviour
         KeyCode.RightArrow,
         KeyCode.DownArrow,
         KeyCode.LeftArrow,
-        KeyCode.Space
+        KeyCode.Space,
         };
 
     List<InputState> InputStates;
@@ -56,6 +58,8 @@ public class DR_InputHandler : MonoBehaviour
             InputStates.Add(inputState);
             KeyDictionary[keyCode] = inputState;
         }
+
+        cameraObj = DR_GameManager.instance.MainCamera;
     }
 
     // Update is called once per frame
@@ -92,5 +96,14 @@ public class DR_InputHandler : MonoBehaviour
             return false;
         }
         return instance.KeyDictionary[key].KeyHeld();
+    }
+
+    public Vector2Int GetMouseCellPosition()
+    {
+        Vector3 Position = cameraObj.ScreenToWorldPoint(Input.mousePosition);
+        int x = Mathf.RoundToInt(Position.x);
+        int y = Mathf.RoundToInt(Position.y);
+
+        return new Vector2Int(x,y);
     }
 }

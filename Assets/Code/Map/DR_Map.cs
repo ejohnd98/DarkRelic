@@ -146,4 +146,12 @@ public class DR_Map
         }
         return Vector2Int.zero;
     }
+
+    public DR_Entity GetActorAtPosition(Vector2Int pos){
+        if (!ValidPosition(pos)){
+            return null;
+        }
+
+        return Cells[pos.y, pos.x].Actor;
+    }
 }

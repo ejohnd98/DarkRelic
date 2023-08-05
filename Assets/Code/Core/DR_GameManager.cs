@@ -114,6 +114,7 @@ public class DR_GameManager : MonoBehaviour
                         }
 
                         LogSystem.instance.AddLog(entityAction);
+                        UISystem.instance.RefreshDetailsUI();
 
                         //TODO: create system to step through an action (use by both AI and player)
 
@@ -215,6 +216,7 @@ public class DR_GameManager : MonoBehaviour
                                 turnSystem.PopNextEntity();
                                 SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
                                 DR_Renderer.instance.UpdateTiles();
+                                UISystem.instance.RefreshDetailsUI();
                             }
                         }
                     }
@@ -241,7 +243,9 @@ public class DR_GameManager : MonoBehaviour
         if (CurrentState != GameState.ANIMATING && DR_Renderer.animsActive > 0){
             SetGameState(GameState.ANIMATING);
         }
+    }
 
+    private void LateUpdate() {
         UpdateCamera();
     }
 

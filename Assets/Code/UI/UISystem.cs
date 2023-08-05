@@ -7,6 +7,10 @@ public class UISystem : MonoBehaviour
 {
     public static UISystem instance;
     public Transform HealthBarPivot; //TODO make healthbar wrapper class (so enemies can have health bars too)
+    public EntityDetailsUI DetailsUI;
+
+    Vector2Int LastMousePos = Vector2Int.zero;
+    bool ShouldUpdateDetailsUI = true;
 
     // Start is called before the first frame update
     void Awake()
@@ -14,8 +18,20 @@ public class UISystem : MonoBehaviour
         instance = this;
     }
 
+    public void RefreshDetailsUI(){
+        ShouldUpdateDetailsUI = true;
+    }
+
     public void RefreshUI(){
         UpdateHealthBar();
+
+        Vector2Int MousePos = DR_InputHandler.instance.GetMouseCellPosition();
+        if (MousePos != LastMousePos || ShouldUpdateDetailsUI){
+            LastMousePos = MousePos;
+            ShouldUpdateDetailsUI = false;
+            DR_Entity MousedOverEntity = DR_GameManager.instance.CurrentMap.GetActorAtPosition(MousePos);
+            DetailsUI.SetEntity(MousedOverEntity);
+        }
     }
 
     void UpdateHealthBar(){
