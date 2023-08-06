@@ -10,7 +10,7 @@ public class InteractionSystem
         DR_Cell targetCell = map.Cells[pos.y, pos.x];
 
         if (pos == entity.Position){
-            actionList.Add(new WaitAction(true));
+            actionList.Add(new WaitAction(entity, true));
             return actionList;
         }
 
@@ -22,7 +22,7 @@ public class InteractionSystem
         }
 
         if (!targetCell.BlocksMovement()){
-            actionList.Add(new MoveAction(pos));
+            actionList.Add(new MoveAction(entity, pos));
         }
 
         if (targetCell.Prop != null){
@@ -33,7 +33,7 @@ public class InteractionSystem
 
             StairComponent stairs = targetCell.Prop.GetComponent<StairComponent>();
             if (stairs != null){
-                actionList.Add(new StairAction(stairs));
+                actionList.Add(new StairAction(entity, stairs));
             }
         }
 

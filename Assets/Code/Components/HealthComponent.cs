@@ -12,6 +12,17 @@ public class HealthComponent : DR_Component
         currentHealth = maxHealth;
     }
 
+    public void TakeDamage(int amount){
+        currentHealth = Mathf.Clamp(currentHealth-amount, 0, maxHealth);
+    }
+
+    public int Heal(int amount){
+        int newHealth = Mathf.Clamp(currentHealth+amount, 0, maxHealth);
+        int recovered = newHealth - currentHealth;
+        currentHealth = newHealth;
+        return recovered;
+    }
+
     public bool IsAlive(){
         return currentHealth > 0;
     }

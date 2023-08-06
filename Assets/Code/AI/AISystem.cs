@@ -15,6 +15,6 @@ public class AISystem
             }
         }
 
-        return new WaitAction();
+        return new WaitAction(entity);
     }
 }

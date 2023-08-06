@@ -97,27 +97,10 @@ public class DR_GameManager : MonoBehaviour
                         DR_Entity entity = turnSystem.PopNextEntity().Entity;
                         
                         DR_Action entityAction = AISystem.DetermineAIAction(entity, CurrentMap);
-
-                        switch (entityAction){
-                            case AttackAction attackAction:
-                                DamageSystem.HandleAttack(attackAction.target, attackAction.attacker);
-                                //NOT GOOD:
-                                if (!attackAction.target.IsAlive()){
-                                    CurrentMap.RemoveActor(attackAction.target.Entity);
-                                }
-                                break;
-                            case WaitAction waitAction:
-                                Debug.Log(entity.Name + " did nothing");
-                                break;
-                            default:
-                            break;
+                        if (entityAction != null){
+                            entityAction.Perform(this);
                         }
-
-                        LogSystem.instance.AddLog(entityAction);
                         UISystem.instance.RefreshDetailsUI();
-
-                        //TODO: create system to step through an action (use by both AI and player)
-
                     }
                     else
                     {
@@ -163,55 +146,8 @@ public class DR_GameManager : MonoBehaviour
                             // Just do first action for now
                             if (possibleActions.Count > 0)
                             {
-                                switch (possibleActions[0])
-                                {
-
-                                    case MoveAction moveAction:
-                                        {
-                                            Debug.Log(PlayerActor.Name + " moved");
-                                            CurrentMap.MoveActor(PlayerActor, moveAction.pos, true);
-                                            break;
-                                        }
-
-                                    case AttackAction attackAction:
-                                        {
-                                            DamageSystem.HandleAttack(attackAction.target, attackAction.attacker);
-                                            //NOT GOOD:
-                                            if (!attackAction.target.IsAlive()){
-                                                CurrentMap.RemoveActor(attackAction.target.Entity);
-                                            }
-                                            break;
-                                        }
-
-                                    case DoorAction doorAction:
-                                        {
-                                            doorAction.target.ToggleOpen();
-                                            Debug.Log(PlayerActor.Name + " opened " + doorAction.target.Entity.Name);
-                                            break;
-                                        }
-
-                                    case StairAction stairAction:
-                                        {
-                                            DR_Map dest = CurrentDungeon.GetNextMap(stairAction.stairs.goesDeeper);
-                                            MoveLevels(CurrentMap, dest, stairAction.stairs.goesDeeper);
-                                            break;
-                                        }
-
-                                    case WaitAction waitAction:
-                                        {
-                                            Debug.Log(PlayerActor.Name + " did nothing");
-                                            break;
-                                        }
-
-                                    default:
-                                        {
-                                            Debug.LogWarning("WAITING_FOR_INPUT: Player tried to perform an unknown action!");
-                                            break;
-                                        }
-                                }
-
-                                LogSystem.instance.AddLog(possibleActions[0]);
-
+                                possibleActions[0].Perform(this);
+                                
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
                                 turnSystem.PopNextEntity();
                                 SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
