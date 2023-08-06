@@ -1293,7 +1293,7 @@ MonoBehaviour:
   DebugMap: {fileID: 2800000, guid: 0582f64cf1c675048b75abd4ede2c6e7, type: 3}
   DebugMap2: {fileID: 2800000, guid: cdb7a3901af95af4889c058482d276a8, type: 3}
   PlayerTexture: {fileID: -2065779700, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-  EnemyTexture: {fileID: 1149762464, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  EnemyTexture: {fileID: 228414793, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   OpenDoorTexture: {fileID: -1390878266, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   ClosedDoorTexture: {fileID: -751181333, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   StairsDownTexture: {fileID: 316422303, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}

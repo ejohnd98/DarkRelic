@@ -731,6 +731,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: 16x16_tilesetv2_29
+      rect:
+        serializedVersion: 2
+        x: 112
+        y: 208
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b7e9ba27ffb1dc4ba877916165944a8
+      internalID: 228414793
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -764,6 +785,7 @@ TextureImporter:
       16x16_tilesetv2_26: -1524527926
       16x16_tilesetv2_27: -286857981
       16x16_tilesetv2_28: 2067603762
+      16x16_tilesetv2_29: 228414793
       16x16_tilesetv2_3: -301514813
       16x16_tilesetv2_4: -1697787086
       16x16_tilesetv2_5: 316422303
