@@ -9,6 +9,7 @@ public class DR_Entity
     public int id = -1;
 
     public bool noLongerValid = false;
+    public bool isOnMap = false;
 
     public List<DR_Component> ComponentList;
 

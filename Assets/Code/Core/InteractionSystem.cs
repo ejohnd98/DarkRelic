@@ -4,13 +4,38 @@ using UnityEngine;
 
 public class InteractionSystem
 {
-    public static List<DR_Action> GetPotentialActions(DR_Entity entity, DR_Map map, Vector2Int pos){
+    public static List<DR_Action> GetPotentialActions(DR_Entity entity, DR_Map map, Vector2Int pos, KeyCode key){
         List<DR_Action> actionList = new List<DR_Action>();
 
         DR_Cell targetCell = map.Cells[pos.y, pos.x];
 
-        if (pos == entity.Position){
+        if (key == KeyCode.Space){
             actionList.Add(new WaitAction(entity, true));
+            return actionList;
+        }
+
+        if (key == KeyCode.G){
+            if (targetCell.Item != null){
+                actionList.Add(new PickupAction(targetCell.Item, entity));
+            }
+            return actionList;
+        }
+
+        bool pressedNumKey = false;
+        for(int i = 0; i < DR_GameManager.NumberKeys.Length; i++){
+            if (key == DR_GameManager.NumberKeys[i]){
+                InventoryComponent inventory = entity.GetComponent<InventoryComponent>();
+                if (inventory != null){
+                    DR_Item item = inventory.GetItem(i);
+                    if (item != null){
+                        actionList.Add(new ItemAction(item, entity, entity));
+                        return actionList;
+                    }
+                }
+                pressedNumKey = true;
+            }
+        }
+        if (pressedNumKey){
             return actionList;
         }
 

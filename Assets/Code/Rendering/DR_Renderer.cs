@@ -84,7 +84,7 @@ public class DR_Renderer : MonoBehaviour
 
         List<DR_Entity> entitiesToRemove = new List<DR_Entity>();
         foreach(DR_Entity entity in EntityObjects.Keys){
-            if (entity.noLongerValid){
+            if (entity.noLongerValid || !entity.isOnMap){
                 entitiesToRemove.Add(entity);
             }
         }

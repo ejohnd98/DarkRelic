@@ -33,7 +33,9 @@ public class DR_GameManager : MonoBehaviour
 
     TurnSystem turnSystem;
 
-    static KeyCode[] KeyDirections = {KeyCode.UpArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.LeftArrow};
+    public static KeyCode[] KeyDirections = {KeyCode.UpArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.LeftArrow};
+    public static KeyCode[] NumberKeys = {KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5,
+        KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9};
     public Vector2Int[] Directions = {Vector2Int.up, Vector2Int.right, Vector2Int.down, Vector2Int.left};
 
     private void Awake() {
@@ -53,6 +55,7 @@ public class DR_GameManager : MonoBehaviour
 
         PlayerActor = EntityFactory.CreateActor(PlayerTexture, "Player");
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
+        UISystem.instance.UpdateInventoryUI(PlayerActor);
 
         MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35));
 
@@ -122,26 +125,40 @@ public class DR_GameManager : MonoBehaviour
                     //TODO make input handler class, and have key presses linger so that you can press arrow keys slightly before allowed
                     if (turnSystem.IsPlayerTurn())
                     {
-                        bool keyPressed = false;
+                        KeyCode key = KeyCode.None;
 
                         Vector2Int interactPos = Vector2Int.zero;
-                        for (int i = 0; i < 4; i++)
+                        for (int i = 0; i < KeyDirections.Length; i++)
                         {
                             if (DR_InputHandler.GetKeyPressed(KeyDirections[i]))
                             {
-                                keyPressed = true;
+                                key = KeyDirections[i];
                                 interactPos = PlayerActor.Position + Directions[i];
                             }
                         }
 
+                        for (int i = 0; i < NumberKeys.Length; i++)
+                        {
+                            if (DR_InputHandler.GetKeyPressed(NumberKeys[i]))
+                            {
+                                key = NumberKeys[i];
+                                interactPos = PlayerActor.Position;
+                            }
+                        }
+
                         if (DR_InputHandler.GetKeyPressed(KeyCode.Space)){
-                            keyPressed = true;
+                            key = KeyCode.Space;
                             interactPos = PlayerActor.Position;
                         }
 
-                        if (keyPressed)
+                        if (DR_InputHandler.GetKeyPressed(KeyCode.G)){
+                            key = KeyCode.G;
+                            interactPos = PlayerActor.Position;
+                        }
+
+                        if (key != KeyCode.None)
                         {
-                            List<DR_Action> possibleActions = InteractionSystem.GetPotentialActions(PlayerActor, CurrentMap, interactPos);
+                            List<DR_Action> possibleActions = InteractionSystem.GetPotentialActions(PlayerActor, CurrentMap, interactPos, key);
 
                             // Just do first action for now
                             if (possibleActions.Count > 0)
@@ -187,7 +204,7 @@ public class DR_GameManager : MonoBehaviour
 
     void SetGameState(GameState newState){
         if (CurrentState != newState){
-            Debug.Log("Changed states from " + CurrentState.ToString() + " to " + newState.ToString());
+            //Debug.Log("Changed states from " + CurrentState.ToString() + " to " + newState.ToString());
         }
         CurrentState = newState;
     }

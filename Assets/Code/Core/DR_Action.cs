@@ -119,6 +119,35 @@ public class ItemAction : DR_Action {
     }
 }
 
+public class PickupAction : DR_Action {
+    public DR_Item item;
+
+    public PickupAction (DR_Item item, DR_Entity user){
+        this.item = item;
+        this.owner = user;
+        loggable = true;
+    }
+
+    public override bool Perform(DR_GameManager gm){
+        base.Perform(gm);
+        InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
+        if (inventory != null){
+            bool addedItem = inventory.AddItem(item);
+            if (addedItem){
+                gm.CurrentMap.RemoveItem(item);
+            }
+            return addedItem;
+        }else{
+            Debug.Log("Inventory is invalid!");
+        }
+        return false;
+    }
+
+    public override string GetLogText(){
+        return owner.Name + " picked up " + item.Name;
+    }
+}
+
 public class WaitAction : DR_Action {
 
     public WaitAction(DR_Entity owner, bool logAction = false){

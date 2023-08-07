@@ -18,6 +18,7 @@ public class DR_Map
         if(!Cell.BlocksMovement() && Cell.Actor == null){
             Cell.Actor = Actor;
             Actor.Position = pos;
+            Actor.isOnMap = true;
             Entities.Add(Actor);
             return true;
         }
@@ -29,6 +30,7 @@ public class DR_Map
         if(!Cell.BlocksMovement() && Cell.Actor == null){
             Cell.Prop = Prop;
             Prop.Position = pos;
+            Prop.isOnMap = true;
             Entities.Add(Prop);
             return true;
         }
@@ -40,15 +42,24 @@ public class DR_Map
         if(!Cell.BlocksMovement() && Cell.Item == null){
             Cell.Item = item;
             item.Position = pos;
+            item.isOnMap = true;
             Entities.Add(item);
             return true;
         }
         return false;
     }
 
+    public void RemoveItem(DR_Item item){
+        DR_Cell Cell = Cells[item.Position.y, item.Position.x];
+        Cell.Item = null;
+        item.isOnMap = false;
+        Entities.Remove(item);
+    }
+
     public void RemoveProp(DR_Entity Prop){
         DR_Cell Cell = Cells[Prop.Position.y, Prop.Position.x];
         Cell.Prop = null;
+        Prop.isOnMap = false;
         Entities.Remove(Prop);
     }
 
@@ -56,6 +67,7 @@ public class DR_Map
         DR_Cell Cell = Cells[pos.y, pos.x];
         DR_Entity RemovedProp = Cell.Prop;
         Cell.Prop = null;
+        RemovedProp.isOnMap = false;
         Entities.Remove(RemovedProp);
 
         return RemovedProp;
@@ -64,6 +76,7 @@ public class DR_Map
     public void RemoveActor(DR_Entity Actor){
         DR_Cell Cell = Cells[Actor.Position.y, Actor.Position.x];
         Cell.Actor = null;
+        Actor.isOnMap = false;
         Entities.Remove(Actor);
     }
 
@@ -71,6 +84,7 @@ public class DR_Map
         DR_Cell Cell = Cells[pos.y, pos.x];
         DR_Entity RemovedActor = Cell.Actor;
         Cell.Actor = null;
+        RemovedActor.isOnMap = false;
         Entities.Remove(RemovedActor);
 
         return RemovedActor;

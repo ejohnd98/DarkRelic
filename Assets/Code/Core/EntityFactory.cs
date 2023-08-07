@@ -10,6 +10,7 @@ public class EntityFactory : MonoBehaviour
         NewActor.Name = Name;
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewActor.AddComponent<HealthComponent>(new HealthComponent(maxHealth));
+        NewActor.AddComponent<InventoryComponent>(new InventoryComponent(9));
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
         NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
         
@@ -30,7 +31,7 @@ public class EntityFactory : MonoBehaviour
         DR_Item NewItem = new DR_Item();
 
         NewItem.Name = Name;
-        NewItem.AddComponent<ItemComponent>(new ItemComponent());
+        NewItem.AddComponent<ItemComponent>(new ItemComponent(NewItem));
         NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewItem.AddComponent<HealingConsumableComponent>(new HealingConsumableComponent(healAmount));
         

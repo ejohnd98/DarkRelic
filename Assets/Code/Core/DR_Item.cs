@@ -7,10 +7,7 @@ public class DR_Item : DR_Entity
 
         bool itemUsed = false;
         for (int i = 0; i < ComponentList.Count; i++){
-            ConsumableComponent consumable = (ConsumableComponent)ComponentList[i];
-            if (consumable != null){
-                itemUsed |= consumable.Consume(gm, user, target);
-            }
+            itemUsed |= ComponentList[i].Trigger(gm, user, target);
         }
         return itemUsed;
     }

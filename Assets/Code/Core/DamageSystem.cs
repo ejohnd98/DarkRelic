@@ -10,7 +10,8 @@ public class DamageSystem
             target.TakeDamage(1);
             if(!target.IsAlive()){
                 Debug.Log(attacker.Name + " killed " + target.Entity.Name);
-                //TODO: make this better. have class to handle garbage collecting
+
+                //TODO: make this better. have class to handle "garbage collecting" of entities
                 target.Entity.noLongerValid = true;
             }
         }

@@ -4,6 +4,21 @@ using UnityEngine;
 
 public abstract class ConsumableComponent : DR_Component {
 
+    public bool RemoveAfterUse = true;
+
+    public override bool Trigger(DR_GameManager gm, DR_Entity user, DR_Entity target){
+        bool wasUsed = Consume(gm, user, target);
+
+        InventoryComponent inventory = user.GetComponent<InventoryComponent>();
+        ItemComponent itemComp = Entity.GetComponent<ItemComponent>();
+        if (wasUsed && inventory != null){
+            inventory.RemoveItem(itemComp.ownerItem);
+            return true;
+        }
+
+        return false;
+    }
+
     public virtual bool Consume(DR_GameManager gm, DR_Entity user, DR_Entity target){
         Debug.LogError("Consume not implemented!");
         return false;

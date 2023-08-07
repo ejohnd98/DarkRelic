@@ -39,6 +39,16 @@ public class DR_InputHandler : MonoBehaviour
         KeyCode.DownArrow,
         KeyCode.LeftArrow,
         KeyCode.Space,
+        KeyCode.G,
+        KeyCode.Alpha1,
+        KeyCode.Alpha2,
+        KeyCode.Alpha3,
+        KeyCode.Alpha4,
+        KeyCode.Alpha5,
+        KeyCode.Alpha6,
+        KeyCode.Alpha7,
+        KeyCode.Alpha8,
+        KeyCode.Alpha9
         };
 
     List<InputState> InputStates;
