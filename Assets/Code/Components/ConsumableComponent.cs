@@ -20,8 +20,18 @@ public abstract class ConsumableComponent : DR_Component {
 
 public class HealingConsumableComponent : ConsumableComponent {
 
+    public int healAmount = 4;
+
+    public HealingConsumableComponent(int amount){
+        healAmount = amount;
+    }
+
     public override bool Consume(DR_GameManager gm, DR_Entity user, DR_Entity target)
     {
-        return true;
+        HealthComponent health= target.GetComponent<HealthComponent>();
+        if (health != null){
+            return (health.Heal(healAmount) != 0);
+        }
+        return false;
     }
 }

@@ -148,6 +148,33 @@ public class MapGeneration{
                     }
                 }
 
+                state = MapGenState.PLACING_ITEMS;
+                break;
+            }
+            case MapGenState.PLACING_ITEMS: {
+                //TODO: do anything but this:
+                for (int i=1; i < rooms.Count; i++){
+                    int itemCount = Random.Range(0, 2);
+
+                    int placedItems = 0;
+                    while (placedItems < itemCount){
+                        int x = rooms[i].pos.x + Random.Range(1, rooms[i].size.x-1);
+                        int y = rooms[i].pos.y + Random.Range(1, rooms[i].size.y-1);
+
+                        // messy retry
+                        int attempts = 10;
+                        while (cells[y,x].type != MapGenCellType.FLOOR && attempts-- > 0){
+                            x = rooms[i].pos.x + Random.Range(1, rooms[i].size.x-1);
+                            y = rooms[i].pos.y + Random.Range(1, rooms[i].size.y-1);
+                        }
+                        if (cells[y,x].type == MapGenCellType.FLOOR){
+                            cells[y,x].type = MapGenCellType.ITEM;
+                        }
+                        //increment regardless to avoid infinite loops
+                        placedItems++;
+                    }
+                }
+
                 state = MapGenState.FINISHED;
                 break;
             }
@@ -300,7 +327,7 @@ public class DR_MapGen
                 bool isDoor = color.r < 0.1f && color.g > 0.9f && color.b < 0.1f;
                 if (isDoor){
                     DR_GameManager gm = DR_GameManager.instance;
-                    DR_Entity door = gm.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
+                    DR_Entity door = EntityFactory.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
                     NewMap.AddProp(door, new Vector2Int(x,y));
                 }
 
@@ -308,7 +335,7 @@ public class DR_MapGen
                 bool isStairsShallower= color.r < 0.1f && color.g < 0.1f && color.b > 0.9f;
                 if (isStairsDeeper || isStairsShallower){
                     DR_GameManager gm = DR_GameManager.instance;
-                    DR_Entity stairs = gm.CreateStairs(isStairsDeeper? gm.StairsDownTexture : gm.StairsUpTexture, isStairsDeeper);
+                    DR_Entity stairs = EntityFactory.CreateStairs(isStairsDeeper? gm.StairsDownTexture : gm.StairsUpTexture, isStairsDeeper);
                     NewMap.AddProp(stairs, new Vector2Int(x,y));
                 }
 
@@ -347,21 +374,26 @@ public class DR_MapGen
                         break;
                     case MapGenCellType.DOOR:
                         newCell.bBlocksMovement = false;
-                        DR_Entity door = gm.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
+                        DR_Entity door = EntityFactory.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
                         NewMap.AddProp(door, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.ENEMY:
                         newCell.bBlocksMovement = false;
-                        DR_Entity enemy = gm.CreateActor(gm.EnemyTexture, "Generic Enemy", 2);
+                        DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Generic Enemy", 2);
                         NewMap.AddActor(enemy, new Vector2Int(x,y));
                         break;
+                    case MapGenCellType.ITEM:
+                        newCell.bBlocksMovement = false;
+                        DR_Item item = EntityFactory.CreateHealingItem(gm.PotionTexture, "Health Potion", 4);
+                        NewMap.AddItem(item, new Vector2Int(x,y));
+                        break;
                     case MapGenCellType.STAIRS_UP:{
-                        DR_Entity stairs = gm.CreateStairs(gm.StairsUpTexture, false);
+                        DR_Entity stairs = EntityFactory.CreateStairs(gm.StairsUpTexture, false);
                         NewMap.AddProp(stairs, new Vector2Int(x,y));
                         break;
                     }
                     case MapGenCellType.STAIRS_DOWN:{
-                        DR_Entity stairs = gm.CreateStairs(gm.StairsDownTexture, true);
+                        DR_Entity stairs = EntityFactory.CreateStairs(gm.StairsDownTexture, true);
                         NewMap.AddProp(stairs, new Vector2Int(x,y));
                         break;
                     }

@@ -1298,6 +1298,7 @@ MonoBehaviour:
   ClosedDoorTexture: {fileID: -751181333, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   StairsDownTexture: {fileID: 316422303, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   StairsUpTexture: {fileID: -1697787086, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  PotionTexture: {fileID: 590706588, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   Directions:

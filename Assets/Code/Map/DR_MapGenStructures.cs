@@ -23,6 +23,7 @@ public enum MapGenCellType{
     FLOOR,
     DOOR,
     ENEMY,
+    ITEM,
     STAIRS_UP,
     STAIRS_DOWN
 }
@@ -35,6 +36,7 @@ public enum MapGenState{
     PLACING_TUNNELS,
     PLACING_PROPS,
     PLACING_ENEMIES,
+    PLACING_ITEMS,
     FINISHED
 }
 

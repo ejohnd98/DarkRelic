@@ -13,7 +13,7 @@ public class MoveAnimComponent : DR_Component
 
     public void SetAnim(Vector2Int target, float time = 0.1f, bool autoStart = true){
         //temp z
-        a = Entity.GetPosFloat(Entity.HasComponent<PropComponent>() ? DR_Renderer.PropDepth : DR_Renderer.ActorDepth);
+        a = Entity.GetPosFloat(DR_Renderer.GetDepthForEntity(Entity));
         b = a;
         b.x = target.x;
         b.y = target.y;

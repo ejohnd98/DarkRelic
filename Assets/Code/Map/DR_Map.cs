@@ -35,6 +35,17 @@ public class DR_Map
         return false;
     }
 
+    public bool AddItem(DR_Item item, Vector2Int pos){
+        DR_Cell Cell = Cells[pos.y, pos.x];
+        if(!Cell.BlocksMovement() && Cell.Item == null){
+            Cell.Item = item;
+            item.Position = pos;
+            Entities.Add(item);
+            return true;
+        }
+        return false;
+    }
+
     public void RemoveProp(DR_Entity Prop){
         DR_Cell Cell = Cells[Prop.Position.y, Prop.Position.x];
         Cell.Prop = null;
@@ -145,6 +156,22 @@ public class DR_Map
             }
         }
         return Vector2Int.zero;
+    }
+
+    public DR_Cell GetCell(Vector2Int pos){
+        if (!ValidPosition(pos)){
+            return null;
+        }
+
+        return Cells[pos.y, pos.x];
+    }
+
+    public DR_Item GetItemAtPosition(Vector2Int pos){
+        if (!ValidPosition(pos)){
+            return null;
+        }
+
+        return Cells[pos.y, pos.x].Item;
     }
 
     public DR_Entity GetActorAtPosition(Vector2Int pos){

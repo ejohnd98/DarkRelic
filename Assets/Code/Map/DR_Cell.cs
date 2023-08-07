@@ -7,6 +7,7 @@ public class DR_Cell
     public bool bBlocksMovement = false;
     public DR_Entity Actor;
     public DR_Entity Prop;
+    public DR_Item Item;
 
     public bool BlocksMovement(){
         if(bBlocksMovement || Actor != null){

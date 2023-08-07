@@ -8,6 +8,7 @@ public class DR_Renderer : MonoBehaviour
     public static int animsActive = 0;
 
     public static float ActorDepth = -1.0f;
+    public static float ItemDepth = -0.75f;
     public static float PropDepth = -0.5f;
 
     public Sprite WallTexture, FloorTexture, FogTexture;
@@ -119,9 +120,9 @@ public class DR_Renderer : MonoBehaviour
             MoveAnimComponent moveComponent = Entity.GetComponent<MoveAnimComponent>();
             if (moveComponent != null && moveComponent.isMoving){
                 moveComponent.AnimStep(deltaTime);
-                pos = moveComponent.GetAnimPosition(isProp ? PropDepth : ActorDepth);
+                pos = moveComponent.GetAnimPosition(GetDepthForEntity(Entity));
             }else{
-                pos = Entity.GetPosFloat(isProp ? PropDepth : ActorDepth);
+                pos = Entity.GetPosFloat(GetDepthForEntity(Entity));
             }
             
             EntityObjects[Entity].transform.position = pos;
@@ -138,5 +139,17 @@ public class DR_Renderer : MonoBehaviour
     public void AddEntityObj(DR_Entity entity){
         GameObject NewEntityObj = Instantiate(CellObj, Vector3.zero, Quaternion.identity, transform);
         EntityObjects[entity] = NewEntityObj;
+    }
+
+    public static float GetDepthForEntity(DR_Entity entity){
+        if (entity.HasComponent<PropComponent>()){
+            return PropDepth;
+        }
+
+        if (entity is DR_Item){
+            return ItemDepth;
+        }
+
+        return ActorDepth;
     }
 }
