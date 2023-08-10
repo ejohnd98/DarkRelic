@@ -78,6 +78,7 @@ public class DR_GameManager : MonoBehaviour
         DR_Renderer.instance.UpdateTiles();
 
         SetGameState(GameState.RUNNING);
+        UISystem.instance.RefreshDetailsUI();
     }
 
     void Update()
@@ -156,14 +157,23 @@ public class DR_GameManager : MonoBehaviour
                             interactPos = PlayerActor.Position;
                         }
 
-                        if (key != KeyCode.None)
+                        DR_Action UIAction = UISystem.instance.GetUIAction();
+
+                        if (key != KeyCode.None || UIAction != null)
                         {
                             List<DR_Action> possibleActions = InteractionSystem.GetPotentialActions(PlayerActor, CurrentMap, interactPos, key);
+                            DR_Action selectedAction = null;
+
+                            if (UIAction != null){
+                                selectedAction = UIAction;
+                            }else if (possibleActions.Count > 0){
+                                selectedAction = possibleActions[0] ;
+                            }
 
                             // Just do first action for now
-                            if (possibleActions.Count > 0)
+                            if (selectedAction != null)
                             {
-                                possibleActions[0].Perform(this);
+                                selectedAction.Perform(this);
 
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
                                 turnSystem.PopNextEntity();
@@ -171,6 +181,7 @@ public class DR_GameManager : MonoBehaviour
                                 DR_Renderer.instance.UpdateTiles();
                                 UISystem.instance.RefreshDetailsUI();
                             }
+                            break;
                         }
                     }
                     else

@@ -10,6 +10,8 @@ public class UISystem : MonoBehaviour
     public EntityDetailsUI detailsUI;
     public InventoryUI inventoryUI;
 
+    DR_Action UIAction;
+
     Vector2Int LastMousePos = Vector2Int.zero;
     bool ShouldUpdateDetailsUI = true;
 
@@ -27,11 +29,15 @@ public class UISystem : MonoBehaviour
         inventoryUI.SetEntity(entity);
     }
 
+    public void RefreshInventoryUI(){
+        inventoryUI.UpdateUI();
+    }
+
     public void RefreshUI(){
         UpdateHealthBar();
 
-        inventoryUI.UpdateUI();
-
+        //TODO: replace this with UIButtons or similar to allow actual UI to block mousing over tiles
+        // (mouse over of inventory items is broken right now)
         Vector2Int MousePos = DR_InputHandler.instance.GetMouseCellPosition();
         if (MousePos != LastMousePos || ShouldUpdateDetailsUI){
             LastMousePos = MousePos;
@@ -49,6 +55,20 @@ public class UISystem : MonoBehaviour
         float HealthFraction = Mathf.Clamp01(PlayerHealth.currentHealth / (float) PlayerHealth.maxHealth);
 
         HealthBarPivot.localScale = new Vector3(HealthFraction, 1.0f, 1.0f);
+    }
+
+    public void SetUIAction(DR_Action action){
+        UIAction = action;
+    }
+
+    public DR_Action GetUIAction(bool clearAction = true){
+        DR_Action returnedAction = UIAction;
+
+        if (clearAction){
+            UIAction = null;
+        }
+        
+        return returnedAction;
     }
 
     void Update()

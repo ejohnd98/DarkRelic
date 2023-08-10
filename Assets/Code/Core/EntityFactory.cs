@@ -10,7 +10,7 @@ public class EntityFactory : MonoBehaviour
         NewActor.Name = Name;
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewActor.AddComponent<HealthComponent>(new HealthComponent(maxHealth));
-        NewActor.AddComponent<InventoryComponent>(new InventoryComponent(9));
+        NewActor.AddComponent<InventoryComponent>(new InventoryComponent(25));
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
         NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
         

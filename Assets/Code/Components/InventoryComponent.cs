@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class InventoryComponent : DR_Component
 {
-    int capacity = 0;
+    public int capacity = 0;
     public List<DR_Item> items;
 
     public InventoryComponent(int capacity){
@@ -14,6 +14,8 @@ public class InventoryComponent : DR_Component
 
     public void RemoveItem(DR_Item item){
         items.Remove(item);
+        //TODO: only do this when the displayed UI matches this one
+        UISystem.instance.RefreshInventoryUI();
     }
 
     public void DropItem(DR_GameManager gm, DR_Item item){
@@ -25,6 +27,9 @@ public class InventoryComponent : DR_Component
         }
 
         gm.CurrentMap.AddItem(item, Entity.Position);
+
+        //TODO: only do this when the displayed UI matches this one
+        UISystem.instance.RefreshInventoryUI();
     }
 
     public DR_Item GetItem(int index){
@@ -37,6 +42,10 @@ public class InventoryComponent : DR_Component
     public bool AddItem(DR_Item item){
         if (items.Count + 1 < capacity){
             items.Add(item);
+
+            //TODO: only do this when the displayed UI matches this one
+            UISystem.instance.RefreshInventoryUI();
+            
             return true;
         }
         return false;

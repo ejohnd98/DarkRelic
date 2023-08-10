@@ -7,6 +7,7 @@ public abstract class DR_Action {
     public DR_Entity owner;
 
     public virtual bool Perform(DR_GameManager gm){
+        //TODO: only log if action was successful (and log a different message if not?)
         LogSystem.instance.AddLog(this);
         return false;
     }
