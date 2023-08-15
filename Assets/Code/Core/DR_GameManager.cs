@@ -21,7 +21,8 @@ public class DR_GameManager : MonoBehaviour
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
     public Texture2D DebugMap, DebugMap2;
-    public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture, PotionTexture;
+    public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
+        PotionTexture, MagicScrollTexture;
 
     public bool debug_disableFOV = false;
 
@@ -53,7 +54,7 @@ public class DR_GameManager : MonoBehaviour
         CurrentDungeon = new DR_Dungeon();
         CurrentDungeon.name = "Testing Dungeon";
 
-        PlayerActor = EntityFactory.CreateActor(PlayerTexture, "Player");
+        PlayerActor = EntityFactory.CreateActor(PlayerTexture, "Player", 20, Alignment.PLAYER);
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
         UISystem.instance.UpdateInventoryUI(PlayerActor);
 

@@ -66,4 +66,9 @@ public class DR_Entity
     public Vector3 GetPosFloat(float z = 0.0f){
         return new Vector3(Position.x, Position.y, z);
     }
+
+    public int DistanceTo(Vector2Int pos){
+        Vector2Int diff = Position - pos;
+        return Mathf.Abs(diff.x) + Mathf.Abs(diff.y);
+    }
 }

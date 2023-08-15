@@ -379,12 +379,24 @@ public class DR_MapGen
                         break;
                     case MapGenCellType.ENEMY:
                         newCell.bBlocksMovement = false;
-                        DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Generic Enemy", 2);
+                        DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Generic Enemy", 2, Alignment.ENEMY);
                         NewMap.AddActor(enemy, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.ITEM:
                         newCell.bBlocksMovement = false;
-                        DR_Item item = EntityFactory.CreateHealingItem(gm.PotionTexture, "Health Potion", 4);
+                        //very temp item generation:
+                        DR_Item item = null;
+                        int itemIndex = Random.Range(0, 2);
+                        switch(itemIndex){
+                            case 0:
+                                item = EntityFactory.CreateHealingItem(gm.PotionTexture, "Health Potion", 4);
+                                break;
+                            case 1:
+                                item = EntityFactory.CreateMagicItem(gm.MagicScrollTexture, "Magic Scroll", 5);
+                                break;
+                            default:
+                                break;
+                        }
                         NewMap.AddItem(item, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.STAIRS_UP:{

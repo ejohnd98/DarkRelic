@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class DamageSystem
 {
-    public static void HandleAttack(HealthComponent target, DR_Entity attacker){
+    public static void HandleAttack(DR_GameManager gm, HealthComponent target, int damage){
         if(target != null){
-            Debug.Log(attacker.Name + " attacked " + target.Entity.Name);
-            target.TakeDamage(1);
+            target.TakeDamage(damage);
             if(!target.IsAlive()){
-                Debug.Log(attacker.Name + " killed " + target.Entity.Name);
-
                 //TODO: make this better. have class to handle "garbage collecting" of entities
                 target.Entity.noLongerValid = true;
+                gm.CurrentMap.RemoveActor(target.Entity);
             }
         }
     }

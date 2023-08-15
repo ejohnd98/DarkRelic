@@ -721,10 +721,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.0681052
-    y: 0.090909086
-    width: 0.8631153
-    height: 0.8181818
+    x: 0.16666667
+    y: 0.13927856
+    width: 0.6666667
+    height: 0.7214429
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -1346,10 +1346,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.0681052
-    y: 0.090909086
-    width: 0.8631153
-    height: 0.8181818
+    x: 0.16666667
+    y: 0.13927856
+    width: 0.6666667
+    height: 0.7214429
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -1569,6 +1569,7 @@ MonoBehaviour:
   StairsDownTexture: {fileID: 316422303, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   StairsUpTexture: {fileID: -1697787086, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   PotionTexture: {fileID: 590706588, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
+  MagicScrollTexture: {fileID: -1012467279, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   Directions:

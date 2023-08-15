@@ -40,6 +40,7 @@ public class DR_InputHandler : MonoBehaviour
         KeyCode.LeftArrow,
         KeyCode.Space,
         KeyCode.G,
+        KeyCode.LeftControl,
         KeyCode.Alpha1,
         KeyCode.Alpha2,
         KeyCode.Alpha3,

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EntityFactory : MonoBehaviour
 {
-    public static DR_Entity CreateActor(Sprite Sprite, string Name, int maxHealth = 10){
+    public static DR_Entity CreateActor(Sprite Sprite, string Name, int maxHealth = 10, Alignment alignment = Alignment.ENEMY){
         DR_Entity NewActor = new DR_Entity();
 
         NewActor.Name = Name;
@@ -13,6 +13,7 @@ public class EntityFactory : MonoBehaviour
         NewActor.AddComponent<InventoryComponent>(new InventoryComponent(25));
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
         NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
+        NewActor.AddComponent<AlignmentComponent>(new AlignmentComponent(alignment));
         
         return NewActor;
     }
@@ -34,6 +35,17 @@ public class EntityFactory : MonoBehaviour
         NewItem.AddComponent<ItemComponent>(new ItemComponent(NewItem));
         NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewItem.AddComponent<HealingConsumableComponent>(new HealingConsumableComponent(healAmount));
+        
+        return NewItem;
+    }
+
+    public static DR_Item CreateMagicItem(Sprite Sprite, string Name, int damageAmount){
+        DR_Item NewItem = new DR_Item();
+
+        NewItem.Name = Name;
+        NewItem.AddComponent<ItemComponent>(new ItemComponent(NewItem));
+        NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
+        NewItem.AddComponent<MagicConsumableComponent>(new MagicConsumableComponent(damageAmount));
         
         return NewItem;
     }

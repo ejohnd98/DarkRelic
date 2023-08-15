@@ -6,6 +6,11 @@ public abstract class DR_Action {
     public bool loggable = false;
     public DR_Entity owner;
 
+    //TODO: create more robust way of multi step actions
+    public bool requiresFurtherInput = false;
+    public bool hasReceivedFurtherInput = false;
+    public Vector2Int additionalVector;
+
     public virtual bool Perform(DR_GameManager gm){
         //TODO: only log if action was successful (and log a different message if not?)
         LogSystem.instance.AddLog(this);
@@ -14,6 +19,10 @@ public abstract class DR_Action {
 
     public virtual string GetLogText(){
         return "";
+    }
+
+    public void ProvideVector(Vector2Int pos){
+        additionalVector = pos;
     }
 }
 
@@ -51,7 +60,9 @@ public class AttackAction : DR_Action {
 
     public override bool Perform(DR_GameManager gm){
         base.Perform(gm);
-        DamageSystem.HandleAttack(target, owner);
+        //todo: get damage amount from some component (melee component?)
+        // and/or assign damage to action upon creating it?
+        DamageSystem.HandleAttack(gm, target, 1);
 
         //TODO: do this somewhere else?
         if (!target.IsAlive()){
@@ -116,7 +127,7 @@ public class ItemAction : DR_Action {
 
     public override string GetLogText(){
         //todo: get this from the item itself
-        return owner.Name + " used " + item.Name;
+        return owner.Name + " used " + item.Name + ((owner == target)? "" : " on " + target.Name);
     }
 }
 
@@ -139,7 +150,7 @@ public class PickupAction : DR_Action {
             }
             return addedItem;
         }else{
-            Debug.Log("Inventory is invalid!");
+            Debug.LogError("Inventory is invalid!");
         }
         return false;
     }
@@ -148,6 +159,36 @@ public class PickupAction : DR_Action {
         return owner.Name + " picked up " + item.Name;
     }
 }
+
+public class DropAction : DR_Action {
+    public DR_Item item;
+
+    public DropAction (DR_Item item, DR_Entity user){
+        this.item = item;
+        this.owner = user;
+        loggable = true;
+    }
+
+    public override bool Perform(DR_GameManager gm){
+        base.Perform(gm);
+        InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
+        if (inventory != null){
+            if (gm.CurrentMap.GetItemAtPosition(owner.Position) == null){
+                inventory.RemoveItem(item);
+                return gm.CurrentMap.AddItem(item, owner.Position);
+            }
+            
+        }else{
+            Debug.LogError("Inventory is invalid!");
+        }
+        return false;
+    }
+
+    public override string GetLogText(){
+        return owner.Name + " dropped " + item.Name;
+    }
+}
+
 
 public class WaitAction : DR_Action {
 

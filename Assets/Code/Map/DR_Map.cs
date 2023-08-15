@@ -39,7 +39,7 @@ public class DR_Map
 
     public bool AddItem(DR_Item item, Vector2Int pos){
         DR_Cell Cell = Cells[pos.y, pos.x];
-        if(!Cell.BlocksMovement() && Cell.Item == null){
+        if(Cell.Item == null){
             Cell.Item = item;
             item.Position = pos;
             item.isOnMap = true;

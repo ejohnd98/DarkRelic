@@ -68,7 +68,14 @@ public class InventoryUI : MonoBehaviour
     }
 
     public void OnItemClicked(DR_Item item, DR_Entity user, DR_Entity target){
-        ItemAction itemAction = new ItemAction(item, user, target);
-        UISystem.instance.SetUIAction(itemAction);
+        //messy drop/add action:
+        DR_Action action;
+
+        if (DR_InputHandler.GetKeyHeld(KeyCode.LeftControl)){
+            action = new DropAction(item, user);
+        }else{
+            action = new ItemAction(item, user, target);
+        }
+        UISystem.instance.SetUIAction(action);
     }
 }
