@@ -80,4 +80,16 @@ public class LogSystem : MonoBehaviour
 
         LogObjs.Add(log);
     }
+
+    public void AddTextLog(string text){
+        if (LogObjs.Count == maxVisibleLogs){
+            Destroy(LogObjs[0].obj);
+            LogObjs.RemoveAt(0);
+        }
+
+        LogEntry log = new LogEntry(text, 1.5f,  GameObject.Instantiate(LogObj, LogParent));
+        log.obj.GetComponent<TextMeshProUGUI>().text = log.content;
+
+        LogObjs.Add(log);
+    }
 }

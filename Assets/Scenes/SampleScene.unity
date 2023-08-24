@@ -1569,8 +1569,8 @@ MonoBehaviour:
   StairsDownTexture: {fileID: 316422303, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   StairsUpTexture: {fileID: -1697787086, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   PotionTexture: {fileID: 590706588, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
-  MagicScrollTexture: {fileID: -1012467279, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-  MagicScrollTexture2: {fileID: -1524527926, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  FireboltTexture: {fileID: -1012467279, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  ShockTexture: {fileID: -1524527926, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   Directions:
@@ -1605,6 +1605,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d15cf1d05125da04a9238e54c2b23030, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mouseWorldPosition: {x: 0, y: 0}
+  mouseIsInWorld: 0
   cameraObj: {fileID: 0}
   inputPersistLength: 0.25
 --- !u!1 &1542393316

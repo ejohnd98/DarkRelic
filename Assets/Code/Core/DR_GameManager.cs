@@ -24,7 +24,7 @@ public class DR_GameManager : MonoBehaviour
     public DR_Map CurrentMap;
     public Texture2D DebugMap, DebugMap2;
     public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
-        PotionTexture, MagicScrollTexture, MagicScrollTexture2;
+        PotionTexture, FireboltTexture, ShockTexture;
 
     public bool debug_disableFOV = false;
 
@@ -67,6 +67,15 @@ public class DR_GameManager : MonoBehaviour
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+
+        //temp:
+        DR_Entity item1 = EntityFactory.CreateHealingItem(PotionTexture, "Health Potion", 4);
+        DR_Entity item2 = EntityFactory.CreateMagicItem(ShockTexture, "Shock Scroll", 5);
+        DR_Entity item3 = EntityFactory.CreateTargetedMagicItem(FireboltTexture, "Firebolt Scroll", 5);
+
+        PlayerActor.GetComponent<InventoryComponent>().AddItem(item1);
+        PlayerActor.GetComponent<InventoryComponent>().AddItem(item2);
+        PlayerActor.GetComponent<InventoryComponent>().AddItem(item3);
         
         MoveLevels(null, CurrentDungeon.maps[0], true);
         UpdateCurrentMap();
@@ -178,6 +187,7 @@ public class DR_GameManager : MonoBehaviour
                             {
                                 if (selectedAction.requiresFurtherInput){
                                     CurrentState = GameState.FURTHER_INPUT_REQUIRED;
+                                    LogSystem.instance.AddTextLog("Please select a target...");
                                     currentAction = selectedAction;
                                     UISystem.instance.BeginTargetSelection();
                                     break;

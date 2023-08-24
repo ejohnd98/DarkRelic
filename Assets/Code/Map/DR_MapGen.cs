@@ -392,10 +392,10 @@ public class DR_MapGen
                                 item = EntityFactory.CreateHealingItem(gm.PotionTexture, "Health Potion", 4);
                                 break;
                             case 1:
-                                item = EntityFactory.CreateMagicItem(gm.MagicScrollTexture, "Closest Magic Scroll", 5);
+                                item = EntityFactory.CreateMagicItem(gm.ShockTexture, "Shock Scroll", 5);
                                 break;
                             case 2:
-                                item = EntityFactory.CreateTargetedMagicItem(gm.MagicScrollTexture2, "Target Magic Scroll", 5);
+                                item = EntityFactory.CreateTargetedMagicItem(gm.FireboltTexture, "Firebolt Scroll", 5);
                                 break;
                             default:
                                 break;
