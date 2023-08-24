@@ -15,8 +15,9 @@ public class DR_Renderer : MonoBehaviour
     public GameObject CellObj;
 
     Dictionary<DR_Entity, GameObject> EntityObjects;
-    //TODO: make cells dictionaries as well (hash can be their position?)
-    List<GameObject> CellObjects;
+    Dictionary<Vector2Int, GameObject> CellObjects;
+
+    Vector2Int selectedCellPos;
 
     void Awake()
     {
@@ -26,7 +27,7 @@ public class DR_Renderer : MonoBehaviour
     
         instance = this;
         EntityObjects = new Dictionary<DR_Entity, GameObject>();
-        CellObjects = new List<GameObject>();
+        CellObjects = new Dictionary<Vector2Int, GameObject>();
     }
 
     void LateUpdate() {
@@ -39,7 +40,7 @@ public class DR_Renderer : MonoBehaviour
     public void UpdateTiles(){
         DR_Map currentMap = DR_GameManager.instance.CurrentMap;
 
-        foreach(GameObject obj in CellObjects){
+        foreach(GameObject obj in CellObjects.Values){
             Destroy(obj);
         }
         CellObjects.Clear();
@@ -56,13 +57,13 @@ public class DR_Renderer : MonoBehaviour
                     NewCellObj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
                 }
                 NewCellObj.GetComponent<SpriteRenderer>().sprite = CellSprite;
-                CellObjects.Add(NewCellObj);
+                CellObjects.Add(new Vector2Int(x,y), NewCellObj);
             }
         }
     }
 
     public void ClearAllObjects(){
-        foreach(GameObject obj in CellObjects){
+        foreach(GameObject obj in CellObjects.Values){
             Destroy(obj);
         }
         CellObjects.Clear();
@@ -141,12 +142,28 @@ public class DR_Renderer : MonoBehaviour
         EntityObjects[entity] = NewEntityObj;
     }
 
+    public void ResetSelectedCell(){
+        if (CellObjects.ContainsKey(selectedCellPos)){
+            GameObject selectedCell = CellObjects[selectedCellPos];
+            selectedCell.GetComponent<CellObj>().SetSelected(false);
+        }
+    }
+
+    public void SetSelectedCell(Vector2Int pos){
+        ResetSelectedCell();
+        if (CellObjects.ContainsKey(pos)){
+            GameObject selectedCell = CellObjects[pos];
+            selectedCell.GetComponent<CellObj>().SetSelected(true);
+            selectedCellPos = pos;
+        }
+    }
+
     public static float GetDepthForEntity(DR_Entity entity){
         if (entity.HasComponent<PropComponent>()){
             return PropDepth;
         }
 
-        if (entity is DR_Item){
+        if (entity is DR_Entity){
             return ItemDepth;
         }
 

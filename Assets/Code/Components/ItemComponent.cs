@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class ItemComponent : DR_Component
 {
-    public DR_Item ownerItem;
+    public bool requireFurtherInputOnUse = false;
+    public bool UseItem(DR_GameManager gm, DR_Entity user, DR_Entity target){
 
-    //TODO: refactor so this isn't needed
-    public ItemComponent(DR_Item ownerAsItem){
-        ownerItem = ownerAsItem;
+        bool itemUsed = false;
+        for (int i = 0; i < Entity.ComponentList.Count; i++){
+            itemUsed |= Entity.ComponentList[i].Trigger(gm, user, target);
+        }
+        return itemUsed;
     }
 }

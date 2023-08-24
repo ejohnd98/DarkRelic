@@ -46,7 +46,7 @@ public class InventoryUI : MonoBehaviour
             for (int i = 0; i < inventory.items.Count; i++){
                 GameObject itemButtonObj = Instantiate(ItemButtonPrefab, Vector3.zero, Quaternion.identity, ItemButtonsParent);
                 UIItemButton itemButton = itemButtonObj.GetComponent<UIItemButton>();
-                DR_Item item = inventory.items[i];
+                DR_Entity item = inventory.items[i];
                 itemButton.SetEntity(item);
 
                 itemButton.OnMouseDownEvents.AddListener(() => {OnItemClicked(item, entity, entity);});
@@ -67,7 +67,7 @@ public class InventoryUI : MonoBehaviour
         InventoryUIParent.SetActive(true);
     }
 
-    public void OnItemClicked(DR_Item item, DR_Entity user, DR_Entity target){
+    public void OnItemClicked(DR_Entity item, DR_Entity user, DR_Entity target){
         //messy drop/add action:
         DR_Action action;
 

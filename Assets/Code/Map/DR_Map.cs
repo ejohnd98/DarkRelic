@@ -37,7 +37,7 @@ public class DR_Map
         return false;
     }
 
-    public bool AddItem(DR_Item item, Vector2Int pos){
+    public bool AddItem(DR_Entity item, Vector2Int pos){
         DR_Cell Cell = Cells[pos.y, pos.x];
         if(Cell.Item == null){
             Cell.Item = item;
@@ -49,7 +49,7 @@ public class DR_Map
         return false;
     }
 
-    public void RemoveItem(DR_Item item){
+    public void RemoveItem(DR_Entity item){
         DR_Cell Cell = Cells[item.Position.y, item.Position.x];
         Cell.Item = null;
         item.isOnMap = false;
@@ -180,7 +180,7 @@ public class DR_Map
         return Cells[pos.y, pos.x];
     }
 
-    public DR_Item GetItemAtPosition(Vector2Int pos){
+    public DR_Entity GetItemAtPosition(Vector2Int pos){
         if (!ValidPosition(pos)){
             return null;
         }

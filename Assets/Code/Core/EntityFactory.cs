@@ -28,24 +28,38 @@ public class EntityFactory : MonoBehaviour
         return NewProp;
     }
 
-    public static DR_Item CreateHealingItem(Sprite Sprite, string Name, int healAmount){
-        DR_Item NewItem = new DR_Item();
+    public static DR_Entity CreateHealingItem(Sprite Sprite, string Name, int healAmount){
+        DR_Entity NewItem = new DR_Entity();
 
         NewItem.Name = Name;
-        NewItem.AddComponent<ItemComponent>(new ItemComponent(NewItem));
+        NewItem.AddComponent<ItemComponent>(new ItemComponent());
         NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewItem.AddComponent<HealingConsumableComponent>(new HealingConsumableComponent(healAmount));
         
         return NewItem;
     }
 
-    public static DR_Item CreateMagicItem(Sprite Sprite, string Name, int damageAmount){
-        DR_Item NewItem = new DR_Item();
+    public static DR_Entity CreateMagicItem(Sprite Sprite, string Name, int damageAmount){
+        DR_Entity NewItem = new DR_Entity();
 
         NewItem.Name = Name;
-        NewItem.AddComponent<ItemComponent>(new ItemComponent(NewItem));
+        NewItem.AddComponent<ItemComponent>(new ItemComponent());
         NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewItem.AddComponent<MagicConsumableComponent>(new MagicConsumableComponent(damageAmount));
+        NewItem.GetComponent<MagicConsumableComponent>().targetClosest = true;
+        
+        return NewItem;
+    }
+
+    public static DR_Entity CreateTargetedMagicItem(Sprite Sprite, string Name, int damageAmount){
+        DR_Entity NewItem = new DR_Entity();
+
+        NewItem.Name = Name;
+        NewItem.AddComponent<ItemComponent>(new ItemComponent());
+        NewItem.GetComponent<ItemComponent>().requireFurtherInputOnUse = true;
+        NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
+        NewItem.AddComponent<MagicConsumableComponent>(new MagicConsumableComponent(damageAmount));
+        NewItem.GetComponent<MagicConsumableComponent>().targetClosest = false;
         
         return NewItem;
     }

@@ -6,10 +6,10 @@ public abstract class DR_Action {
     public bool loggable = false;
     public DR_Entity owner;
 
-    //TODO: create more robust way of multi step actions
+    //TODO: create more robust way of multi step actions (array of input structs/classes?)
+    // could later autopopulate that array to streamline using items and targeting things
     public bool requiresFurtherInput = false;
     public bool hasReceivedFurtherInput = false;
-    public Vector2Int additionalVector;
 
     public virtual bool Perform(DR_GameManager gm){
         //TODO: only log if action was successful (and log a different message if not?)
@@ -21,8 +21,9 @@ public abstract class DR_Action {
         return "";
     }
 
-    public void ProvideVector(Vector2Int pos){
-        additionalVector = pos;
+    public virtual bool GiveAdditionalInput(DR_GameManager gm, Vector2Int pos){
+        Debug.LogError("GiveAdditionalInput not implemented!");
+        return false;
     }
 }
 
@@ -111,18 +112,38 @@ public class DoorAction : DR_Action {
 
 public class ItemAction : DR_Action {
     public DR_Entity target;
-    public DR_Item item;
+    public DR_Entity item;
 
-    public ItemAction (DR_Item item, DR_Entity user, DR_Entity target){
+    public ItemAction (DR_Entity item, DR_Entity user, DR_Entity target){
         this.item = item;
         this.owner = user;
         this.target = target;
+
+        ItemComponent itemComponent = item.GetComponent<ItemComponent>();
+        if (itemComponent != null){
+            requiresFurtherInput = itemComponent.requireFurtherInputOnUse;
+        }
+
         loggable = true;
     }
 
     public override bool Perform(DR_GameManager gm){
         base.Perform(gm);
-        return item.UseItem(gm, owner, target);
+        ItemComponent itemComponent = item.GetComponent<ItemComponent>();
+        if (itemComponent != null){
+            return itemComponent.UseItem(gm, owner, target);
+        }
+        return false;
+    }
+
+    public override bool GiveAdditionalInput(DR_GameManager gm, Vector2Int pos){
+        DR_Entity newTarget = gm.CurrentMap.GetActorAtPosition(pos);
+        if (newTarget != null){
+            target = newTarget;
+            hasReceivedFurtherInput = true;
+            return true;
+        }
+        return false;
     }
 
     public override string GetLogText(){
@@ -132,9 +153,9 @@ public class ItemAction : DR_Action {
 }
 
 public class PickupAction : DR_Action {
-    public DR_Item item;
+    public DR_Entity item;
 
-    public PickupAction (DR_Item item, DR_Entity user){
+    public PickupAction (DR_Entity item, DR_Entity user){
         this.item = item;
         this.owner = user;
         loggable = true;
@@ -161,9 +182,9 @@ public class PickupAction : DR_Action {
 }
 
 public class DropAction : DR_Action {
-    public DR_Item item;
+    public DR_Entity item;
 
-    public DropAction (DR_Item item, DR_Entity user){
+    public DropAction (DR_Entity item, DR_Entity user){
         this.item = item;
         this.owner = user;
         loggable = true;

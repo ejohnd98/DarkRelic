@@ -5,20 +5,20 @@ using UnityEngine;
 public class InventoryComponent : DR_Component
 {
     public int capacity = 0;
-    public List<DR_Item> items;
+    public List<DR_Entity> items;
 
     public InventoryComponent(int capacity){
-        items = new List<DR_Item>();
+        items = new List<DR_Entity>();
         this.capacity = capacity;
     }
 
-    public void RemoveItem(DR_Item item){
+    public void RemoveItem(DR_Entity item){
         items.Remove(item);
         //TODO: only do this when the displayed UI matches this one
         UISystem.instance.RefreshInventoryUI();
     }
 
-    public void DropItem(DR_GameManager gm, DR_Item item){
+    public void DropItem(DR_GameManager gm, DR_Entity item){
         items.Remove(item);
 
         if (gm.CurrentMap.GetItemAtPosition(Entity.Position) != null){
@@ -32,14 +32,14 @@ public class InventoryComponent : DR_Component
         UISystem.instance.RefreshInventoryUI();
     }
 
-    public DR_Item GetItem(int index){
+    public DR_Entity GetItem(int index){
         if (index < items.Count){
             return items[index];
         }
         return null;
     }
 
-    public bool AddItem(DR_Item item){
+    public bool AddItem(DR_Entity item){
         if (items.Count + 1 < capacity){
             items.Add(item);
 

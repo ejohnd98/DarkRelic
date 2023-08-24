@@ -10,9 +10,8 @@ public abstract class ConsumableComponent : DR_Component {
         bool wasUsed = Consume(gm, user, target);
 
         InventoryComponent inventory = user.GetComponent<InventoryComponent>();
-        ItemComponent itemComp = Entity.GetComponent<ItemComponent>();
         if (wasUsed && inventory != null){
-            inventory.RemoveItem(itemComp.ownerItem);
+            inventory.RemoveItem(Entity);
             return true;
         }
 
@@ -25,7 +24,7 @@ public abstract class ConsumableComponent : DR_Component {
     }
 
     public DR_Action GetAction(DR_Entity user, DR_Entity target){
-        DR_Item OwningItem = (DR_Item)Entity;
+        DR_Entity OwningItem = (DR_Entity)Entity;
         if (OwningItem == null){
             Debug.LogException(new System.Exception("ConsumableComponent on non-item entity"));
         }
@@ -56,44 +55,52 @@ public class MagicConsumableComponent : ConsumableComponent {
     public int damageAmount = 5;
     public int maxRange = 6;
 
+    //todo: make enum of targeting types?
+    public bool targetClosest = false;
+
     public MagicConsumableComponent(int amount){
         damageAmount = amount;
     }
 
     public override bool Consume(DR_GameManager gm, DR_Entity user, DR_Entity target)
-    {
-        //Picks closest entity as target
-        DR_Entity closestTarget = null;
-        AlignmentComponent userAlignment = user.GetComponent<AlignmentComponent>();
-        if (userAlignment == null){
-            Debug.LogError("MagicDamageComponent.Consume: user (" + user.Name + ") alignment component is NULL!");
-            return false;
-        }
+    { 
+        DR_Entity chosenTarget = null;
 
-        int closestDist = -1;
-        foreach (DR_Entity entity in gm.CurrentMap.Entities){
+        //Picks closest entity if target is null
+        if (targetClosest){
+            AlignmentComponent userAlignment = user.GetComponent<AlignmentComponent>();
+            if (userAlignment == null){
+                Debug.LogError("MagicDamageComponent.Consume: user (" + user.Name + ") alignment component is NULL!");
+                return false;
+            }
 
-            AlignmentComponent alignment = entity.GetComponent<AlignmentComponent>();
-            if (alignment != null && !alignment.IsFriendly(userAlignment)){
-                
-                int dist = entity.DistanceTo(user.Position);
-                if (dist > maxRange){
-                    continue;
-                }
+            int closestDist = -1;
+            foreach (DR_Entity entity in gm.CurrentMap.Entities){
 
-                if (!gm.CurrentMap.IsVisible[entity.Position.y, entity.Position.x]){
-                    continue;
-                }
+                AlignmentComponent alignment = entity.GetComponent<AlignmentComponent>();
+                if (alignment != null && !alignment.IsFriendly(userAlignment)){
+                    
+                    int dist = entity.DistanceTo(user.Position);
+                    if (dist > maxRange){
+                        continue;
+                    }
 
-                if (closestTarget == null || dist < closestDist){
-                    closestDist = dist;
-                    closestTarget = entity;
+                    if (!gm.CurrentMap.IsVisible[entity.Position.y, entity.Position.x]){
+                        continue;
+                    }
+
+                    if (chosenTarget == null || dist < closestDist){
+                        closestDist = dist;
+                        chosenTarget = entity;
+                    }
                 }
             }
+        }else{
+            chosenTarget = target;
         }
 
-        if (closestTarget != null){
-            HealthComponent health = closestTarget.GetComponent<HealthComponent>();
+        if (chosenTarget != null){
+            HealthComponent health = chosenTarget.GetComponent<HealthComponent>();
             if (health != null){
                 DamageSystem.HandleAttack(gm, health, damageAmount);
                 return true;

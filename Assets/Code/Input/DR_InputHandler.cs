@@ -1,10 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 //TODO: move this to the "new" input system
 public class DR_InputHandler : MonoBehaviour
 {
+    public Vector2Int mouseWorldPosition;
+    public bool mouseIsInWorld = false;
     class InputState {
         public KeyCode key;
         public float persistCounter = 0.0f;
@@ -89,6 +92,11 @@ public class DR_InputHandler : MonoBehaviour
                 InputStates[i].held = false;
             }
         }
+
+        mouseIsInWorld = !EventSystem.current.IsPointerOverGameObject();
+        if (mouseIsInWorld){
+            mouseWorldPosition = GetMouseCellPosition();
+        }
     }
 
     public static bool GetKeyPressed(KeyCode key){
@@ -109,7 +117,7 @@ public class DR_InputHandler : MonoBehaviour
         return instance.KeyDictionary[key].KeyHeld();
     }
 
-    public Vector2Int GetMouseCellPosition()
+    private Vector2Int GetMouseCellPosition()
     {
         Vector3 Position = cameraObj.ScreenToWorldPoint(Input.mousePosition);
         int x = Mathf.RoundToInt(Position.x);

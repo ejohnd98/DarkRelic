@@ -7,6 +7,7 @@ public class DR_GameManager : MonoBehaviour
     enum GameState {
         RUNNING,
         WAITING_FOR_INPUT,
+        FURTHER_INPUT_REQUIRED,
         ANIMATING,
 
         INVALID
@@ -17,12 +18,13 @@ public class DR_GameManager : MonoBehaviour
     public static DR_GameManager instance;
 
     GameState CurrentState = GameState.INVALID;
+    DR_Action currentAction;
 
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
     public Texture2D DebugMap, DebugMap2;
     public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
-        PotionTexture, MagicScrollTexture;
+        PotionTexture, MagicScrollTexture, MagicScrollTexture2;
 
     public bool debug_disableFOV = false;
 
@@ -174,6 +176,12 @@ public class DR_GameManager : MonoBehaviour
                             // Just do first action for now
                             if (selectedAction != null)
                             {
+                                if (selectedAction.requiresFurtherInput){
+                                    CurrentState = GameState.FURTHER_INPUT_REQUIRED;
+                                    currentAction = selectedAction;
+                                    UISystem.instance.BeginTargetSelection();
+                                    break;
+                                }
                                 selectedAction.Perform(this);
 
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
@@ -192,6 +200,27 @@ public class DR_GameManager : MonoBehaviour
                     }
                     break;
                 }
+            case GameState.FURTHER_INPUT_REQUIRED:
+            {
+                if (currentAction.hasReceivedFurtherInput){
+                    bool actionSuccess = currentAction.Perform(this);
+                    if (!actionSuccess){
+                        SetGameState(GameState.WAITING_FOR_INPUT);
+                        currentAction = null;
+                        break;
+                    }
+
+                    PlayerActor.GetComponent<TurnComponent>().SpendTurn();
+                    turnSystem.PopNextEntity();
+                    SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+                    DR_Renderer.instance.UpdateTiles();
+                    UISystem.instance.RefreshDetailsUI();
+
+                    SetGameState(GameState.RUNNING);
+                    currentAction = null;
+                }
+                break;
+            }
 
             case GameState.ANIMATING:
             {
@@ -212,6 +241,19 @@ public class DR_GameManager : MonoBehaviour
 
     private void LateUpdate() {
         UpdateCamera();
+    }
+
+    public bool ProvideAdditionalInput(Vector2Int pos){
+        if (CurrentState != GameState.FURTHER_INPUT_REQUIRED){
+            Debug.LogError("Tried to provide further input but not in correct state!");
+            return false;
+        }
+        if (currentAction == null){
+            Debug.LogError("Tried to provide further input but currentAction is null!");
+            return false;
+        }
+
+        return currentAction.GiveAdditionalInput(this, pos);
     }
 
     void SetGameState(GameState newState){

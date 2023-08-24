@@ -385,14 +385,17 @@ public class DR_MapGen
                     case MapGenCellType.ITEM:
                         newCell.bBlocksMovement = false;
                         //very temp item generation:
-                        DR_Item item = null;
-                        int itemIndex = Random.Range(0, 2);
+                        DR_Entity item = null;
+                        int itemIndex = Random.Range(0, 3);
                         switch(itemIndex){
                             case 0:
                                 item = EntityFactory.CreateHealingItem(gm.PotionTexture, "Health Potion", 4);
                                 break;
                             case 1:
-                                item = EntityFactory.CreateMagicItem(gm.MagicScrollTexture, "Magic Scroll", 5);
+                                item = EntityFactory.CreateMagicItem(gm.MagicScrollTexture, "Closest Magic Scroll", 5);
+                                break;
+                            case 2:
+                                item = EntityFactory.CreateTargetedMagicItem(gm.MagicScrollTexture2, "Target Magic Scroll", 5);
                                 break;
                             default:
                                 break;

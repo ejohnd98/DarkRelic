@@ -26,7 +26,7 @@ public class InteractionSystem
             if (key == DR_GameManager.NumberKeys[i]){
                 InventoryComponent inventory = entity.GetComponent<InventoryComponent>();
                 if (inventory != null){
-                    DR_Item item = inventory.GetItem(i);
+                    DR_Entity item = inventory.GetItem(i);
                     if (item != null){
                         actionList.Add(new ItemAction(item, entity, entity));
                         return actionList;
