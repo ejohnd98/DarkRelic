@@ -163,7 +163,7 @@ public class DR_Renderer : MonoBehaviour
             return PropDepth;
         }
 
-        if (entity is DR_Entity){
+        if (entity.HasComponent<ItemComponent>()){
             return ItemDepth;
         }
 
