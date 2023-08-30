@@ -119,9 +119,13 @@ public class DR_Renderer : MonoBehaviour
             // TODO: make proper system to determine z depth for each entity
             Vector3 pos;
             MoveAnimComponent moveComponent = Entity.GetComponent<MoveAnimComponent>();
-            if (moveComponent != null && moveComponent.isMoving){
+            AttackAnimComponent attackAnimComponent = Entity.GetComponent<AttackAnimComponent>();
+            if (moveComponent != null && moveComponent.isAnimating){
                 moveComponent.AnimStep(deltaTime);
                 pos = moveComponent.GetAnimPosition(GetDepthForEntity(Entity));
+            }else if (attackAnimComponent != null && attackAnimComponent.isAnimating){
+                attackAnimComponent.AnimStep(deltaTime);
+                pos = attackAnimComponent.GetAnimPosition(GetDepthForEntity(Entity));
             }else{
                 pos = Entity.GetPosFloat(GetDepthForEntity(Entity));
             }

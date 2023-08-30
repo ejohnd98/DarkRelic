@@ -11,6 +11,7 @@ public class DamageSystem
                 //TODO: make this better. have class to handle "garbage collecting" of entities
                 target.Entity.noLongerValid = true;
                 gm.CurrentMap.RemoveActor(target.Entity);
+                target.Entity.DestroyEntity();
             }
         }
     }

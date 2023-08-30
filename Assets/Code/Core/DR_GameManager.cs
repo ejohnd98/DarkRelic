@@ -34,7 +34,7 @@ public class DR_GameManager : MonoBehaviour
     //Temp Player
     DR_Entity PlayerActor;
 
-    TurnSystem turnSystem;
+    public TurnSystem turnSystem;
 
     public static KeyCode[] KeyDirections = {KeyCode.UpArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.LeftArrow};
     public static KeyCode[] NumberKeys = {KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5,

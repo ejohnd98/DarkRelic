@@ -16,6 +16,14 @@ public class TurnSystem
         CanAct = new List<TurnComponent>();
     }
 
+    public void RemoveEntityTurnComponent(TurnComponent turnComp){
+        if (turnComp == null){
+            return;
+        }
+        EligibleEntities.Remove(turnComp);
+        CanAct.Remove(turnComp);
+    }
+
     public void UpdateEntityLists(DR_Map map){
         EligibleEntities.Clear();
         CanAct.Clear();
@@ -71,7 +79,17 @@ public class TurnSystem
             return false;
         }
 
-        DR_Entity NextEntity = GetNextEntity().Entity;
+        // TODO: have entities properly remove themselves
+        // messy handling of entites which have been removed
+        TurnComponent NextEntityTurn = GetNextEntity();
+        DR_Entity NextEntity = NextEntityTurn.Entity;
+
+        if (NextEntity == null){
+            CanAct.Remove(NextEntityTurn);
+            EligibleEntities.Remove(NextEntityTurn);
+            return IsPlayerTurn(); //recursively call to remove all null entities
+        }
+
         return NextEntity.HasComponent<PlayerComponent>();
     }
 }

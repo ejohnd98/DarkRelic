@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MoveAnimComponent : DR_Component
+// TODO: this is essentially a copy of MoveAnimComponent. Create base anim class?
+// also maybe make these components only on entities while the anim is active?
+public class AttackAnimComponent : DR_Component
 {
     public bool isAnimating = false;
 
@@ -11,9 +13,13 @@ public class MoveAnimComponent : DR_Component
     float counter = 0.0f;
     public float length = 0.1f;
 
-    public void SetAnim(Vector2Int target, float time = 0.15f, bool autoStart = true){
+    public void SetAnim(Vector2Int target, float time = 0.3f, bool autoStart = true){
         //temp z
         a = Entity.GetPosFloat(DR_Renderer.GetDepthForEntity(Entity));
+
+        //raise slightly so attacker is above target
+        a.z -= 0.01f;
+
         b = a;
         b.x = target.x;
         b.y = target.y;
@@ -41,9 +47,12 @@ public class MoveAnimComponent : DR_Component
         if (!isAnimating){
             return;
         }
-        currentPos = b;
+        currentPos = a;
         isAnimating = false;
         DR_Renderer.animsActive--;
+
+        // testing removing component after use
+        Entity.RemoveComponent(this);
     }
 
     public void AnimStep(float time){
@@ -55,10 +64,22 @@ public class MoveAnimComponent : DR_Component
         if (counter > 1.0f){
             StopAnim();
         }
-        currentPos = Easings.QuadEaseOut(a,b, Mathf.Clamp01(counter));
+
+        if (counter < 0.5f){
+            currentPos = Easings.EaseInBack(a, b, Mathf.Clamp01(counter*2.0f));
+        }else{
+            currentPos = Easings.QuadEaseOut(b,a, Mathf.Clamp01((counter-0.5f)*2.0f));
+        }
+        
     }
 
     public Vector3 GetAnimPosition(float depth = 0.0f){
         return isAnimating? currentPos : Entity.GetPosFloat(depth);
+    }
+
+    public override void OnComponentRemoved()
+    {
+        base.OnComponentRemoved();
+        StopAnim();
     }
 }

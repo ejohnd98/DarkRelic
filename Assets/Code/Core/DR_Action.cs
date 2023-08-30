@@ -68,7 +68,11 @@ public class AttackAction : DR_Action {
         //TODO: do this somewhere else?
         if (!target.IsAlive()){
             gm.CurrentMap.RemoveActor(target.Entity);
+            target.Entity.DestroyEntity();
         }
+
+        AttackAnimComponent attackAnim = owner.AddComponent<AttackAnimComponent>(new AttackAnimComponent());
+        attackAnim.SetAnim(target.Entity.Position);
 
         return true;
     }

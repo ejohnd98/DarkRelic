@@ -33,17 +33,17 @@ public class DR_Entity
         return id;
     }
 
-    public bool AddComponent<T>(T NewComponent) where T : DR_Component
+    public T AddComponent<T>(T NewComponent) where T : DR_Component
     {
         if (HasComponent<T>()){
             Debug.LogError(Name + " already has the following component: " + typeof(T).Name);
-            return false;
+            return null;
         }
 
         ComponentList.Add(NewComponent);
         NewComponent.Entity = this;
 
-        return true;
+        return NewComponent;
     }
 
     public T GetComponent<T>() where T : DR_Component
@@ -56,6 +56,34 @@ public class DR_Entity
             }
         }
         return null;
+    }
+
+    public void RemoveComponentByType<T>() where T : DR_Component
+    {
+        DR_Component componentToRemove = null;
+        foreach (DR_Component component in ComponentList)
+        {
+            if (component.GetType().Equals(typeof(T)))
+            {
+                componentToRemove = component;
+            }
+        }
+        RemoveComponent(componentToRemove);
+    }
+
+    public void RemoveComponent(DR_Component Component)
+    {
+        if (Component != null){
+            Component.OnComponentRemoved();
+            ComponentList.Remove(Component);
+        }
+    }
+
+    public void DestroyEntity(){
+        foreach (DR_Component component in ComponentList)
+        {
+            component.OnComponentRemoved();
+        }
     }
 
     public bool HasComponent<T>() where T : DR_Component
