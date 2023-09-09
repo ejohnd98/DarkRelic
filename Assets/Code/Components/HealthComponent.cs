@@ -26,4 +26,10 @@ public class HealthComponent : DR_Component
     public bool IsAlive(){
         return currentHealth > 0;
     }
+
+    public void IncreaseMaxHealth(int amount)
+    {
+        maxHealth += amount;
+        Heal(amount);
+    }
 }  

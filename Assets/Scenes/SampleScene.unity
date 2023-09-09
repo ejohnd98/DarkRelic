@@ -1571,6 +1571,7 @@ MonoBehaviour:
   PotionTexture: {fileID: 590706588, guid: fa8e18c404fcbf14c9c79599e1ce090e, type: 3}
   FireboltTexture: {fileID: -1012467279, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   ShockTexture: {fileID: -1524527926, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  cursorTexture: {fileID: 2800000, guid: 374432b117b2e3e4e9efae1befa4822a, type: 3}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   Directions:

@@ -379,7 +379,7 @@ public class DR_MapGen
                         break;
                     case MapGenCellType.ENEMY:
                         newCell.bBlocksMovement = false;
-                        DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Generic Enemy", 2, Alignment.ENEMY);
+                        DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Enemy", 2, Alignment.ENEMY);
                         NewMap.AddActor(enemy, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.ITEM:

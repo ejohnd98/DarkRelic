@@ -102,7 +102,7 @@ public class MagicConsumableComponent : ConsumableComponent {
         if (chosenTarget != null){
             HealthComponent health = chosenTarget.GetComponent<HealthComponent>();
             if (health != null){
-                DamageSystem.HandleAttack(gm, health, damageAmount);
+                DamageSystem.HandleAttack(gm, user, health, damageAmount);
                 return true;
             }
         }

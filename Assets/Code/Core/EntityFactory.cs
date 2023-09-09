@@ -14,6 +14,7 @@ public class EntityFactory : MonoBehaviour
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
         NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
         NewActor.AddComponent<AlignmentComponent>(new AlignmentComponent(alignment));
+        NewActor.AddComponent<LevelComponent>(new LevelComponent());
         
         return NewActor;
     }

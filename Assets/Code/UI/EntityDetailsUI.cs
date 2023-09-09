@@ -29,6 +29,12 @@ public class EntityDetailsUI : MonoBehaviour
             return;
         }
         string detailsText = entity.Name;
+        LevelComponent level = entity.GetComponent<LevelComponent>();
+        if (level != null){
+            detailsText += " - Lvl " + level.level;
+        }
+
+
         HealthComponent health = entity.GetComponent<HealthComponent>();
         if (health != null){
             detailsText += "\n" + health.currentHealth + " / " + health.maxHealth;

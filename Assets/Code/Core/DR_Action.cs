@@ -63,7 +63,7 @@ public class AttackAction : DR_Action {
         base.Perform(gm);
         //todo: get damage amount from some component (melee component?)
         // and/or assign damage to action upon creating it?
-        DamageSystem.HandleAttack(gm, target, 1);
+        DamageSystem.HandleAttack(gm, owner, target, 1);
 
         //TODO: do this somewhere else?
         if (!target.IsAlive()){
