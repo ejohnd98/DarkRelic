@@ -82,4 +82,13 @@ public class EntityFactory : MonoBehaviour
         
         return NewProp;
     }
+
+    public static DR_Entity CreateGoal(Sprite spr){
+        DR_Entity NewProp = CreateProp(spr, "Goal");
+
+        NewProp.AddComponent<GoalComponent>(new GoalComponent());
+        NewProp.GetComponent<PropComponent>().blocksSight = false;
+        
+        return NewProp;
+    }
 }

@@ -9,6 +9,7 @@ public class DR_GameManager : MonoBehaviour
         WAITING_FOR_INPUT,
         FURTHER_INPUT_REQUIRED,
         ANIMATING,
+        GAME_OVER,
 
         INVALID
     }
@@ -24,7 +25,7 @@ public class DR_GameManager : MonoBehaviour
     public DR_Map CurrentMap;
     public Texture2D DebugMap, DebugMap2;
     public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
-        PotionTexture, FireboltTexture, ShockTexture;
+        PotionTexture, FireboltTexture, ShockTexture, GoalTexture;
 
     public Texture2D cursorTexture;
 
@@ -70,6 +71,8 @@ public class DR_GameManager : MonoBehaviour
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        
+        mapGenInfo.isLastFloor = true;
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
 
         //temp:
@@ -263,6 +266,20 @@ public class DR_GameManager : MonoBehaviour
         if (CurrentState != GameState.ANIMATING && DR_Renderer.animsActive > 0){
             SetGameState(GameState.ANIMATING);
         }
+
+        if (CurrentState != GameState.GAME_OVER && !PlayerActor.GetComponent<HealthComponent>().IsAlive()){
+            OnPlayerDied();
+        }
+    }
+
+    public void OnPlayerDied(){
+        CurrentState = GameState.GAME_OVER;
+        UISystem.instance.ShowGameOver();
+    }
+
+    public void OnGameWon(){
+        CurrentState = GameState.GAME_OVER;
+        UISystem.instance.ShowVictory();
     }
 
     private void LateUpdate() {

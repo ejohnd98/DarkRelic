@@ -114,6 +114,26 @@ public class DoorAction : DR_Action {
     }
 }
 
+public class GoalAction : DR_Action {
+    public GoalComponent target;
+
+    public GoalAction (GoalComponent target, DR_Entity opener = null){
+        this.target = target;
+        this.owner = opener;
+        loggable = true;
+    }
+
+    public override bool Perform(DR_GameManager gm){
+        base.Perform(gm);
+        gm.OnGameWon();
+        return true;
+    }
+
+    public override string GetLogText(){
+        return owner.Name + " has claimed victory!";
+    }
+}
+
 public class ItemAction : DR_Action {
     public DR_Entity target;
     public DR_Entity item;

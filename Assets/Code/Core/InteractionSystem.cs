@@ -60,6 +60,11 @@ public class InteractionSystem
             if (stairs != null){
                 actionList.Add(new StairAction(entity, stairs));
             }
+
+            GoalComponent goal = targetCell.Prop.GetComponent<GoalComponent>();
+            if (goal != null){
+                actionList.Add(new GoalAction(goal, entity));
+            }
         }
 
         return actionList;

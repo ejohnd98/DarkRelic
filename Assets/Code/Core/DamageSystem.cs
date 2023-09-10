@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class DamageSystem
 {
+    //TODO: expand this to use stats when they are implemented.
+    // use FEH formula? strength + weapon 
+
     public static void HandleAttack(DR_GameManager gm, DR_Entity attacker, HealthComponent target, int damage){
         if(target != null){
             target.TakeDamage(damage);

@@ -10,6 +10,8 @@ public class MapGenInfo{
     public MapGenInfo(Vector2Int MapSize){
         this.MapSize = MapSize;
     }
+
+    public bool isLastFloor = false;
     // Possible parameters:
     // - type of generator (cave, ruins, castle, etc)
     // - required rooms (min/max room size)
@@ -25,7 +27,8 @@ public enum MapGenCellType{
     ENEMY,
     ITEM,
     STAIRS_UP,
-    STAIRS_DOWN
+    STAIRS_DOWN,
+    GOAL
 }
 
 //TODO: create base class to represent a state, then can avoid defining every state in this enum

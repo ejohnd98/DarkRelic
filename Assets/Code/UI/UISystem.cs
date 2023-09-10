@@ -3,22 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class UISystem : MonoBehaviour
 {
-    enum UIState {
+    public enum UIState {
         NORMAL, //come up with better name?
         SELECTING_TARGET,
+        MAIN_MENU,
 
         INVALID
     }
 
-    UIState currentState = UIState.NORMAL;
+    public UIState currentState = UIState.NORMAL;
 
     public static UISystem instance;
     public Transform HealthBarPivot; //TODO make healthbar wrapper class (so enemies can have health bars too)
     public EntityDetailsUI detailsUI;
     public InventoryUI inventoryUI;
+    public GameObject gameOverUI, victoryUI;
 
     DR_Action UIAction;
 
@@ -29,7 +32,9 @@ public class UISystem : MonoBehaviour
     void Awake()
     {
         instance = this;
-        detailsUI.SetEntity(null);
+        if (detailsUI != null){
+            detailsUI.SetEntity(null);
+        }
     }
 
     public void RefreshDetailsUI(){
@@ -45,6 +50,9 @@ public class UISystem : MonoBehaviour
     }
 
     public void RefreshUI(){
+        if (currentState == UIState.MAIN_MENU){
+            return;
+        }
         UpdateHealthBar();
 
         if (!DR_InputHandler.instance.mouseIsInWorld){
@@ -112,11 +120,35 @@ public class UISystem : MonoBehaviour
                     //TODO: allow selecting other items in inventory?
                 }
                 break;
+            case UIState.MAIN_MENU:
+                break;
             default:
                 break;
         }
 
         //TODO: Call this from other parts of game when needed instead of every tick
         RefreshUI();
+    }
+
+    public void ShowGameOver()
+    {
+        gameOverUI.SetActive(true);
+    }
+
+    public void ShowVictory()
+    {
+        victoryUI.SetActive(true);
+    }
+
+    public static void ExitGame(){
+        Application.Quit();
+    }
+
+    public static void NewGame(){
+        SceneManager.LoadScene(1);
+    }
+
+    public static void ReturnToMenu(){
+        SceneManager.LoadScene(0);
     }
 }

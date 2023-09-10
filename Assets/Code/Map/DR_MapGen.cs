@@ -9,6 +9,7 @@ public class MapGeneration{
     public MapGenCell[,] cells;
     public List<MapGenRoom> rooms;
     public Vector2Int mapSize;
+    public bool isLastFloor = false;
 
     int placedRooms = 0;
 
@@ -95,7 +96,8 @@ public class MapGeneration{
                 Vector2Int endPos = endRoom.pos + endRoom.size/2;
 
                 cells[startPos.y, startPos.x].type = MapGenCellType.STAIRS_UP;
-                cells[endPos.y, endPos.x].type = MapGenCellType.STAIRS_DOWN;
+                cells[endPos.y, endPos.x].type = isLastFloor ? MapGenCellType.GOAL : MapGenCellType.STAIRS_DOWN;
+                
 
                 // doors
                 for (int y = 0; y < mapSize.y; y++){
@@ -301,6 +303,8 @@ public class DR_MapGen
     public static DR_Map CreateMapFromMapInfo(MapGenInfo mapGenInfo){
         //TODO: visualize this
         MapGeneration mapGen = new MapGeneration(mapGenInfo.MapSize);
+        mapGen.isLastFloor = mapGenInfo.isLastFloor;
+        
         while (mapGen.state != MapGenState.FINISHED){
             mapGen.Step();
         }
@@ -410,6 +414,11 @@ public class DR_MapGen
                     case MapGenCellType.STAIRS_DOWN:{
                         DR_Entity stairs = EntityFactory.CreateStairs(gm.StairsDownTexture, true);
                         NewMap.AddProp(stairs, new Vector2Int(x,y));
+                        break;
+                    }
+                    case MapGenCellType.GOAL:{
+                        DR_Entity goal = EntityFactory.CreateGoal(gm.GoalTexture);
+                        NewMap.AddProp(goal, new Vector2Int(x,y));
                         break;
                     }
                     case MapGenCellType.NOT_SET:
