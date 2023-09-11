@@ -304,7 +304,7 @@ public class DR_MapGen
         //TODO: visualize this
         MapGeneration mapGen = new MapGeneration(mapGenInfo.MapSize);
         mapGen.isLastFloor = mapGenInfo.isLastFloor;
-        
+
         while (mapGen.state != MapGenState.FINISHED){
             mapGen.Step();
         }
@@ -384,6 +384,7 @@ public class DR_MapGen
                     case MapGenCellType.ENEMY:
                         newCell.bBlocksMovement = false;
                         DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Enemy", 2, Alignment.ENEMY);
+                        enemy.AddComponent<AIComponent>(new AIComponent());
                         NewMap.AddActor(enemy, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.ITEM:
