@@ -17,6 +17,8 @@ public class UISystem : MonoBehaviour
 
     public UIState currentState = UIState.NORMAL;
 
+    public Texture2D cursorTexture;
+
     public static UISystem instance;
     public Transform HealthBarPivot; //TODO make healthbar wrapper class (so enemies can have health bars too)
     public EntityDetailsUI detailsUI;
@@ -35,6 +37,8 @@ public class UISystem : MonoBehaviour
         if (detailsUI != null){
             detailsUI.SetEntity(null);
         }
+
+        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
     }
 
     public void RefreshDetailsUI(){

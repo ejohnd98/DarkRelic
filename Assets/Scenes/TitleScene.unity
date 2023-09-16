@@ -243,9 +243,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 2
+  cursorTexture: {fileID: 2800000, guid: 374432b117b2e3e4e9efae1befa4822a, type: 3}
   HealthBarPivot: {fileID: 0}
   detailsUI: {fileID: 0}
   inventoryUI: {fileID: 0}
+  gameOverUI: {fileID: 0}
+  victoryUI: {fileID: 0}
 --- !u!1001 &102844401
 PrefabInstance:
   m_ObjectHideFlags: 0

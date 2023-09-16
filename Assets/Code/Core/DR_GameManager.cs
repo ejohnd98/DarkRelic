@@ -27,8 +27,6 @@ public class DR_GameManager : MonoBehaviour
     public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
         PotionTexture, FireboltTexture, ShockTexture, GoalTexture;
 
-    public Texture2D cursorTexture;
-
     public bool debug_disableFOV = false;
 
     //Temp Camera 
@@ -51,8 +49,6 @@ public class DR_GameManager : MonoBehaviour
         }else{
             instance = this;
         }
-
-        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
     }
 
     void Start()
