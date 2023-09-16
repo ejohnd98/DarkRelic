@@ -4,7 +4,19 @@ using UnityEngine;
 
 public class AIComponent : DR_Component
 {
-    // put all AI decision related code here
-    //OR use AISystem and only store data here such as memory, path, state (fleeing?)
     public DR_Entity target; 
+
+    public bool HasTarget(){
+        if (target == null){
+            return false;
+        }
+        if (Entity.noLongerValid){
+            return false;
+        }
+        if (!target.GetComponent<HealthComponent>().IsAlive()){
+            return false;
+        }
+        
+        return true;
+    }
 }

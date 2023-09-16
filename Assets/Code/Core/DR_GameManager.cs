@@ -118,9 +118,7 @@ public class DR_GameManager : MonoBehaviour
 
                         turnSystem.GetNextEntity().SpendTurn();
                         DR_Entity entity = turnSystem.PopNextEntity().Entity;
-                        
-                        //TODO: either flesh out AISystem or move to AIComponent
-                        DR_Action entityAction = AISystem.DetermineAIAction(entity, CurrentMap);
+                        DR_Action entityAction = AISystem.DetermineAIAction(this, entity);
                         if (entityAction != null){
                             entityAction.Perform(this);
                         }
