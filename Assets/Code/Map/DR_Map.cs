@@ -90,8 +90,8 @@ public class DR_Map
         return RemovedActor;
     }
 
-    public bool MoveActorRelative(DR_Entity Actor, Vector2Int posChange){
-        return MoveActor(Actor, Actor.Position + posChange);
+    public bool MoveActorRelative(DR_Entity Actor, Vector2Int posChange, bool animate = false){
+        return MoveActor(Actor, Actor.Position + posChange, animate);
     }
 
     public bool MoveActor(DR_Entity Actor, Vector2Int pos, bool animate = false){
@@ -102,7 +102,8 @@ public class DR_Map
             return false;
         }
         
-        if (animate){
+        //TODO: figure out better way to tell if actor has an entity to animate
+        if (animate && IsVisible[Actor.Position.y, Actor.Position.x]){
             MoveAnimComponent moveAnim = Actor.GetComponent<MoveAnimComponent>();
             moveAnim.SetAnim(pos);
         }

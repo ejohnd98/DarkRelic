@@ -75,10 +75,8 @@ public class Pathfinding {
                     adj.y--; break;
                 }
 
-                //TODO: add in option for ignoring actors in pathing to map.BlocksMovement(adj)
-
                 if (map.ValidPosition(adj) && (!map.BlocksMovement(adj, true) || adj == b)) { //if space is free (true = wall)
-                    if ((!visited[a.y,a.x] || dist[a.y,a.x] + 1 < dist[a.y,a.x])) { //check if new or shorter path
+                    if ((!visited[adj.y,adj.x] || dist[adj.y,adj.x] + 1 < dist[adj.y,adj.x])) { //check if new or shorter path
                         cameFrom[adj.y,adj.x] = curr; //set path followed to get here
                         dist[adj.y,adj.x] = dist[curr.y,curr.x] + 1; //dist is one more than parent (as we are working with grids)
                         int priority = (dist[adj.y,adj.x] + GetHeuristic(adj, b)); //set priority to dist + heuristicdd to queue
@@ -92,8 +90,9 @@ public class Pathfinding {
         }
         if (pathFound) { //reconstruct path
             int length = 0;
+            result.steps = new List<Vector2Int>();
             curr = b;
-            while (!(cameFrom[curr.y,curr.x] == a)) {
+            while (curr != a) {
                 result.steps.Add(curr);
                 length++;
                 curr = cameFrom[curr.y,curr.x];
@@ -114,6 +113,6 @@ public class Pathfinding {
     static int GetHeuristic(Vector2Int a, Vector2Int b) { //get distance between two positions
         int dx = b.x - a.x;
         int dy = b.y - a.y;
-        return dx + dy;//sqrt((dx * dx) + (dy * dy));
+        return Mathf.Abs(dx) + Mathf.Abs(dy);//sqrt((dx * dx) + (dy * dy));
     }
 }

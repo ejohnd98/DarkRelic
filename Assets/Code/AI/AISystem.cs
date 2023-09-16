@@ -24,26 +24,17 @@ public class AISystem
                 }
             }
 
+            //TODO: should optimize this to not throw away whole path each time
             //Not within range:
-            
-            if (!aiComponent.HasPath()){
-                aiComponent.currentPath = Pathfinding.FindPath(gm.CurrentMap, entity.Position, target.Position);
-            }
+
+            aiComponent.currentPath = Pathfinding.FindPath(gm.CurrentMap, entity.Position, target.Position);
+
             if (aiComponent.HasPath()){
                 Vector2Int nextPos = aiComponent.currentPath.AdvanceStep();
                 return new MoveAction(entity, nextPos);
             }
 
         }
-
-        //branch here:
-        //if no target: return wait action (later, wander or move to last known target location)
-        //if target:
-        //  if within attack range, (create skeleton function for that) attack.
-        //  otherwise, compute path (create pathfinding class that returns a result class)
-        //  then move towards target
-
-        //Temp:
 
         return new WaitAction(entity);
     }
