@@ -9,8 +9,8 @@ public class DR_Cell
     public DR_Entity Prop;
     public DR_Entity Item;
 
-    public bool BlocksMovement(){
-        if(bBlocksMovement || Actor != null){
+    public bool BlocksMovement(bool ignoreActor = false){
+        if(!ignoreActor && Actor != null){
             return true;
         }
 

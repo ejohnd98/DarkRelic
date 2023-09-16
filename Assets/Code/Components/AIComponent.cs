@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class AIComponent : DR_Component
 {
-    public DR_Entity target; 
+    public DR_Entity target;
+
+    public PathResult currentPath;
 
     public bool HasTarget(){
         if (target == null){
@@ -18,5 +20,9 @@ public class AIComponent : DR_Component
         }
         
         return true;
+    }
+
+    public bool HasPath(){
+        return currentPath != null && currentPath.validPath && currentPath.HasNextStep();
     }
 }

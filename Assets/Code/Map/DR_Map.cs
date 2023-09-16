@@ -130,16 +130,16 @@ public class DR_Map
         return (x >= 0 && x < MapSize.x && y >= 0 && y < MapSize.y);
     }
 
-    public bool BlocksMovement(Vector2Int pos){
-        return BlocksMovement(pos.x, pos.y);
+    public bool BlocksMovement(Vector2Int pos, bool ignoreActor = false){
+        return BlocksMovement(pos.x, pos.y, ignoreActor);
     }
 
-    public bool BlocksMovement(int x, int y){
+    public bool BlocksMovement(int x, int y, bool ignoreActor = false){
         if (!ValidPosition(x, y)){
             return true;
         }
 
-        return Cells[y,x].BlocksMovement();
+        return Cells[y,x].BlocksMovement(ignoreActor);
     }
 
     public bool BlocksSight(Vector2Int pos){

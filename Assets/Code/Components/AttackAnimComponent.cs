@@ -4,6 +4,7 @@ using UnityEngine;
 
 // TODO: this is essentially a copy of MoveAnimComponent. Create base anim class?
 // also maybe make these components only on entities while the anim is active?
+// also also, create class for projectile animations with the same base
 public class AttackAnimComponent : DR_Component
 {
     public bool isAnimating = false;

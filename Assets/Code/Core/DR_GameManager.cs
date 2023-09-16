@@ -23,7 +23,7 @@ public class DR_GameManager : MonoBehaviour
 
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
-    public Texture2D DebugMap, DebugMap2;
+    public Texture2D DebugMap, DebugMap2, pathfindTestMap;
     public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
         PotionTexture, FireboltTexture, ShockTexture, GoalTexture;
 
@@ -67,13 +67,16 @@ public class DR_GameManager : MonoBehaviour
 
         MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35));
 
-        // Add maps to Dungeon
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        // pathfinding debug map
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(pathfindTestMap));
 
-        mapGenInfo.isLastFloor = true;
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        // Add maps to Dungeon
+        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+
+        // mapGenInfo.isLastFloor = true;
+        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
 
         //temp:
         DR_Entity item1 = EntityFactory.CreateHealingItem(PotionTexture, "Health Potion", 4);

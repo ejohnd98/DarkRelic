@@ -13,6 +13,29 @@ public class AISystem
             aiComponent.target = DetermineTarget(gm, entity);
         }
 
+        if(aiComponent.HasTarget()){
+            DR_Entity target = aiComponent.target;
+
+            //Within range:
+            if (entity.DistanceTo(target.Position) == 1){
+                HealthComponent targetHealth = target.GetComponent<HealthComponent>();
+                if (targetHealth.IsAlive()){
+                    return new AttackAction(targetHealth, entity);
+                }
+            }
+
+            //Not within range:
+            
+            if (!aiComponent.HasPath()){
+                aiComponent.currentPath = Pathfinding.FindPath(gm.CurrentMap, entity.Position, target.Position);
+            }
+            if (aiComponent.HasPath()){
+                Vector2Int nextPos = aiComponent.currentPath.AdvanceStep();
+                return new MoveAction(entity, nextPos);
+            }
+
+        }
+
         //branch here:
         //if no target: return wait action (later, wander or move to last known target location)
         //if target:
@@ -21,13 +44,6 @@ public class AISystem
         //  then move towards target
 
         //Temp:
-        DR_Entity Target = aiComponent.target;
-        if (Target != null && Target.GetComponent<HealthComponent>().IsAlive()){
-            Vector2Int playerPosDiff = Target.Position - entity.Position;
-            if (Mathf.Abs(playerPosDiff.x) + Mathf.Abs(playerPosDiff.y) == 1){
-                return new AttackAction(Target.GetComponent<HealthComponent>(), entity);
-            }
-        }
 
         return new WaitAction(entity);
     }

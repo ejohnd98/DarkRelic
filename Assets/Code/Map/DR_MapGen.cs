@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 // Class which creates and stores the current generation progress
@@ -316,39 +317,38 @@ public class DR_MapGen
         int Width = MapTexture.width;
         int Height = MapTexture.height;
 
-        DR_Map NewMap = CreateEmptyMap(new Vector2Int(Width, Height));
+        MapGeneration mapGen = new MapGeneration(new Vector2Int(Width, Height));
 
         Color[] Pixels = MapTexture.GetPixels();
 
         for (int y = 0; y < Height; y++){
             for (int x = 0; x < Width; x++){
                 int Index1D = y*Width + x;
-                NewMap.Cells[y,x] = new DR_Cell();
                 Color color = Pixels[Index1D];
+
                 bool isWall = color.r < 0.1f && color.g < 0.1f && color.b < 0.1f;
-                NewMap.Cells[y,x].bBlocksMovement = isWall;
+
+                mapGen.cells[y,x].type = isWall ? MapGenCellType.WALL : MapGenCellType.FLOOR;
 
                 bool isDoor = color.r < 0.1f && color.g > 0.9f && color.b < 0.1f;
                 if (isDoor){
-                    DR_GameManager gm = DR_GameManager.instance;
-                    DR_Entity door = EntityFactory.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
-                    NewMap.AddProp(door, new Vector2Int(x,y));
+                    mapGen.cells[y,x].type = MapGenCellType.DOOR;
                 }
 
                 bool isStairsDeeper = color.r > 0.9f && color.g < 0.1f && color.b < 0.1f;
                 bool isStairsShallower= color.r < 0.1f && color.g < 0.1f && color.b > 0.9f;
                 if (isStairsDeeper || isStairsShallower){
-                    DR_GameManager gm = DR_GameManager.instance;
-                    DR_Entity stairs = EntityFactory.CreateStairs(isStairsDeeper? gm.StairsDownTexture : gm.StairsUpTexture, isStairsDeeper);
-                    NewMap.AddProp(stairs, new Vector2Int(x,y));
+                    mapGen.cells[y,x].type = isStairsDeeper ? MapGenCellType.STAIRS_DOWN : MapGenCellType.STAIRS_UP;
                 }
 
-                NewMap.IsVisible[y,x] = false;
-                NewMap.IsKnown[y,x] = false;
+                bool isEnemy = color.r > 0.9f && color.g < 0.6f && color.g > 0.4f && color.b < 0.1f;
+                if (isEnemy){
+                    mapGen.cells[y,x].type = MapGenCellType.ENEMY;
+                }
             }
         }
 
-        return NewMap;
+        return CreateMapFromGeneration(mapGen);
     }
 
     private static DR_Map CreateEmptyMap (Vector2Int size){
