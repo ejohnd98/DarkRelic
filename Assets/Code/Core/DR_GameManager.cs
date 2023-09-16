@@ -68,15 +68,15 @@ public class DR_GameManager : MonoBehaviour
         MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35));
 
         // pathfinding debug map
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(pathfindTestMap));
+        //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(pathfindTestMap));
 
         // Add maps to Dungeon
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
 
-        // mapGenInfo.isLastFloor = true;
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        mapGenInfo.isLastFloor = true;
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
 
         //temp:
         DR_Entity item1 = EntityFactory.CreateHealingItem(PotionTexture, "Health Potion", 4);
@@ -97,7 +97,7 @@ public class DR_GameManager : MonoBehaviour
         turnSystem = new TurnSystem();
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-        DR_Renderer.instance.UpdateTiles();
+        DR_Renderer.instance.CreateTiles();
 
         SetGameState(GameState.RUNNING);
         UISystem.instance.RefreshDetailsUI();
@@ -350,7 +350,7 @@ public class DR_GameManager : MonoBehaviour
         UpdateCurrentMap();
         UpdateCamera(true);
         DR_Renderer.instance.ClearAllObjects();
-        DR_Renderer.instance.UpdateTiles();
+        DR_Renderer.instance.CreateTiles();
     }
     
     //  UI FUNCTIONS

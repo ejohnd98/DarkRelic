@@ -36,8 +36,23 @@ public class DR_Renderer : MonoBehaviour
         //DR_GameManager.instance.UpdateCamera();
     }
 
-    // TODO: only update tiles that need updating (don't delete everything everytime, reuse game objects)
     public void UpdateTiles(){
+        DR_Map currentMap = DR_GameManager.instance.CurrentMap;
+
+        foreach (var (pos, obj) in CellObjects){
+            Sprite CellSprite = FogTexture;
+            if (currentMap.IsVisible[pos.y, pos.x] || DR_GameManager.instance.debug_disableFOV){
+                CellSprite = currentMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
+                obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+            }else if (currentMap.IsKnown[pos.y, pos.x]){
+                CellSprite = currentMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
+                obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+            }
+            obj.GetComponent<SpriteRenderer>().sprite = CellSprite;
+        }
+    }
+
+    public void CreateTiles(){
         DR_Map currentMap = DR_GameManager.instance.CurrentMap;
 
         foreach(GameObject obj in CellObjects.Values){
@@ -49,17 +64,11 @@ public class DR_Renderer : MonoBehaviour
         for(int y = 0; y < currentMap.MapSize.y; y++){
             for(int x = 0; x < currentMap.MapSize.x; x++){
                 GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
-                Sprite CellSprite = FogTexture;
-                if (currentMap.IsVisible[y, x] || DR_GameManager.instance.debug_disableFOV){
-                    CellSprite = currentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                }else if (currentMap.IsKnown[y, x]){
-                    CellSprite = currentMap.Cells[y,x].bBlocksMovement? WallTexture : FloorTexture;
-                    NewCellObj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
-                }
-                NewCellObj.GetComponent<SpriteRenderer>().sprite = CellSprite;
                 CellObjects.Add(new Vector2Int(x,y), NewCellObj);
             }
         }
+
+        UpdateTiles();
     }
 
     public void ClearAllObjects(){
@@ -75,17 +84,20 @@ public class DR_Renderer : MonoBehaviour
     }
 
     public void UpdateEntities(float deltaTime){
+        Debug.Log("UpdateEntities");
         DR_Map currentMap = DR_GameManager.instance.CurrentMap;
 
         foreach(DR_Entity entity in currentMap.Entities){
-            if (!EntityObjects.ContainsKey(entity)){
+            bool isVisible = currentMap.IsVisible[entity.Position.y, entity.Position.x];
+            if (isVisible && !EntityObjects.ContainsKey(entity)){
                 AddEntityObj(entity);
             }
         }
 
         List<DR_Entity> entitiesToRemove = new List<DR_Entity>();
         foreach(DR_Entity entity in EntityObjects.Keys){
-            if (entity.noLongerValid || !entity.isOnMap){
+            bool isVisible = currentMap.IsVisible[entity.Position.y, entity.Position.x];
+            if (entity.noLongerValid || !entity.isOnMap || !isVisible){
                 entitiesToRemove.Add(entity);
             }
         }
