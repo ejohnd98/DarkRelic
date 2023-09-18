@@ -25,7 +25,7 @@ public class DR_GameManager : MonoBehaviour
     public DR_Map CurrentMap;
     public Texture2D DebugMap, DebugMap2, pathfindTestMap;
     public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
-        PotionTexture, FireboltTexture, ShockTexture, GoalTexture;
+        PotionTexture, FireboltTexture, ShockTexture, GoalTexture, AmuletTexture;
 
     public bool debug_disableFOV = false;
 
@@ -78,10 +78,12 @@ public class DR_GameManager : MonoBehaviour
         DR_Entity item1 = EntityFactory.CreateHealingItem(PotionTexture, "Health Potion", 4);
         DR_Entity item2 = EntityFactory.CreateMagicItem(ShockTexture, "Shock Scroll", 5);
         DR_Entity item3 = EntityFactory.CreateTargetedMagicItem(FireboltTexture, "Firebolt Scroll", 5);
+        DR_Entity testEquipment = EntityFactory.CreateEquipmentItem(AmuletTexture, "Amulet");
 
         PlayerActor.GetComponent<InventoryComponent>().AddItem(item1);
         PlayerActor.GetComponent<InventoryComponent>().AddItem(item2);
         PlayerActor.GetComponent<InventoryComponent>().AddItem(item3);
+        PlayerActor.GetComponent<InventoryComponent>().AddItem(testEquipment);
         
         MoveLevels(null, CurrentDungeon.maps[0], true);
         UpdateCurrentMap();

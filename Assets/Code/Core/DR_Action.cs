@@ -176,6 +176,32 @@ public class ItemAction : DR_Action {
     }
 }
 
+public class ChangeEquipmentAction : DR_Action {
+    public DR_Entity item;
+    public bool equip;
+
+    public ChangeEquipmentAction (DR_Entity item, DR_Entity user, bool equip){
+        this.item = item;
+        this.owner = user;
+        this.equip = equip;
+
+        loggable = true;
+    }
+
+    public override bool Perform(DR_GameManager gm){
+        base.Perform(gm);
+        InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
+        if (inventory != null){
+            return equip? inventory.EquipItem(item) : inventory.UnequipItem(item);
+        }
+        return false;
+    }
+
+    public override string GetLogText(){
+        return owner.Name + (equip ? " equipped " : " unequipped ") + item.Name;
+    }
+}
+
 public class PickupAction : DR_Action {
     public DR_Entity item;
 

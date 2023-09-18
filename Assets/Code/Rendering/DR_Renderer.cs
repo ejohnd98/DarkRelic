@@ -84,7 +84,6 @@ public class DR_Renderer : MonoBehaviour
     }
 
     public void UpdateEntities(float deltaTime){
-        Debug.Log("UpdateEntities");
         DR_Map currentMap = DR_GameManager.instance.CurrentMap;
 
         foreach(DR_Entity entity in currentMap.Entities){

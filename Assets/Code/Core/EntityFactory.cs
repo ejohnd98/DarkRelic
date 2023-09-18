@@ -29,6 +29,17 @@ public class EntityFactory : MonoBehaviour
         return NewProp;
     }
 
+    public static DR_Entity CreateEquipmentItem(Sprite Sprite, string Name){
+        DR_Entity NewItem = new DR_Entity();
+
+        NewItem.Name = Name;
+        NewItem.AddComponent<ItemComponent>(new ItemComponent());
+        NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
+        NewItem.AddComponent<EquippableComponent>(new EquippableComponent());
+        
+        return NewItem;
+    }
+
     public static DR_Entity CreateHealingItem(Sprite Sprite, string Name, int healAmount){
         DR_Entity NewItem = new DR_Entity();
 

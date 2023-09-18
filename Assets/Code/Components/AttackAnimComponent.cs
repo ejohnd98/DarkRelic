@@ -22,8 +22,8 @@ public class AttackAnimComponent : DR_Component
         a.z -= 0.01f;
 
         b = a;
-        b.x = target.x;
-        b.y = target.y;
+        b.x = a.x *0.35f + target.x *0.65f;
+        b.y = a.y *0.35f + target.y *0.65f;
 
         length = time;
 
