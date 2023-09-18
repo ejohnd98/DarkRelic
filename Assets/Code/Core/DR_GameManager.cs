@@ -78,7 +78,8 @@ public class DR_GameManager : MonoBehaviour
         DR_Entity item1 = EntityFactory.CreateHealingItem(PotionTexture, "Health Potion", 4);
         DR_Entity item2 = EntityFactory.CreateMagicItem(ShockTexture, "Shock Scroll", 5);
         DR_Entity item3 = EntityFactory.CreateTargetedMagicItem(FireboltTexture, "Firebolt Scroll", 5);
-        DR_Entity testEquipment = EntityFactory.CreateEquipmentItem(AmuletTexture, "Amulet");
+        DR_Entity testEquipment = EntityFactory.CreateEquipmentItem(AmuletTexture, "Amulet of Double Damage");
+        testEquipment.GetComponent<EquippableComponent>().modifiers.Add(new AttackMultiplierModifier(2.0f));
 
         PlayerActor.GetComponent<InventoryComponent>().AddItem(item1);
         PlayerActor.GetComponent<InventoryComponent>().AddItem(item2);

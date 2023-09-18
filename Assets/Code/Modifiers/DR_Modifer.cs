@@ -4,13 +4,48 @@ using UnityEngine;
 
 public abstract class DR_Modifier
 {
-    //TODO: rework damage system so that it loops through all of an entities modifiers (gets )
+    //called upon attacking a target
+    public virtual void OnAttack(DR_GameManager gm, DamageEvent damageEvent){
+    }
 
-    //TODO: have virtual functions for any potential actions which modifiers can override
-    // such as on attack (or on hit), on kill (or on killed)
+    //called upon being hit
+    public virtual void OnHit(DR_GameManager gm, DamageEvent damageEvent){
+    }
 
-    //TODO: these should receive some sort of damage event which it can modify.
+    //called upon killing a target
+    public virtual void OnKill(DR_GameManager gm, DamageEvent damageEvent){
+    }
 
-    //public virtual void ComputeStats(){  
-    //}
+    //called upon being killed
+    public virtual void OnKilled(DR_GameManager gm, DamageEvent damageEvent){
+    }
+
+    public virtual void ApplyAttackerDamageChanges(DR_GameManager gm, DamageEvent damageEvent){
+    }
+
+    public virtual void ApplyDefenderDamageChanges(DR_GameManager gm, DamageEvent damageEvent){
+    }
+
+    public virtual string GetDescription(){
+        return "[modifier with no description!]";
+    }
+}
+
+public class AttackMultiplierModifier : DR_Modifier
+{
+    float multiplier = 1.0f;
+
+    public AttackMultiplierModifier(float multiplier){
+        this.multiplier = multiplier;
+    }
+
+    public override void ApplyAttackerDamageChanges(DR_GameManager gm, DamageEvent damageEvent)
+    {
+        damageEvent.multiplier *= multiplier;
+    }
+
+    public override string GetDescription()
+    {
+        return "multiply attack damage by " + multiplier.ToString("0.0"); //TODO: want ability to color this number
+    }
 }

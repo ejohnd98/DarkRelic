@@ -46,6 +46,12 @@ public class EntityDetailsUI : MonoBehaviour
         }else{
             DetailsImage.gameObject.SetActive(false);
         }
+        EquippableComponent equippable = entity.GetComponent<EquippableComponent>();
+        if (equippable != null){
+            foreach(DR_Modifier modifier in equippable.modifiers){
+                detailsText += "\n" + modifier.GetDescription();
+            }
+        }
 
         DetailsText.text = detailsText;
         DetailsUIParent.SetActive(true);

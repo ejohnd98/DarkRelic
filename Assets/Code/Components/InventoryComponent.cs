@@ -9,7 +9,7 @@ public class InventoryComponent : DR_Component
     public int equippedItems = 0;
     public List<DR_Entity> items;
 
-    public InventoryComponent(int capacity, int maxEquips = 15){
+    public InventoryComponent(int capacity, int maxEquips = 10){
         items = new List<DR_Entity>();
         this.capacity = capacity;
         this.maxEquips = maxEquips;
