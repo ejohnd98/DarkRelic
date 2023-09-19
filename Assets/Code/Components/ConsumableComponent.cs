@@ -30,6 +30,10 @@ public abstract class ConsumableComponent : DR_Component {
         }
         return new ItemAction(OwningItem, user, target);
     }
+
+    public virtual string GetDescription(){
+        return "";
+    }
 }
 
 public class HealingConsumableComponent : ConsumableComponent {
@@ -47,6 +51,10 @@ public class HealingConsumableComponent : ConsumableComponent {
             return (health.Heal(healAmount) != 0);
         }
         return false;
+    }
+
+    public override string GetDescription(){
+        return "Restores " + healAmount + " health";
     }
 }
 
@@ -107,5 +115,9 @@ public class MagicConsumableComponent : ConsumableComponent {
             }
         }
         return false;
+    }
+
+    public override string GetDescription(){
+        return "Targets " + (targetClosest? "closest enemy" : "selected enemy") + "\nDeals " + damageAmount + " damage";
     }
 }

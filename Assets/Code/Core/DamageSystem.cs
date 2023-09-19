@@ -16,27 +16,36 @@ public class DamageEvent
     public float multiplier = 1.0f;
     public int addedDamage = 0;
 
-    public DamageEvent(DR_Entity attacker, DR_Entity target, DR_Entity item = null){
+    public bool killed = false;
+
+    public DamageEvent(DR_Entity attacker, DR_Entity target, int baseDamage, DR_Entity item = null){
         this.attacker = attacker;
         this.target = target;
         this.item = item;
+        this.baseDamage = baseDamage;
 
         OnAttack = new UnityEvent();
         OnKill = new UnityEvent();
-
-        baseDamage = 1; //TODO: figure out where this comes from (str/atk stat probably)
     }
 
     public int GetResultingDamage(){
         return (int)((baseDamage + addedDamage) * multiplier);
     }
+
+    public string GetLogText(){
+        if (!killed){
+            return attacker.Name + " dealt " + GetResultingDamage() + " damage to " + target.Name;
+        }else{
+            return attacker.Name + " dealt " + GetResultingDamage() + " damage and KILLED " + target.Name;
+        }
+    }
 }
 
 public class DamageSystem
 {
-    public static void HandleAttack(DR_GameManager gm, DR_Entity attacker, HealthComponent target, int damage){
+    public static DamageEvent HandleAttack(DR_GameManager gm, DR_Entity attacker, HealthComponent target, int damage){
 
-        DamageEvent damageEvent = new DamageEvent(attacker, target.Entity);
+        DamageEvent damageEvent = new DamageEvent(attacker, target.Entity, damage);
         InventoryComponent attackerInventory = attacker.GetComponent<InventoryComponent>();
         if (attackerInventory != null){
             foreach (DR_Entity item in attackerInventory.items){
@@ -73,7 +82,8 @@ public class DamageSystem
             damageEvent.OnAttack?.Invoke();
 
             if(!target.IsAlive()){
-                
+                damageEvent.killed = true;
+
                 LevelComponent targetLevel = target.Entity.GetComponent<LevelComponent>();
                 LevelComponent attackerLevel = attacker.GetComponent<LevelComponent>();
                 if (targetLevel != null && attackerLevel != null){
@@ -88,5 +98,9 @@ public class DamageSystem
                 target.Entity.DestroyEntity();
             }
         }
+
+        LogSystem.instance.AddDamageLog(damageEvent);
+
+        return damageEvent;
     }
 }

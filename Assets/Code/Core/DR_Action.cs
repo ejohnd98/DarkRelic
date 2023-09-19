@@ -52,7 +52,7 @@ public class AttackAction : DR_Action {
     public AttackAction (HealthComponent target, DR_Entity attacker = null){
         this.target = target;
         this.owner = attacker;
-        loggable = true;
+        loggable = false; //handle this separately for attacks
     }
 
     public override string GetLogText(){
@@ -65,7 +65,7 @@ public class AttackAction : DR_Action {
         // and/or assign damage to action upon creating it?
         DamageSystem.HandleAttack(gm, owner, target, 1);
 
-        //TODO: do this somewhere else?
+        //TODO: check if this is still needed here
         if (!target.IsAlive()){
             gm.CurrentMap.RemoveActor(target.Entity);
             target.Entity.DestroyEntity();
