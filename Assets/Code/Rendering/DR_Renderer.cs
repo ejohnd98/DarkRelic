@@ -102,6 +102,8 @@ public class DR_Renderer : MonoBehaviour
         }
         foreach(DR_Entity entity in entitiesToRemove){
             Destroy(EntityObjects[entity]);
+            entity.GetComponent<AttackAnimComponent>()?.StopAnim();
+            entity.GetComponent<MoveAnimComponent>()?.StopAnim();
             EntityObjects.Remove(entity);
         }
 
