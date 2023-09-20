@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class EntityFactory : MonoBehaviour
 {
-    public static DR_Entity CreateActor(Sprite Sprite, string Name, int maxHealth = 10, Alignment alignment = Alignment.ENEMY){
+    public static DR_Entity CreateActor(Sprite Sprite, string Name, Alignment alignment = Alignment.ENEMY, int level = 1){
         DR_Entity NewActor = new DR_Entity();
 
         NewActor.Name = Name;
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
-        NewActor.AddComponent<HealthComponent>(new HealthComponent(maxHealth));
+        NewActor.AddComponent<HealthComponent>(new HealthComponent(1)); //TODO: no longer should be providing maxhealth directly
         NewActor.AddComponent<InventoryComponent>(new InventoryComponent(25));
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
         NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
         NewActor.AddComponent<AlignmentComponent>(new AlignmentComponent(alignment));
-        NewActor.AddComponent<LevelComponent>(new LevelComponent());
+        NewActor.AddComponent<LevelComponent>(new LevelComponent(level, NewActor));
         
         return NewActor;
     }

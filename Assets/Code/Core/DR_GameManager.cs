@@ -57,21 +57,24 @@ public class DR_GameManager : MonoBehaviour
         CurrentDungeon = new DR_Dungeon();
         CurrentDungeon.name = "Testing Dungeon";
 
-        PlayerActor = EntityFactory.CreateActor(PlayerTexture, "Player", 20, Alignment.PLAYER);
+        PlayerActor = EntityFactory.CreateActor(PlayerTexture, "Player", Alignment.PLAYER, 1);
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
         UISystem.instance.UpdateInventoryUI(PlayerActor);
 
-        MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35));
+        MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35), 1);
 
         // pathfinding debug map
         //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(pathfindTestMap));
 
         // Add maps to Dungeon
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        mapGenInfo.depth = 2;
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        mapGenInfo.depth = 3;
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
 
         mapGenInfo.isLastFloor = true;
+        mapGenInfo.depth = 4;
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
 
         //temp:
@@ -217,8 +220,6 @@ public class DR_GameManager : MonoBehaviour
 
                                         //todo: create new game state for this where player can choose skills. etc
                                         //ie. this should be a choice later:
-                                        HealthComponent health = PlayerActor.GetComponent<HealthComponent>();
-                                        health.IncreaseMaxHealth(5);
                                     }
                                 }
                         }

@@ -11,6 +11,7 @@ public class MapGeneration{
     public List<MapGenRoom> rooms;
     public Vector2Int mapSize;
     public bool isLastFloor = false;
+    public int depth = 1;
 
     int placedRooms = 0;
 
@@ -302,9 +303,11 @@ public class MapGeneration{
 public class DR_MapGen
 {
     public static DR_Map CreateMapFromMapInfo(MapGenInfo mapGenInfo){
-        //TODO: visualize this
+        //TODO: visualize this process
+        //TODO: have mapgeneration just store one of these MapGenInfo classes?
         MapGeneration mapGen = new MapGeneration(mapGenInfo.MapSize);
         mapGen.isLastFloor = mapGenInfo.isLastFloor;
+        mapGen.depth = mapGenInfo.depth;
 
         while (mapGen.state != MapGenState.FINISHED){
             mapGen.Step();
@@ -383,7 +386,7 @@ public class DR_MapGen
                         break;
                     case MapGenCellType.ENEMY:
                         newCell.bBlocksMovement = false;
-                        DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Enemy", 2, Alignment.ENEMY);
+                        DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Enemy", Alignment.ENEMY, generation.depth);
                         enemy.AddComponent<AIComponent>(new AIComponent());
                         NewMap.AddActor(enemy, new Vector2Int(x,y));
                         break;

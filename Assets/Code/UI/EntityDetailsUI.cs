@@ -38,7 +38,7 @@ public class EntityDetailsUI : MonoBehaviour
             if (!firstLine){
                 detailsText += "\n";
             }
-            detailsText += "Level " + level.level;
+            detailsText += "Level " + level.level + "\nStr: " + level.stats.strength;
             firstLine = false;
         }
 

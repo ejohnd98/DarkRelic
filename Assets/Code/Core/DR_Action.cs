@@ -61,9 +61,10 @@ public class AttackAction : DR_Action {
 
     public override bool Perform(DR_GameManager gm){
         base.Perform(gm);
-        //todo: get damage amount from some component (melee component?)
-        // and/or assign damage to action upon creating it?
-        DamageSystem.HandleAttack(gm, owner, target, 1);
+        
+        int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+
+        DamageSystem.HandleAttack(gm, owner, target, baseDamage);
 
         //TODO: check if this is still needed here
         if (!target.IsAlive()){

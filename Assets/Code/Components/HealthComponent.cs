@@ -32,4 +32,14 @@ public class HealthComponent : DR_Component
         maxHealth += amount;
         Heal(amount);
     }
+
+    public void SetMaxHealth(int newMaxHealth)
+    {
+        int healthChange = newMaxHealth - maxHealth;
+        maxHealth = newMaxHealth;
+        if (healthChange > 0){
+            Heal(healthChange);
+        }
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+    }
 }  

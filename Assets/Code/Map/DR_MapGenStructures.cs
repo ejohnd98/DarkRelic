@@ -6,9 +6,11 @@ using UnityEngine;
 
 public class MapGenInfo{
     public Vector2Int MapSize;
+    public int depth = 1;
 
-    public MapGenInfo(Vector2Int MapSize){
+    public MapGenInfo(Vector2Int MapSize, int depth){
         this.MapSize = MapSize;
+        this.depth = depth;
     }
 
     public bool isLastFloor = false;
