@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,8 @@ using UnityEngine;
 public class MoveAnimComponent : DR_Component
 {
     public bool isAnimating = false;
+
+    public event Action<MoveAnimComponent> AnimFinished;
 
     Vector3 a, b;
     Vector3 currentPos;
@@ -44,6 +47,7 @@ public class MoveAnimComponent : DR_Component
         currentPos = b;
         isAnimating = false;
         DR_Renderer.animsActive--;
+        AnimFinished?.Invoke(this);
     }
 
     public void AnimStep(float time){

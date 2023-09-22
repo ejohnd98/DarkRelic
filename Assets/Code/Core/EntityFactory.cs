@@ -102,4 +102,26 @@ public class EntityFactory : MonoBehaviour
         
         return NewProp;
     }
+
+    public static DR_Entity CreateProjectileEntityAtPosition(Sprite Sprite, string Name, Vector2Int start, Vector2Int end){
+        DR_Entity NewActor = new DR_Entity();
+
+        NewActor.Name = Name;
+        NewActor.Position = start;
+        NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
+        MoveAnimComponent moveAnim = NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
+        moveAnim.AnimFinished += (MoveAnimComponent moveAnim) => {
+                Debug.Log("AnimFinished!");
+                DR_GameManager.instance.CurrentMap.RemoveEntity(NewActor);
+                NewActor.noLongerValid = true;
+                NewActor.DestroyEntity();
+                NewActor.isOnMap = false;
+            };
+
+        DR_GameManager.instance.CurrentMap.AddEntity(NewActor);
+        NewActor.isOnMap = true;
+
+        moveAnim.SetAnim(end, 0.25f, true);
+        return NewActor;
+    }
 }

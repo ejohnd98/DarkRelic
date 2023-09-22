@@ -3062,6 +3062,7 @@ MonoBehaviour:
   ShockTexture: {fileID: -1524527926, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   GoalTexture: {fileID: 269414168, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   AmuletTexture: {fileID: -286857981, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  ProjectileTexture: {fileID: -1681357973, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   Directions:

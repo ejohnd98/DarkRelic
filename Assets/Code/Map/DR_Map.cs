@@ -49,6 +49,15 @@ public class DR_Map
         return false;
     }
 
+    // add entity that doesn't occupy a cell
+    public void AddEntity(DR_Entity entity){
+        Entities.Add(entity);
+    }
+
+    public void RemoveEntity(DR_Entity entity){
+        Entities.Remove(entity);
+    }
+
     public void RemoveItem(DR_Entity item){
         DR_Cell Cell = Cells[item.Position.y, item.Position.x];
         Cell.Item = null;

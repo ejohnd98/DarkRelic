@@ -108,6 +108,8 @@ public class MagicConsumableComponent : ConsumableComponent {
         }
 
         if (chosenTarget != null){
+            EntityFactory.CreateProjectileEntityAtPosition(DR_GameManager.instance.ProjectileTexture, "Projectile", user.Position, chosenTarget.Position);
+
             HealthComponent health = chosenTarget.GetComponent<HealthComponent>();
             if (health != null){
                 DamageSystem.HandleAttack(gm, user, health, damageAmount);
