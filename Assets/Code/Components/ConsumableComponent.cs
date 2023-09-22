@@ -63,6 +63,10 @@ public class MagicConsumableComponent : ConsumableComponent {
     public int damageAmount = 5;
     public int maxRange = 6;
 
+    //todo: figure out better spot for these
+    public Color color = Color.white;
+    public Sprite projectileSprite;
+
     //todo: make enum of targeting types?
     public bool targetClosest = false;
 
@@ -108,7 +112,7 @@ public class MagicConsumableComponent : ConsumableComponent {
         }
 
         if (chosenTarget != null){
-            EntityFactory.CreateProjectileEntityAtPosition(DR_GameManager.instance.ProjectileTexture, "Projectile", user.Position, chosenTarget.Position);
+            EntityFactory.CreateProjectileEntityAtPosition(projectileSprite, "Projectile", user.Position, chosenTarget.Position, color);
 
             HealthComponent health = chosenTarget.GetComponent<HealthComponent>();
             if (health != null){

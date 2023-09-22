@@ -59,6 +59,8 @@ public class EntityFactory : MonoBehaviour
         NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewItem.AddComponent<MagicConsumableComponent>(new MagicConsumableComponent(damageAmount));
         NewItem.GetComponent<MagicConsumableComponent>().targetClosest = true;
+        NewItem.GetComponent<MagicConsumableComponent>().color = new Color(1.0f, 1.0f, 0.529f);
+        NewItem.GetComponent<MagicConsumableComponent>().projectileSprite = DR_GameManager.instance.SparkProjectile;
         
         return NewItem;
     }
@@ -72,6 +74,8 @@ public class EntityFactory : MonoBehaviour
         NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewItem.AddComponent<MagicConsumableComponent>(new MagicConsumableComponent(damageAmount));
         NewItem.GetComponent<MagicConsumableComponent>().targetClosest = false;
+        NewItem.GetComponent<MagicConsumableComponent>().color = new Color(0.99f, 0.24f, 0.19f);
+        NewItem.GetComponent<MagicConsumableComponent>().projectileSprite = DR_GameManager.instance.FireProjectile;
         
         return NewItem;
     }
@@ -103,7 +107,7 @@ public class EntityFactory : MonoBehaviour
         return NewProp;
     }
 
-    public static DR_Entity CreateProjectileEntityAtPosition(Sprite Sprite, string Name, Vector2Int start, Vector2Int end){
+    public static DR_Entity CreateProjectileEntityAtPosition(Sprite Sprite, string Name, Vector2Int start, Vector2Int end, Color color){
         DR_Entity NewActor = new DR_Entity();
 
         NewActor.Name = Name;
@@ -116,12 +120,13 @@ public class EntityFactory : MonoBehaviour
                 NewActor.noLongerValid = true;
                 NewActor.DestroyEntity();
                 NewActor.isOnMap = false;
+                FXSpawner.instance.SpawnParticleFX(end, color);
             };
 
         DR_GameManager.instance.CurrentMap.AddEntity(NewActor);
         NewActor.isOnMap = true;
 
-        moveAnim.SetAnim(end, 0.25f, true);
+        moveAnim.SetAnim(end, 0.2f, true, EaseType.Linear);
         return NewActor;
     }
 }

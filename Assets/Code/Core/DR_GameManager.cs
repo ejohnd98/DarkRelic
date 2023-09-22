@@ -25,7 +25,7 @@ public class DR_GameManager : MonoBehaviour
     public DR_Map CurrentMap;
     public Texture2D DebugMap, DebugMap2, pathfindTestMap;
     public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
-        PotionTexture, FireboltTexture, ShockTexture, GoalTexture, AmuletTexture, ProjectileTexture;
+        PotionTexture, FireboltTexture, ShockTexture, GoalTexture, AmuletTexture, FireProjectile, SparkProjectile;
 
     public bool debug_disableFOV = false;
 

@@ -10,6 +10,10 @@ public class Easings
         return Vector3.Slerp(a, b, x);
     }
 
+    public static Vector3 Linear(Vector3 a, Vector3 b, float x) {
+        return Vector3.Lerp(a,b,x);
+    }
+
     public static Vector3 QuadEaseOut(Vector3 a, Vector3 b, float x) {
         float val = 1 - (1 - x) * (1 - x);
         val = 1.0f - val;

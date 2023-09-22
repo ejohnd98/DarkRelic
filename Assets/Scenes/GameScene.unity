@@ -3028,6 +3028,7 @@ GameObject:
   - component: {fileID: 1484776820}
   - component: {fileID: 1484776819}
   - component: {fileID: 1484776821}
+  - component: {fileID: 1484776822}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3062,7 +3063,8 @@ MonoBehaviour:
   ShockTexture: {fileID: -1524527926, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   GoalTexture: {fileID: 269414168, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   AmuletTexture: {fileID: -286857981, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-  ProjectileTexture: {fileID: -1681357973, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  FireProjectile: {fileID: -1681357973, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  SparkProjectile: {fileID: -264209838, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   Directions:
@@ -3101,6 +3103,19 @@ MonoBehaviour:
   mouseIsInWorld: 0
   cameraObj: {fileID: 0}
   inputPersistLength: 0.25
+--- !u!114 &1484776822
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484776818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e771a37192c26843b73611d9c3c7032, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FXObj: {fileID: 330791543554764459, guid: aaa4ac33f49b4524d8fa44b75257ea06, type: 3}
 --- !u!1 &1542393316
 GameObject:
   m_ObjectHideFlags: 0
