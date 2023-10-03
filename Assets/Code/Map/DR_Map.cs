@@ -182,6 +182,15 @@ public class DR_Map
         return Vector2Int.zero;
     }
 
+    public Vector2Int GetAdjacentPosition(Vector2Int pos){
+        foreach (Vector2Int dir in DR_GameManager.instance.Directions){
+            if (!BlocksMovement(pos + dir)){
+                return pos + dir;
+            }
+        }
+        return Vector2Int.zero;
+    }
+
     public DR_Cell GetCell(Vector2Int pos){
         if (!ValidPosition(pos)){
             return null;

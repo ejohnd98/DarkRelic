@@ -31,9 +31,7 @@ public class DR_Renderer : MonoBehaviour
     }
 
     void LateUpdate() {
-        //TODO: add a monobehaviour component to the entity objects so they can update the move position theirselves?
         UpdateEntities(Time.deltaTime);
-        //DR_GameManager.instance.UpdateCamera();
     }
 
     public void UpdateTiles(){
@@ -77,6 +75,10 @@ public class DR_Renderer : MonoBehaviour
         }
         CellObjects.Clear();
 
+        foreach(DR_Entity entity in EntityObjects.Keys){
+            entity.GetComponent<AttackAnimComponent>()?.StopAnim();
+            entity.GetComponent<MoveAnimComponent>()?.StopAnim();
+        }
         foreach(GameObject obj in EntityObjects.Values){
             Destroy(obj);
         }

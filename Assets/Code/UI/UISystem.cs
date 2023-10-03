@@ -23,6 +23,7 @@ public class UISystem : MonoBehaviour
     public Transform HealthBarPivot; //TODO make healthbar wrapper class (so enemies can have health bars too)
     public EntityDetailsUI detailsUI;
     public InventoryUI inventoryUI;
+    public DepthGaugeUI depthUI;
     public GameObject gameOverUI, victoryUI;
 
     DR_Action UIAction;
@@ -51,6 +52,10 @@ public class UISystem : MonoBehaviour
 
     public void RefreshInventoryUI(){
         inventoryUI.UpdateUI();
+    }
+
+    public void UpdateDepthUI(){
+        depthUI.SetDungeon(DR_GameManager.instance.CurrentDungeon);
     }
 
     public void RefreshUI(){
