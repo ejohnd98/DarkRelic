@@ -140,9 +140,9 @@ public class DR_GameManager : MonoBehaviour
                         DR_Entity entity = turnSystem.PopNextEntity().Entity;
                         DR_Action entityAction = AISystem.DetermineAIAction(this, entity);
                         if (entityAction != null){
-                            entityAction.Perform(this);
+                            ActionSystem.HandleAction(this, entityAction);
+                            UISystem.instance.RefreshDetailsUI();
                         }
-                        UISystem.instance.RefreshDetailsUI();
                     }
                     else
                     {
@@ -218,7 +218,7 @@ public class DR_GameManager : MonoBehaviour
                                     UISystem.instance.BeginTargetSelection();
                                     break;
                                 }
-                                selectedAction.Perform(this);
+                                ActionSystem.HandleAction(this, selectedAction);
 
                                 PlayerActor.GetComponent<TurnComponent>().SpendTurn();
                                 turnSystem.PopNextEntity();

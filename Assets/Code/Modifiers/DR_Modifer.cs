@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO: refactor to DR_AttackModifier
+// Then can have DR_StatModifiers which are added to LevelComponent (implement a GetStats function which returns the resulting stats)
 public abstract class DR_Modifier
 {
     //called upon attacking a target
