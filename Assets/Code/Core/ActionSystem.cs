@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class ActionEvent
 {
-    DR_Action action;
+    public DR_Action action;
 
     public ActionEvent(DR_Action action){
         this.action = action;
@@ -15,11 +15,9 @@ public class ActionEvent
 
 public class ActionSystem
 {
-    public static ActionEvent HandleAction(DR_GameManager gm, DR_Action action){
+    public static bool HandleAction(DR_GameManager gm, ActionEvent actionEvent){
 
-        ActionEvent actionEvent = new ActionEvent(action);
-
-        action.Perform(gm);
+        return actionEvent.action.Perform(gm);
 
         /*
         Requirements:
@@ -36,7 +34,5 @@ public class ActionSystem
 
         
         */
-
-        return actionEvent;
     }
 }

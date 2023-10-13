@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class DR_GameManager : MonoBehaviour
 {
-    enum GameState {
+    public enum GameState {
         RUNNING,
         WAITING_FOR_INPUT,
         FURTHER_INPUT_REQUIRED,
         ANIMATING,
+        HANDLING_TURN,
         GAME_OVER,
 
         INVALID
@@ -19,7 +20,7 @@ public class DR_GameManager : MonoBehaviour
     public static DR_GameManager instance;
 
     GameState CurrentState = GameState.INVALID;
-    DR_Action currentAction;
+    ActionEvent currentActionEvent;
 
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
@@ -140,7 +141,8 @@ public class DR_GameManager : MonoBehaviour
                         DR_Entity entity = turnSystem.PopNextEntity().Entity;
                         DR_Action entityAction = AISystem.DetermineAIAction(this, entity);
                         if (entityAction != null){
-                            ActionSystem.HandleAction(this, entityAction);
+                            ActionEvent entityActionEvent = new ActionEvent(entityAction);
+                            ActionSystem.HandleAction(this, entityActionEvent);
                             UISystem.instance.RefreshDetailsUI();
                         }
                     }
@@ -161,7 +163,6 @@ public class DR_GameManager : MonoBehaviour
 
             case GameState.WAITING_FOR_INPUT:
                 {
-                    //TODO make input handler class, and have key presses linger so that you can press arrow keys slightly before allowed
                     if (turnSystem.IsPlayerTurn())
                     {
                         KeyCode key = KeyCode.None;
@@ -211,19 +212,24 @@ public class DR_GameManager : MonoBehaviour
                             // Just do first action for now
                             if (selectedAction != null)
                             {
-                                if (selectedAction.requiresFurtherInput){
+                                ActionEvent actionEvent = new ActionEvent(selectedAction);
+                                if (actionEvent.action.requiresFurtherInput){
                                     CurrentState = GameState.FURTHER_INPUT_REQUIRED;
                                     LogSystem.instance.AddTextLog("Please select a target...");
-                                    currentAction = selectedAction;
+                                    currentActionEvent = actionEvent;
                                     UISystem.instance.BeginTargetSelection();
                                     break;
                                 }
-                                ActionSystem.HandleAction(this, selectedAction);
+                                if (ActionSystem.HandleAction(this, actionEvent)){
+                                    PlayerActor.GetComponent<TurnComponent>().SpendTurn();
+                                    turnSystem.PopNextEntity();
+                                    SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+                                    DR_Renderer.instance.UpdateTiles();
+                                }else{
+                                    currentActionEvent = null;
+                                }
 
-                                PlayerActor.GetComponent<TurnComponent>().SpendTurn();
-                                turnSystem.PopNextEntity();
-                                SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-                                DR_Renderer.instance.UpdateTiles();
+                                
                                 UISystem.instance.RefreshDetailsUI();
                             }
                             
@@ -248,11 +254,11 @@ public class DR_GameManager : MonoBehaviour
                 }
             case GameState.FURTHER_INPUT_REQUIRED:
             {
-                if (currentAction.hasReceivedFurtherInput){
-                    bool actionSuccess = currentAction.Perform(this);
+                if (currentActionEvent.action.hasReceivedFurtherInput){
+                    bool actionSuccess = currentActionEvent.action.Perform(this);
                     if (!actionSuccess){
                         SetGameState(GameState.WAITING_FOR_INPUT);
-                        currentAction = null;
+                        currentActionEvent = null;
                         break;
                     }
 
@@ -263,16 +269,19 @@ public class DR_GameManager : MonoBehaviour
                     UISystem.instance.RefreshDetailsUI();
 
                     SetGameState(GameState.RUNNING);
-                    currentAction = null;
+                    currentActionEvent = null;
                 }
                 break;
             }
-
             case GameState.ANIMATING:
             {
                 if (DR_Renderer.animsActive <= 0){
                     SetGameState(GameState.RUNNING);
                 }
+                break;
+            }
+            case GameState.HANDLING_TURN:
+            {
                 break;
             }
 
@@ -308,15 +317,15 @@ public class DR_GameManager : MonoBehaviour
             Debug.LogError("Tried to provide further input but not in correct state!");
             return false;
         }
-        if (currentAction == null){
+        if (currentActionEvent == null){
             Debug.LogError("Tried to provide further input but currentAction is null!");
             return false;
         }
 
-        return currentAction.GiveAdditionalInput(this, pos);
+        return currentActionEvent.action.GiveAdditionalInput(this, pos);
     }
 
-    void SetGameState(GameState newState){
+    public void SetGameState(GameState newState){
         if (CurrentState != newState){
             //Debug.Log("Changed states from " + CurrentState.ToString() + " to " + newState.ToString());
         }

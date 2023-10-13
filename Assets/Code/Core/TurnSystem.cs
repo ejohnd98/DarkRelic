@@ -92,4 +92,23 @@ public class TurnSystem
 
         return NextEntity.HasComponent<PlayerComponent>();
     }
+
+    public static void HandleTurn(DR_GameManager gm, DR_Entity turnTaker){
+        //double check that the turnTaker CAN take a turn:
+        //if not, return
+        //else
+        gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
+
+        //get turncomponent
+
+        //determine if this is the player or an AI:
+        bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
+        if(isPlayer){
+            //put input checking code here?
+
+            //check if further input is required
+            //if so, set a state (create new enum for this system?)
+            //also, create callback for when turn handling is done??
+        }
+    }
 }
