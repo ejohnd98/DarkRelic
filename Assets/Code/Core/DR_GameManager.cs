@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class DR_GameManager : MonoBehaviour
@@ -111,7 +112,7 @@ public class DR_GameManager : MonoBehaviour
         UpdateCamera(true);
 
         // Create Turn System
-        turnSystem = new TurnSystem();
+        turnSystem = gameObject.AddComponent<TurnSystem>();
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
         DR_Renderer.instance.CreateTiles();
@@ -165,85 +166,7 @@ public class DR_GameManager : MonoBehaviour
                 {
                     if (turnSystem.IsPlayerTurn())
                     {
-                        KeyCode key = KeyCode.None;
-
-                        Vector2Int interactPos = Vector2Int.zero;
-                        for (int i = 0; i < KeyDirections.Length; i++)
-                        {
-                            if (DR_InputHandler.GetKeyPressed(KeyDirections[i]))
-                            {
-                                key = KeyDirections[i];
-                                interactPos = PlayerActor.Position + Directions[i];
-                            }
-                        }
-
-                        for (int i = 0; i < NumberKeys.Length; i++)
-                        {
-                            if (DR_InputHandler.GetKeyPressed(NumberKeys[i]))
-                            {
-                                key = NumberKeys[i];
-                                interactPos = PlayerActor.Position;
-                            }
-                        }
-
-                        if (DR_InputHandler.GetKeyPressed(KeyCode.Space)){
-                            key = KeyCode.Space;
-                            interactPos = PlayerActor.Position;
-                        }
-
-                        if (DR_InputHandler.GetKeyPressed(KeyCode.G)){
-                            key = KeyCode.G;
-                            interactPos = PlayerActor.Position;
-                        }
-
-                        DR_Action UIAction = UISystem.instance.GetUIAction();
-
-                        if (key != KeyCode.None || UIAction != null)
-                        {
-                            List<DR_Action> possibleActions = InteractionSystem.GetPotentialActions(PlayerActor, CurrentMap, interactPos, key);
-                            DR_Action selectedAction = null;
-
-                            if (UIAction != null){
-                                selectedAction = UIAction;
-                            }else if (possibleActions.Count > 0){
-                                selectedAction = possibleActions[0] ;
-                            }
-
-                            // Just do first action for now
-                            if (selectedAction != null)
-                            {
-                                ActionEvent actionEvent = new ActionEvent(selectedAction);
-                                if (actionEvent.action.requiresFurtherInput){
-                                    CurrentState = GameState.FURTHER_INPUT_REQUIRED;
-                                    LogSystem.instance.AddTextLog("Please select a target...");
-                                    currentActionEvent = actionEvent;
-                                    UISystem.instance.BeginTargetSelection();
-                                    break;
-                                }
-                                if (ActionSystem.HandleAction(this, actionEvent)){
-                                    PlayerActor.GetComponent<TurnComponent>().SpendTurn();
-                                    turnSystem.PopNextEntity();
-                                    SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-                                    DR_Renderer.instance.UpdateTiles();
-                                }else{
-                                    currentActionEvent = null;
-                                }
-
-                                
-                                UISystem.instance.RefreshDetailsUI();
-                            }
-                            
-                                if (PlayerActor != null){
-                                    LevelComponent levelComp = PlayerActor.GetComponent<LevelComponent>();
-                                    if (levelComp.RequiresLevelUp()){
-                                        LogSystem.instance.AddTextLog("Player leveled up!");
-                                        levelComp.AdvanceLevel();
-
-                                        //todo: create new game state for this where player can choose skills. etc
-                                        //ie. this should be a choice later:
-                                    }
-                                }
-                        }
+                        turnSystem.HandleTurn(this, PlayerActor);
                     }
                     else
                     {
@@ -306,6 +229,10 @@ public class DR_GameManager : MonoBehaviour
     public void OnGameWon(){
         CurrentState = GameState.GAME_OVER;
         UISystem.instance.ShowVictory();
+    }
+
+    public void OnTurnHandled(){
+        SetGameState(GameState.RUNNING);
     }
 
     private void LateUpdate() {
