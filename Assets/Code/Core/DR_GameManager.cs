@@ -69,10 +69,10 @@ public class DR_GameManager : MonoBehaviour
         MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35), 1);
 
         // pathfinding debug map
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(DebugMap2));
+        //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(DebugMap2));
 
         // Add maps to Dungeon
-        //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         mapGenInfo.depth = 2;
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         mapGenInfo.depth = 3;
@@ -234,13 +234,13 @@ public class DR_GameManager : MonoBehaviour
     public void UpdateCamera(bool forcePos = false)
     {
         Vector3 DesiredPos = MainCamera.transform.position;
-        // if (PlayerActor.HasComponent<MoveAnimComponent>()){
-        //     DesiredPos.x = PlayerActor.GetComponent<MoveAnimComponent>().GetAnimPosition().x;
-        //     DesiredPos.y = PlayerActor.GetComponent<MoveAnimComponent>().GetAnimPosition().y;
-        // }else{
+        if (PlayerActor.HasComponent<MoveAnimation>()){
+            DesiredPos.x = PlayerActor.GetComponent<MoveAnimation>().GetAnimPosition().x;
+            DesiredPos.y = PlayerActor.GetComponent<MoveAnimation>().GetAnimPosition().y;
+        }else{
             DesiredPos.x = PlayerActor.Position.x;
             DesiredPos.y = PlayerActor.Position.y;
-        //}
+        }
         
 
         if (forcePos){
@@ -258,6 +258,12 @@ public class DR_GameManager : MonoBehaviour
         UISystem.instance.UpdateDepthUI();
     }
 
+    // TODO:
+    // --- BUG! ---
+    // There is a bug where enemies aren't being cleaned up correctly when moving floors (or at least that's when it's been noticed)
+    // they appear when mousing over in details panel, but have no sprite (perhaps not being removed from entities array)
+    // they can still attack player
+    // --- BUG! ---
     public void MoveLevels(DR_Map origin, DR_Map destination, bool goingDeeper){
         if (origin == destination){
             return;
