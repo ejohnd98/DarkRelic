@@ -31,6 +31,7 @@ public class DR_Renderer : MonoBehaviour
     }
 
     void LateUpdate() {
+        AnimationSystem.UpdateAnims(Time.deltaTime);
         UpdateEntities(Time.deltaTime);
     }
 
@@ -75,10 +76,6 @@ public class DR_Renderer : MonoBehaviour
         }
         CellObjects.Clear();
 
-        foreach(DR_Entity entity in EntityObjects.Keys){
-            entity.GetComponent<AttackAnimComponent>()?.StopAnim();
-            entity.GetComponent<MoveAnimComponent>()?.StopAnim();
-        }
         foreach(GameObject obj in EntityObjects.Values){
             Destroy(obj);
         }
@@ -104,8 +101,6 @@ public class DR_Renderer : MonoBehaviour
         }
         foreach(DR_Entity entity in entitiesToRemove){
             Destroy(EntityObjects[entity]);
-            entity.GetComponent<AttackAnimComponent>()?.StopAnim();
-            entity.GetComponent<MoveAnimComponent>()?.StopAnim();
             EntityObjects.Remove(entity);
         }
 
@@ -133,14 +128,12 @@ public class DR_Renderer : MonoBehaviour
 
             // TODO: make proper system to determine z depth for each entity
             Vector3 pos;
-            MoveAnimComponent moveComponent = Entity.GetComponent<MoveAnimComponent>();
-            AttackAnimComponent attackAnimComponent = Entity.GetComponent<AttackAnimComponent>();
-            if (moveComponent != null && moveComponent.isAnimating){
-                moveComponent.AnimStep(deltaTime);
-                pos = moveComponent.GetAnimPosition(GetDepthForEntity(Entity));
-            }else if (attackAnimComponent != null && attackAnimComponent.isAnimating){
-                attackAnimComponent.AnimStep(deltaTime);
-                pos = attackAnimComponent.GetAnimPosition(GetDepthForEntity(Entity));
+            MoveAnimation moveAnim = Entity.GetComponent<MoveAnimation>();
+            AttackAnimation attackAnim = Entity.GetComponent<AttackAnimation>();
+            if (moveAnim != null){
+                pos = moveAnim.GetAnimPosition(GetDepthForEntity(Entity));
+            }else if (attackAnim != null){
+                pos = attackAnim.GetAnimPosition(GetDepthForEntity(Entity));
             }else{
                 pos = Entity.GetPosFloat(GetDepthForEntity(Entity));
             }

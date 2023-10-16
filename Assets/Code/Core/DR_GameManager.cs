@@ -6,8 +6,7 @@ using UnityEngine;
 public class DR_GameManager : MonoBehaviour
 {
     public enum GameState {
-        RUNNING,
-        WAITING_FOR_INPUT,
+        ADVANCE_GAME,
         FURTHER_INPUT_REQUIRED,
         ANIMATING,
         HANDLING_TURN,
@@ -70,10 +69,10 @@ public class DR_GameManager : MonoBehaviour
         MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35), 1);
 
         // pathfinding debug map
-        //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(pathfindTestMap));
+        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(DebugMap2));
 
         // Add maps to Dungeon
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         mapGenInfo.depth = 2;
         CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
         mapGenInfo.depth = 3;
@@ -117,7 +116,7 @@ public class DR_GameManager : MonoBehaviour
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
         DR_Renderer.instance.CreateTiles();
 
-        SetGameState(GameState.RUNNING);
+        SetGameState(GameState.ADVANCE_GAME);
         UISystem.instance.RefreshDetailsUI();
         UISystem.instance.UpdateDepthUI();
     }
@@ -126,26 +125,12 @@ public class DR_GameManager : MonoBehaviour
     {
         switch (CurrentState)
         {
-            case GameState.RUNNING:
+            case GameState.ADVANCE_GAME:
                 {
                     if (turnSystem.CanEntityAct())
                     {
-                        if (turnSystem.IsPlayerTurn())
-                        {
-                            SetGameState(GameState.WAITING_FOR_INPUT);
-                            break;
-                        }
-
-                        //AI TURN
-
-                        turnSystem.GetNextEntity().SpendTurn();
                         DR_Entity entity = turnSystem.PopNextEntity().Entity;
-                        DR_Action entityAction = AISystem.DetermineAIAction(this, entity);
-                        if (entityAction != null){
-                            ActionEvent entityActionEvent = new ActionEvent(entityAction);
-                            ActionSystem.HandleAction(this, entityActionEvent);
-                            UISystem.instance.RefreshDetailsUI();
-                        }
+                        turnSystem.HandleTurn(this, entity);
                     }
                     else
                     {
@@ -161,45 +146,32 @@ public class DR_GameManager : MonoBehaviour
                     }
                     break;
                 }
-
-            case GameState.WAITING_FOR_INPUT:
-                {
-                    if (turnSystem.IsPlayerTurn())
-                    {
-                        turnSystem.HandleTurn(this, PlayerActor);
-                    }
-                    else
-                    {
-                        SetGameState(GameState.RUNNING);
-                        break;
-                    }
-                    break;
-                }
             case GameState.FURTHER_INPUT_REQUIRED:
             {
-                if (currentActionEvent.action.hasReceivedFurtherInput){
-                    bool actionSuccess = currentActionEvent.action.Perform(this);
-                    if (!actionSuccess){
-                        SetGameState(GameState.WAITING_FOR_INPUT);
-                        currentActionEvent = null;
-                        break;
-                    }
+                SetGameState(GameState.ADVANCE_GAME);
+                // if (currentActionEvent.action.hasReceivedFurtherInput){
+                //     bool actionSuccess = currentActionEvent.action.Perform(this);
+                //     if (!actionSuccess){
+                //         SetGameState(GameState.WAITING_FOR_INPUT);
+                //         currentActionEvent = null;
+                //         break;
+                //     }
 
-                    PlayerActor.GetComponent<TurnComponent>().SpendTurn();
-                    turnSystem.PopNextEntity();
-                    SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-                    DR_Renderer.instance.UpdateTiles();
-                    UISystem.instance.RefreshDetailsUI();
+                //     PlayerActor.GetComponent<TurnComponent>().SpendTurn();
+                //     turnSystem.PopNextEntity();
+                //     SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+                //     DR_Renderer.instance.UpdateTiles();
+                //     UISystem.instance.RefreshDetailsUI();
 
-                    SetGameState(GameState.RUNNING);
-                    currentActionEvent = null;
-                }
+                //     SetGameState(GameState.RUNNING);
+                //     currentActionEvent = null;
+                // }
                 break;
             }
             case GameState.ANIMATING:
             {
                 if (DR_Renderer.animsActive <= 0){
-                    SetGameState(GameState.RUNNING);
+                    SetGameState(GameState.ADVANCE_GAME);
                 }
                 break;
             }
@@ -232,7 +204,7 @@ public class DR_GameManager : MonoBehaviour
     }
 
     public void OnTurnHandled(){
-        SetGameState(GameState.RUNNING);
+        SetGameState(GameState.ADVANCE_GAME);
     }
 
     private void LateUpdate() {
@@ -262,13 +234,13 @@ public class DR_GameManager : MonoBehaviour
     public void UpdateCamera(bool forcePos = false)
     {
         Vector3 DesiredPos = MainCamera.transform.position;
-        if (PlayerActor.HasComponent<MoveAnimComponent>()){
-            DesiredPos.x = PlayerActor.GetComponent<MoveAnimComponent>().GetAnimPosition().x;
-            DesiredPos.y = PlayerActor.GetComponent<MoveAnimComponent>().GetAnimPosition().y;
-        }else{
+        // if (PlayerActor.HasComponent<MoveAnimComponent>()){
+        //     DesiredPos.x = PlayerActor.GetComponent<MoveAnimComponent>().GetAnimPosition().x;
+        //     DesiredPos.y = PlayerActor.GetComponent<MoveAnimComponent>().GetAnimPosition().y;
+        // }else{
             DesiredPos.x = PlayerActor.Position.x;
             DesiredPos.y = PlayerActor.Position.y;
-        }
+        //}
         
 
         if (forcePos){

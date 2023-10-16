@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class TurnSystem : MonoBehaviour
 {
-    // keep a list of all actors
-    // have a queue of any actors that are going to act in the current turn
-    // each turn loop through and add to a 
-
     List<TurnComponent> EligibleEntities;
     List<TurnComponent> CanAct;
 
@@ -80,7 +76,7 @@ public class TurnSystem : MonoBehaviour
         }
 
         // TODO: have entities properly remove themselves
-        // messy handling of entites which have been removed
+        // Messy handling of entites which have been removed:
         TurnComponent NextEntityTurn = GetNextEntity();
         DR_Entity NextEntity = NextEntityTurn.Entity;
 
@@ -94,66 +90,76 @@ public class TurnSystem : MonoBehaviour
     }
 
     public void HandleTurn(DR_GameManager gm, DR_Entity turnTaker){
-        //TODO: maybe this shouldn't be called on updatewhen it is the players turn (ie. only call this when there IS input?)
+        Debug.Log("Handling turn for " + turnTaker.Name);
+        gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
 
-        DR_Action turnAction = null;
-
-        //get turncomponent
-
-        //determine if this is the player or an AI:
         bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
+
         if(isPlayer){
-            turnAction = GetPlayerActionFromInput(gm, turnTaker);
+            StartCoroutine(WaitForPlayerInput(gm, turnTaker));
         }else{
-            //TODO: move AI code here
-        }
-
-        if (turnAction != null){
-            gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
-
-            ActionEvent actionEvent = new ActionEvent(turnAction);
-            if (actionEvent.action.requiresFurtherInput){
-                // CurrentState = GameState.FURTHER_INPUT_REQUIRED;
-                // LogSystem.instance.AddTextLog("Please select a target...");
-                // currentActionEvent = actionEvent;
-                // UISystem.instance.BeginTargetSelection();
-                // break;
-
-                //TODO: move into a coroutine here?
-                //TODO: possibly move into one regardless of whether further input is required
-                //TODO: ie. yield return until this bool is true
-                //TODO: (this reduces weird branching behaviour between actions with/without needed input)
-            }
-            if (ActionSystem.HandleAction(gm, actionEvent)){
-                turnTaker.GetComponent<TurnComponent>().SpendTurn();
-                PopNextEntity();
-                if (isPlayer){
-                    SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
-                    DR_Renderer.instance.UpdateTiles();
-                }
-                
-            }
-
-            StartCoroutine(CheckForTurnEnd(gm, turnTaker));
+            HandleTurnAction(gm, turnTaker, AISystem.DetermineAIAction(gm, turnTaker));
         }
     }
 
-    IEnumerator CheckForTurnEnd(DR_GameManager gm, DR_Entity turnTaker){
-        Debug.Log("CheckForTurnEnd started");
-        yield return new WaitUntil(() => DR_Renderer.animsActive <= 0);
-        Debug.Log("CheckForTurnEnd finishing up");
+    IEnumerator WaitForPlayerInput(DR_GameManager gm, DR_Entity turnTaker){
+        DR_Action playerAction = null;
+        while(playerAction == null){
+            playerAction = GetPlayerActionFromInput(gm, turnTaker);
+            yield return null;
+        }
+        HandleTurnAction(gm, turnTaker, playerAction);
+    }
 
-        //End of turn stuff:
+    void HandleTurnAction(DR_GameManager gm, DR_Entity turnTaker, DR_Action action){
+        bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
+
+        if (action == null){
+            Debug.LogAssertion("TurnSystem.HandleTurnAction | action is null!");
+            return;
+        }
+
+
+        ActionEvent actionEvent = new ActionEvent(action);
+        if (actionEvent.action.requiresFurtherInput){
+            //TODO: split with a coroutine function here
+        }
+
+        if (ActionSystem.HandleAction(gm, actionEvent)){
+            turnTaker.GetComponent<TurnComponent>().SpendTurn();
+            if (isPlayer){
+                SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
+                DR_Renderer.instance.UpdateTiles();
+            }
+            
+        }else{
+            Debug.LogError("ActionSystem could not handle action for " + turnTaker);
+        }
+
+        //TODO: move animation component into DR_Action, then check if that exists here.
+        // If so, run coroutuine to wait for it, otherwise call TurnEnd directly (assuming animation should run before performing the action)
+
+        //alternatively, have the actions themselves run a coroutine to wait for their animations to finish.
+        // this may be much more flexible. if doing this, will need a coroutine here to wait until the action is done.
+        // or create an action event and subscribe to it which could be easier/cleaner.
+
+        StartCoroutine(CheckForTurnEnd(gm, turnTaker));
+    }
+
+    IEnumerator CheckForTurnEnd(DR_GameManager gm, DR_Entity turnTaker){
+        yield return new WaitUntil(() => !AnimationSystem.IsAnimating());
+        TurnEnd(gm, turnTaker);
+    }
+
+    void TurnEnd(DR_GameManager gm, DR_Entity turnTaker){
         LevelComponent levelComp = turnTaker.GetComponent<LevelComponent>();
         if (levelComp.RequiresLevelUp()){
             LogSystem.instance.AddTextLog(turnTaker.Name + " leveled up!");
             levelComp.AdvanceLevel();
-
-            //TODO: create new game state for this where player can choose skills. etc
         }
             
         UISystem.instance.RefreshDetailsUI();
-
+        Debug.Log("Turn handled for " + turnTaker.Name);
         gm.OnTurnHandled();
     }
 

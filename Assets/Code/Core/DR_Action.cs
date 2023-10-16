@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public abstract class DR_Action {
     public bool loggable = false;
     public DR_Entity owner;
@@ -25,6 +26,19 @@ public abstract class DR_Action {
         Debug.LogError("GiveAdditionalInput not implemented!");
         return false;
     }
+
+    //TODO: DR_Animation: move existing animation components into this new class
+    // these animations will be stored in a list in a new AnimationSystem class.
+    // the renderer will iterate through them, but when possible perform multiple at once (can do that later though)
+
+    //TODO: make these work:
+    // public virtual DR_Animation GetStartAnimation(){
+    //     return null;
+    // }
+
+    // public virtual DR_Animation GetEndAnimation(){
+    //     return null;
+    // }
 }
 
 public class MoveAction : DR_Action {
@@ -72,8 +86,9 @@ public class AttackAction : DR_Action {
             target.Entity.DestroyEntity();
         }
 
-        AttackAnimComponent attackAnim = owner.AddComponent<AttackAnimComponent>(new AttackAnimComponent());
+        AttackAnimation attackAnim = owner.AddComponent<AttackAnimation>(new());
         attackAnim.SetAnim(target.Entity.Position);
+        AnimationSystem.AddAnimation(attackAnim);
 
         return true;
     }

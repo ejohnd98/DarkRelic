@@ -113,8 +113,10 @@ public class DR_Map
         
         //TODO: figure out better way to tell if actor has an entity to animate
         if (animate && IsVisible[Actor.Position.y, Actor.Position.x]){
-            MoveAnimComponent moveAnim = Actor.GetComponent<MoveAnimComponent>();
+            MoveAnimation moveAnim = new();
+            Actor.AddComponent<MoveAnimation>(moveAnim);
             moveAnim.SetAnim(pos);
+            AnimationSystem.AddAnimation(moveAnim);
         }
 
         FromCell.Actor = null;

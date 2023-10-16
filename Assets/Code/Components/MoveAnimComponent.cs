@@ -3,12 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//todo: define this in Easings?
-public enum EaseType{
-    QuadEaseOut,
-    Linear
-}
-
 public class MoveAnimComponent : DR_Component
 {
     public bool isAnimating = false;
