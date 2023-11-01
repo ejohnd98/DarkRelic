@@ -7,15 +7,35 @@ public abstract class DR_Action {
     public bool loggable = false;
     public DR_Entity owner;
 
-    //TODO: create more robust way of multi step actions (array of input structs/classes?)
-    // could later autopopulate that array to streamline using items and targeting things
     public bool requiresFurtherInput = false;
     public bool hasReceivedFurtherInput = false;
 
-    public virtual bool Perform(DR_GameManager gm){
-        //TODO: only log if action was successful (and log a different message if not?)
-        LogSystem.instance.AddLog(this);
-        return false;
+    public bool hasStarted = false;
+    public bool hasFinished = false;
+    public bool wasSuccess = true;
+
+    public virtual void StartAction(DR_GameManager gm){
+        hasStarted = true;
+    }
+
+    public virtual void ActionStep(DR_GameManager gm, float deltaTime){
+        if (!hasStarted || hasFinished){
+            return;
+        }
+        EndAction(gm);
+
+        //TODO: refactor action to have a list of subactions (or some other name)
+        // These would be the action itself, plus any animations. they would be executed sequentially
+        // use events for anims to call some TriggerNextSubaction method as thye finish?
+        // for attacks, this event could be partway through (ie when sprite has just bumped into target)
+        // this will sync up removing sprites with attack anim
+    }
+
+    public virtual void EndAction(DR_GameManager gm){
+        if (wasSuccess){
+            LogSystem.instance.AddLog(this);
+        }
+        hasFinished = true;
     }
 
     public virtual string GetLogText(){
@@ -32,17 +52,18 @@ public abstract class DR_Action {
     // the renderer will iterate through them, but when possible perform multiple at once (can do that later though)
 
     //TODO: make these work:
-    // public virtual DR_Animation GetStartAnimation(){
-    //     return null;
-    // }
+    public virtual DR_Animation GetStartAnimation(){
+        return null;
+    }
 
-    // public virtual DR_Animation GetEndAnimation(){
-    //     return null;
-    // }
+    public virtual DR_Animation GetEndAnimation(){
+        return null;
+    }
 }
 
 public class MoveAction : DR_Action {
     public Vector2Int pos = Vector2Int.zero;
+    MoveAnimation moveAnim;
 
     public MoveAction (DR_Entity entity, int x, int y){
         this.owner = entity;
@@ -54,14 +75,41 @@ public class MoveAction : DR_Action {
         this.pos = pos;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
-        return gm.CurrentMap.MoveActor(owner, pos, true);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
+
+        Vector2Int posA = owner.Position;
+        if(!gm.CurrentMap.CanMoveActor(owner, pos)){
+            wasSuccess = false;
+            EndAction(gm);
+        }
+
+        if (gm.CurrentMap.IsVisible[owner.Position.y, owner.Position.x]){
+            moveAnim = owner.AddComponent<MoveAnimation>(new());
+            moveAnim.SetAnim(pos);
+            AnimationSystem.AddAnimation(moveAnim);
+
+            //TODO: later have animation system return a bool if the action can be completed without the animation
+            // this will let multiple enemies animate at once
+        }
+
+        gm.CurrentMap.MoveActor(owner, pos, false);
+    }
+
+    public override void ActionStep(DR_GameManager gm, float deltaTime)
+    {
+        if (!hasStarted || hasFinished){
+            return;
+        }
+        if (moveAnim == null || !moveAnim.isAnimating){
+            EndAction(gm);
+        }
     }
 }
 
 public class AttackAction : DR_Action {
     public HealthComponent target;
+    public AttackAnimation attackAnim;
 
     public AttackAction (HealthComponent target, DR_Entity attacker = null){
         this.target = target;
@@ -73,9 +121,26 @@ public class AttackAction : DR_Action {
         return owner.Name + " attacked " + target.Entity.Name + "!";
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
-        
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
+
+        attackAnim = owner.AddComponent<AttackAnimation>(new());
+        attackAnim.SetAnim(target.Entity.Position);
+        AnimationSystem.AddAnimation(attackAnim);
+    }
+
+    public override void ActionStep(DR_GameManager gm, float deltaTime)
+    {
+        if (!hasStarted || hasFinished){
+            return;
+        }
+        if (attackAnim == null || !attackAnim.isAnimating){
+            EndAction(gm);
+        }
+    }
+
+    public override void EndAction(DR_GameManager gm)
+    {
         int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
 
         DamageSystem.HandleAttack(gm, owner, target, baseDamage);
@@ -86,11 +151,7 @@ public class AttackAction : DR_Action {
             target.Entity.DestroyEntity();
         }
 
-        AttackAnimation attackAnim = owner.AddComponent<AttackAnimation>(new());
-        attackAnim.SetAnim(target.Entity.Position);
-        AnimationSystem.AddAnimation(attackAnim);
-
-        return true;
+        base.EndAction(gm);
     }
 }
 
@@ -107,11 +168,11 @@ public class StairAction : DR_Action {
         return owner.Name + (stairs.goesDeeper ? " descended down a set of stairs." : " climbed up a set of stairs.");
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
         gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper);
-        return true;
+        //return true;
     }
 }
 
@@ -123,10 +184,10 @@ public class DoorAction : DR_Action {
         this.owner = opener;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         target.ToggleOpen();
-        return true;
+        EndAction(gm);
     }
 }
 
@@ -139,10 +200,10 @@ public class GoalAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         gm.OnGameWon();
-        return true;
+        //return true;
     }
 
     public override string GetLogText(){
@@ -153,6 +214,8 @@ public class GoalAction : DR_Action {
 public class ItemAction : DR_Action {
     public DR_Entity target;
     public DR_Entity item;
+
+    public MoveAnimation moveAnim;
 
     public ItemAction (DR_Entity item, DR_Entity user, DR_Entity target){
         this.item = item;
@@ -167,13 +230,34 @@ public class ItemAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
+
+        MagicConsumableComponent magic = item.GetComponent<MagicConsumableComponent>();
+        if (magic != null){
+            Vector2Int targetPos = magic.GetTargetPosition(gm, owner, null);
+            moveAnim = EntityFactory.CreateProjectileEntityAtPosition(
+                magic.projectileSprite, "Projectile", owner.Position,targetPos, magic.color).GetComponent<MoveAnimation>();
+        }
+    }
+
+    public override void ActionStep(DR_GameManager gm, float deltaTime)
+    {
+        if (!hasStarted || hasFinished){
+            return;
+        }
+        if (moveAnim == null || !moveAnim.isAnimating){
+            EndAction(gm);
+        }
+    }
+
+    public override void EndAction(DR_GameManager gm)
+    {
         ItemComponent itemComponent = item.GetComponent<ItemComponent>();
         if (itemComponent != null){
-            return itemComponent.UseItem(gm, owner, target);
+            itemComponent.UseItem(gm, owner, target);
         }
-        return false;
+        base.EndAction(gm);
     }
 
     public override bool GiveAdditionalInput(DR_GameManager gm, Vector2Int pos){
@@ -204,13 +288,12 @@ public class ChangeEquipmentAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
         if (inventory != null){
-            return equip? inventory.EquipItem(item) : inventory.UnequipItem(item);
+            bool success = equip? inventory.EquipItem(item) : inventory.UnequipItem(item);
         }
-        return false;
     }
 
     public override string GetLogText(){
@@ -227,19 +310,19 @@ public class PickupAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
         if (inventory != null){
             bool addedItem = inventory.AddItem(item);
             if (addedItem){
                 gm.CurrentMap.RemoveItem(item);
             }
-            return addedItem;
+            return;
         }else{
             Debug.LogError("Inventory is invalid!");
         }
-        return false;
+        return;
     }
 
     public override string GetLogText(){
@@ -256,19 +339,19 @@ public class DropAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
         if (inventory != null){
             if (gm.CurrentMap.GetItemAtPosition(owner.Position) == null){
                 inventory.RemoveItem(item);
-                return gm.CurrentMap.AddItem(item, owner.Position);
+                gm.CurrentMap.AddItem(item, owner.Position);
             }
             
         }else{
             Debug.LogError("Inventory is invalid!");
         }
-        return false;
+        return;
     }
 
     public override string GetLogText(){
@@ -284,9 +367,9 @@ public class WaitAction : DR_Action {
         loggable = logAction;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
-        return true;
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
+        return;
     }
 
     public override string GetLogText(){

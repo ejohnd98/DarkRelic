@@ -103,6 +103,15 @@ public class DR_Map
         return MoveActor(Actor, Actor.Position + posChange, animate);
     }
 
+    public bool CanMoveActor(DR_Entity Actor, Vector2Int pos){
+        DR_Cell FromCell = Cells[Actor.Position.y, Actor.Position.x];
+        DR_Cell ToCell = Cells[pos.y, pos.x];
+        if(ToCell.BlocksMovement() || ToCell.Actor != null){
+            return false;
+        }
+        return true;
+    }
+
     public bool MoveActor(DR_Entity Actor, Vector2Int pos, bool animate = false){
         DR_Cell FromCell = Cells[Actor.Position.y, Actor.Position.x];
         DR_Cell ToCell = Cells[pos.y, pos.x];

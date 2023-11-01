@@ -20,7 +20,6 @@ public class DR_GameManager : MonoBehaviour
     public static DR_GameManager instance;
 
     GameState CurrentState = GameState.INVALID;
-    ActionEvent currentActionEvent;
 
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
@@ -134,9 +133,7 @@ public class DR_GameManager : MonoBehaviour
                     }
                     else
                     {
-                        //advance game
-
-                        //reduce debts
+                        //reduce debts until an entity can act
                         int limit = 50;
                         while (!turnSystem.CanEntityAct() && limit-- > 0)
                         {
@@ -212,16 +209,17 @@ public class DR_GameManager : MonoBehaviour
     }
 
     public bool ProvideAdditionalInput(Vector2Int pos){
-        if (CurrentState != GameState.FURTHER_INPUT_REQUIRED){
-            Debug.LogError("Tried to provide further input but not in correct state!");
-            return false;
-        }
-        if (currentActionEvent == null){
-            Debug.LogError("Tried to provide further input but currentAction is null!");
-            return false;
-        }
+        // if (CurrentState != GameState.FURTHER_INPUT_REQUIRED){
+        //     Debug.LogError("Tried to provide further input but not in correct state!");
+        //     return false;
+        // }
+        // if (currentActionEvent == null){
+        //     Debug.LogError("Tried to provide further input but currentAction is null!");
+        //     return false;
+        // }
 
-        return currentActionEvent.action.GiveAdditionalInput(this, pos);
+        // return currentActionEvent.action.GiveAdditionalInput(this, pos);
+        return true;
     }
 
     public void SetGameState(GameState newState){

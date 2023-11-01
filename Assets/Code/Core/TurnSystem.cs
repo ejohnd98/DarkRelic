@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,9 +8,13 @@ public class TurnSystem : MonoBehaviour
     List<TurnComponent> EligibleEntities;
     List<TurnComponent> CanAct;
 
+    DR_Action currentAction = null;
+    DR_GameManager gm = null;
+
     public TurnSystem(){
         EligibleEntities = new List<TurnComponent>();
         CanAct = new List<TurnComponent>();
+        gm = DR_GameManager.instance;
     }
 
     public void RemoveEntityTurnComponent(TurnComponent turnComp){
@@ -90,7 +95,7 @@ public class TurnSystem : MonoBehaviour
     }
 
     public void HandleTurn(DR_GameManager gm, DR_Entity turnTaker){
-        Debug.Log("Handling turn for " + turnTaker.Name);
+        //Debug.Log("Handling turn for " + turnTaker.Name);
         gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
 
         bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
@@ -108,6 +113,10 @@ public class TurnSystem : MonoBehaviour
             playerAction = GetPlayerActionFromInput(gm, turnTaker);
             yield return null;
         }
+        if (playerAction.requiresFurtherInput){
+            //TODO: if playerAction requires input, wait as well
+        }
+
         HandleTurnAction(gm, turnTaker, playerAction);
     }
 
@@ -118,48 +127,45 @@ public class TurnSystem : MonoBehaviour
             Debug.LogAssertion("TurnSystem.HandleTurnAction | action is null!");
             return;
         }
-
-
-        ActionEvent actionEvent = new ActionEvent(action);
-        if (actionEvent.action.requiresFurtherInput){
-            //TODO: split with a coroutine function here
+        if (currentAction != null){
+            Debug.LogAssertion("TurnSystem.HandleTurnAction | currentAction is NOT null!");
+            return;
         }
+        currentAction = action;
+        currentAction.StartAction(gm);
+        StartCoroutine(CheckIfActionFinished(gm, turnTaker));
+    }
 
-        if (ActionSystem.HandleAction(gm, actionEvent)){
+    void Update(){
+        if (currentAction != null){ //TODO: change to flag/state
+            currentAction.ActionStep(gm, Time.deltaTime);
+        }
+    }
+
+    IEnumerator CheckIfActionFinished(DR_GameManager gm, DR_Entity turnTaker){
+        yield return new WaitUntil(() => currentAction.hasFinished);
+        Debug.Log("action "+ currentAction.GetType() + " for " + turnTaker.Name + " succeeded: " + currentAction.wasSuccess);
+        TurnEnd(gm, turnTaker, currentAction.wasSuccess);
+    }
+
+    void TurnEnd(DR_GameManager gm, DR_Entity turnTaker, bool actionSucceeded){
+        if (actionSucceeded){
+
+            LevelComponent levelComp = turnTaker.GetComponent<LevelComponent>();
+            if (levelComp.RequiresLevelUp()){
+                LogSystem.instance.AddTextLog(turnTaker.Name + " leveled up!");
+                levelComp.AdvanceLevel();
+            }
+                
+            UISystem.instance.RefreshDetailsUI();
+
             turnTaker.GetComponent<TurnComponent>().SpendTurn();
-            if (isPlayer){
+            if (turnTaker.HasComponent<PlayerComponent>()){
                 SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
                 DR_Renderer.instance.UpdateTiles();
             }
-            
-        }else{
-            Debug.LogError("ActionSystem could not handle action for " + turnTaker);
         }
-
-        //TODO: move animation component into DR_Action, then check if that exists here.
-        // If so, run coroutuine to wait for it, otherwise call TurnEnd directly (assuming animation should run before performing the action)
-
-        //alternatively, have the actions themselves run a coroutine to wait for their animations to finish.
-        // this may be much more flexible. if doing this, will need a coroutine here to wait until the action is done.
-        // or create an action event and subscribe to it which could be easier/cleaner.
-
-        StartCoroutine(CheckForTurnEnd(gm, turnTaker));
-    }
-
-    IEnumerator CheckForTurnEnd(DR_GameManager gm, DR_Entity turnTaker){
-        yield return new WaitUntil(() => !AnimationSystem.IsAnimating());
-        TurnEnd(gm, turnTaker);
-    }
-
-    void TurnEnd(DR_GameManager gm, DR_Entity turnTaker){
-        LevelComponent levelComp = turnTaker.GetComponent<LevelComponent>();
-        if (levelComp.RequiresLevelUp()){
-            LogSystem.instance.AddTextLog(turnTaker.Name + " leveled up!");
-            levelComp.AdvanceLevel();
-        }
-            
-        UISystem.instance.RefreshDetailsUI();
-        Debug.Log("Turn handled for " + turnTaker.Name);
+        currentAction = null;
         gm.OnTurnHandled();
     }
 
