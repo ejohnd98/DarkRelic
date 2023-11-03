@@ -69,6 +69,9 @@ public class MoveAnimation : DR_Animation {
 
 public class AttackAnimation : DR_Animation {
     public Vector3 start, end, current;
+    public event Action<DR_Animation> AnimHalfway;
+
+    bool halfwayReached = false;
 
     public override void AnimStep(float time)
     {
@@ -77,6 +80,10 @@ public class AttackAnimation : DR_Animation {
         if (counter < 0.5f){
             current = Easings.EaseInBack(start, end, Mathf.Clamp01(counter*2.0f));
         }else{
+            if (!halfwayReached){
+                halfwayReached = true;
+                AnimHalfway?.Invoke(this);
+            }
             current = Easings.QuadEaseOut(end,start, Mathf.Clamp01((counter-0.5f)*2.0f));
         }
     }

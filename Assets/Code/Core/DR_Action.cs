@@ -89,20 +89,23 @@ public class MoveAction : DR_Action {
             moveAnim.SetAnim(pos);
             AnimationSystem.AddAnimation(moveAnim);
 
+            moveAnim.AnimFinished += (DR_Animation moveAnim) => {
+                EndAction(gm);
+            };
+
+            gm.CurrentMap.MoveActor(owner, pos, false);
             //TODO: later have animation system return a bool if the action can be completed without the animation
             // this will let multiple enemies animate at once
+        }else{
+            gm.CurrentMap.MoveActor(owner, pos, false);
+            EndAction(gm);
         }
-
-        gm.CurrentMap.MoveActor(owner, pos, false);
     }
 
     public override void ActionStep(DR_GameManager gm, float deltaTime)
     {
         if (!hasStarted || hasFinished){
             return;
-        }
-        if (moveAnim == null || !moveAnim.isAnimating){
-            EndAction(gm);
         }
     }
 }
@@ -127,6 +130,22 @@ public class AttackAction : DR_Action {
         attackAnim = owner.AddComponent<AttackAnimation>(new());
         attackAnim.SetAnim(target.Entity.Position);
         AnimationSystem.AddAnimation(attackAnim);
+
+        attackAnim.AnimHalfway += (DR_Animation moveAnim) => {
+            int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+
+            DamageSystem.HandleAttack(gm, owner, target, baseDamage);
+
+            //TODO: check if this is still needed here
+            if (!target.IsAlive()){
+                gm.CurrentMap.RemoveActor(target.Entity);
+                target.Entity.DestroyEntity();
+            }
+        };
+
+        attackAnim.AnimFinished += (DR_Animation moveAnim) => {
+            EndAction(gm);
+        };
     }
 
     public override void ActionStep(DR_GameManager gm, float deltaTime)
@@ -134,24 +153,6 @@ public class AttackAction : DR_Action {
         if (!hasStarted || hasFinished){
             return;
         }
-        if (attackAnim == null || !attackAnim.isAnimating){
-            EndAction(gm);
-        }
-    }
-
-    public override void EndAction(DR_GameManager gm)
-    {
-        int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
-
-        DamageSystem.HandleAttack(gm, owner, target, baseDamage);
-
-        //TODO: check if this is still needed here
-        if (!target.IsAlive()){
-            gm.CurrentMap.RemoveActor(target.Entity);
-            target.Entity.DestroyEntity();
-        }
-
-        base.EndAction(gm);
     }
 }
 
