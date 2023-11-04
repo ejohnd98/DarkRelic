@@ -1162,6 +1162,8 @@ GameObject:
   - component: {fileID: 519420029}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
+  - component: {fileID: 519420035}
+  - component: {fileID: 519420034}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1312,6 +1314,41 @@ MonoBehaviour:
   m_CropFrameX: 0
   m_CropFrameY: 0
   m_StretchFill: 0
+--- !u!95 &519420034
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 754f9fa0c00e3f640a1c39a825324f56, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &519420035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a4c4bf7f7590174694aeebf1a59c9f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  testInput: 1
+  testTrigger: 0
 --- !u!1 &558963313
 GameObject:
   m_ObjectHideFlags: 0
@@ -3362,8 +3399,15 @@ MonoBehaviour:
   FireProjectile: {fileID: -1681357973, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   SparkProjectile: {fileID: -264209838, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   BossTexture: {fileID: 35848247, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  PlayerAnim:
+  - {fileID: -2065779700, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  - {fileID: -35984604, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  EnemyAnim:
+  - {fileID: 1249172118, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  - {fileID: 1149762464, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
+  turnSystem: {fileID: 0}
   Directions:
   - {x: 0, y: 1}
   - {x: 1, y: 0}
@@ -3413,6 +3457,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FXObj: {fileID: 330791543554764459, guid: aaa4ac33f49b4524d8fa44b75257ea06, type: 3}
+  whiteMat: {fileID: 2100000, guid: 0df34838ebd30b646b1c88fe4e146a39, type: 2}
 --- !u!1 &1542393316
 GameObject:
   m_ObjectHideFlags: 0

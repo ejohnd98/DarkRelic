@@ -81,8 +81,11 @@ public class DamageSystem
 
             damageEvent.OnAttack?.Invoke();
 
+            float cameraShakeAmount = 0.5f;
+
             if(!target.IsAlive()){
                 damageEvent.killed = true;
+                cameraShakeAmount *= 2.0f;
 
                 LevelComponent targetLevel = target.Entity.GetComponent<LevelComponent>();
                 LevelComponent attackerLevel = attacker.GetComponent<LevelComponent>();
@@ -91,12 +94,19 @@ public class DamageSystem
                 }
 
                 damageEvent.OnKill?.Invoke();
+                FXSpawner.instance.SpawnDeathFX(target.Entity);
 
                 //TODO: make this better. have class to handle "garbage collecting" of entities
                 target.Entity.noLongerValid = true;
                 gm.CurrentMap.RemoveActor(target.Entity);
                 target.Entity.DestroyEntity();
             }
+
+            if (target.Entity.HasComponent<PlayerComponent>()){
+                cameraShakeAmount *= 1.5f;
+            }
+
+            CameraShake.ShakeCamera(cameraShakeAmount);
         }
 
         LogSystem.instance.AddDamageLog(damageEvent);

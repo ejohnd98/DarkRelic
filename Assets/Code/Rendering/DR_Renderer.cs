@@ -139,7 +139,14 @@ public class DR_Renderer : MonoBehaviour
             }
             
             EntityObjects[Entity].transform.position = pos;
-            EntityObjects[Entity].GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
+
+            // Messy way of setting animation while still letting doors reflect their sprite when it changes
+            if (Entity.GetComponent<SpriteComponent>().hasAnimation){
+                
+            }else{
+                EntityObjects[Entity].GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
+            }
+            
 
             if (!isVisible && isKnown && !DR_GameManager.instance.debug_disableFOV){
                 EntityObjects[Entity].GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
@@ -152,6 +159,10 @@ public class DR_Renderer : MonoBehaviour
     public void AddEntityObj(DR_Entity entity){
         GameObject NewEntityObj = Instantiate(CellObj, Vector3.zero, Quaternion.identity, transform);
         EntityObjects[entity] = NewEntityObj;
+
+        if (entity.GetComponent<SpriteComponent>() is SpriteComponent spriteComp && spriteComp.hasAnimation){
+            NewEntityObj.GetComponent<CellObj>().SetAnim(spriteComp);
+        }
     }
 
     public void ResetSelectedCell(){

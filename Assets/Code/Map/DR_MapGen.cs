@@ -387,6 +387,9 @@ public class DR_MapGen
                     case MapGenCellType.ENEMY:
                         newCell.bBlocksMovement = false;
                         DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Enemy", Alignment.ENEMY, generation.depth);
+                        enemy.GetComponent<SpriteComponent>().hasAnimation = true;
+                        enemy.GetComponent<SpriteComponent>().animFrames = gm.EnemyAnim;
+                        enemy.GetComponent<SpriteComponent>().animLength = 1.25f;
                         enemy.AddComponent<AIComponent>(new AIComponent());
                         NewMap.AddActor(enemy, new Vector2Int(x,y));
                         break;

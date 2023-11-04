@@ -27,6 +27,8 @@ public class DR_GameManager : MonoBehaviour
     public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
         PotionTexture, FireboltTexture, ShockTexture, GoalTexture, AmuletTexture, FireProjectile, SparkProjectile, BossTexture;
 
+    public Sprite[] PlayerAnim, EnemyAnim;
+
     public bool debug_disableFOV = false;
 
     //Temp Camera 
@@ -60,6 +62,12 @@ public class DR_GameManager : MonoBehaviour
 
         PlayerActor = EntityFactory.CreateActor(PlayerTexture, "Player", Alignment.PLAYER, 1);
         PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
+
+        //Temp sprite anim adding:
+        PlayerActor.GetComponent<SpriteComponent>().hasAnimation = true;
+        PlayerActor.GetComponent<SpriteComponent>().animFrames = PlayerAnim;
+        PlayerActor.GetComponent<SpriteComponent>().animLength = 1.0f;
+
         UISystem.instance.UpdateInventoryUI(PlayerActor);
 
         BossActor = EntityFactory.CreateActor(BossTexture, "Boss", Alignment.ENEMY, 10);
