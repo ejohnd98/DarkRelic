@@ -31,7 +31,9 @@ public class AISystem
 
             if (aiComponent.HasPath()){
                 Vector2Int nextPos = aiComponent.currentPath.AdvanceStep();
-                return new MoveAction(entity, nextPos);
+                if (gm.CurrentMap.CanMoveActor(entity, nextPos)){
+                    return new MoveAction(entity, nextPos);
+                }
             }
 
         }

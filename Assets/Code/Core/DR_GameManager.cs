@@ -33,6 +33,7 @@ public class DR_GameManager : MonoBehaviour
 
     //Temp Camera 
     public Camera MainCamera;
+    public Vector3 cameraOffset;
 
     //Temp Player
     DR_Entity PlayerActor;
@@ -247,6 +248,8 @@ public class DR_GameManager : MonoBehaviour
             DesiredPos.x = PlayerActor.Position.x;
             DesiredPos.y = PlayerActor.Position.y;
         }
+
+        DesiredPos += cameraOffset;
         
 
         if (forcePos){
