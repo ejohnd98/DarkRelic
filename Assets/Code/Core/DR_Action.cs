@@ -1,18 +1,78 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class ActionInput {
+    public string playerPrompt;
+    public bool hasInput = false;
+    public bool hasPrompted = false;
+    public bool hasExitInput = false;
+
+    //TODO: make this generic, and instead of just a validation check, set the value as well?
+    public Vector2Int inputValue = Vector2Int.zero;
+    private Func<Vector2Int, bool> validationCheck;
+
+    public ActionInput(Func<Vector2Int, bool> valCheck, string prompt = "Please enter a position"){
+        validationCheck = valCheck ?? DefaultValidationCheck;
+        playerPrompt = prompt;
+    }
+
+    public bool GiveInput(Vector2Int inputPos){
+        if (!validationCheck(inputPos)){
+            return false;
+        }
+        inputValue = inputPos;
+        hasInput = true;
+        return true;
+    }
+
+    private static bool DefaultValidationCheck(Vector2Int value){
+        return true;
+    }
+}
 
 public abstract class DR_Action {
     public bool loggable = false;
     public DR_Entity owner;
 
-    public bool requiresFurtherInput = false;
-    public bool hasReceivedFurtherInput = false;
+    // Right now this is only used for additional inputs not given when
+    // the action is created (ie. requires further input from player)
+    public List<ActionInput> actionInputs = new List<ActionInput>();
 
     public bool hasStarted = false;
     public bool hasFinished = false;
     public bool wasSuccess = true;
+
+    public bool RequiresInput(){
+        foreach (ActionInput actionInput in actionInputs){
+            if (actionInput.hasExitInput){
+                return false;
+            }
+            if (!actionInput.hasInput){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool ShouldExitAction(){
+        foreach (ActionInput actionInput in actionInputs){
+            if (actionInput.hasExitInput){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ActionInput GetNextNeededInput(){
+        for (int i = 0; i < actionInputs.Count; i++){
+            if (!actionInputs[i].hasInput){
+                return actionInputs[i];
+            }
+        }
+        return null;
+    }
 
     public virtual void StartAction(DR_GameManager gm){
         hasStarted = true;
@@ -26,7 +86,7 @@ public abstract class DR_Action {
 
         //TODO: refactor action to have a list of subactions (or some other name)
         // These would be the action itself, plus any animations. they would be executed sequentially
-        // use events for anims to call some TriggerNextSubaction method as thye finish?
+        // use events for anims to call some TriggerNextSubaction method as they finish?
         // for attacks, this event could be partway through (ie when sprite has just bumped into target)
         // this will sync up removing sprites with attack anim
     }
@@ -40,11 +100,6 @@ public abstract class DR_Action {
 
     public virtual string GetLogText(){
         return "";
-    }
-
-    public virtual bool GiveAdditionalInput(DR_GameManager gm, Vector2Int pos){
-        Debug.LogError("GiveAdditionalInput not implemented!");
-        return false;
     }
 
     //TODO: DR_Animation: move existing animation components into this new class
@@ -225,7 +280,17 @@ public class ItemAction : DR_Action {
 
         ItemComponent itemComponent = item.GetComponent<ItemComponent>();
         if (itemComponent != null){
-            requiresFurtherInput = itemComponent.requireFurtherInputOnUse;
+            if (itemComponent.requireFurtherInputOnUse){
+
+                actionInputs.Add(new(
+                    //Input validation:
+                    pos => {
+                        DR_Entity newTarget = DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos);
+                        return newTarget != null;
+                    },
+                    "Please select a target, or press ESC to cancel."
+                ));
+            }
         }
 
         loggable = true;
@@ -234,9 +299,18 @@ public class ItemAction : DR_Action {
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
 
+        if (actionInputs.Count > 0){
+            target = DR_GameManager.instance.CurrentMap.GetActorAtPosition(actionInputs[0].inputValue);
+        }
+
         MagicConsumableComponent magic = item.GetComponent<MagicConsumableComponent>();
         if (magic != null){
-            Vector2Int targetPos = magic.GetTargetPosition(gm, owner, null);
+            Vector2Int targetPos;
+            if (magic.targetClosest){
+                targetPos = magic.GetTargetPosition(gm, owner, null);
+            }else{
+                targetPos = target.Position;
+            }
             moveAnim = EntityFactory.CreateProjectileEntityAtPosition(
                 magic.projectileSprite, "Projectile", owner.Position,targetPos, magic.color).GetComponent<MoveAnimation>();
         }
@@ -259,16 +333,6 @@ public class ItemAction : DR_Action {
             itemComponent.UseItem(gm, owner, target);
         }
         base.EndAction(gm);
-    }
-
-    public override bool GiveAdditionalInput(DR_GameManager gm, Vector2Int pos){
-        DR_Entity newTarget = gm.CurrentMap.GetActorAtPosition(pos);
-        if (newTarget != null){
-            target = newTarget;
-            hasReceivedFurtherInput = true;
-            return true;
-        }
-        return false;
     }
 
     public override string GetLogText(){

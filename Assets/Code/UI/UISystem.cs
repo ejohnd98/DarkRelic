@@ -27,6 +27,7 @@ public class UISystem : MonoBehaviour
     public GameObject gameOverUI, victoryUI;
 
     DR_Action UIAction;
+    ActionInput currentActionInput;
 
     Vector2Int LastMousePos = Vector2Int.zero;
     bool ShouldUpdateDetailsUI = true;
@@ -107,10 +108,17 @@ public class UISystem : MonoBehaviour
         return returnedAction;
     }
 
-    //TODO: pass in int for # of targets? or an array to be filled?
-    public void BeginTargetSelection(){
+    public void BeginTargetSelection(ActionInput actionInput){
+        currentActionInput = actionInput;
         currentState = UIState.SELECTING_TARGET;
     }
+
+    public void BackOutOfTargetSelection(){
+        currentActionInput.hasExitInput = true;
+        currentActionInput = null;
+        currentState = UIState.NORMAL;
+    }
+
 
     void Update()
     {
@@ -119,14 +127,16 @@ public class UISystem : MonoBehaviour
             case UIState.NORMAL:
                 break;
             case UIState.SELECTING_TARGET:
-                //TODO: do this through DR_InputHandler
                 if (Input.GetMouseButtonDown(0) && DR_InputHandler.instance.mouseIsInWorld){
                     Vector2Int MousePos = DR_InputHandler.instance.mouseWorldPosition;
-                    if (DR_GameManager.instance.ProvideAdditionalInput(MousePos)){
+                    if (currentActionInput.GiveInput(MousePos)){
                         currentState = UIState.NORMAL;
+                        currentActionInput = null;
                     }
-
                     //TODO: allow selecting other items in inventory?
+                }
+                if (Input.GetKeyDown(KeyCode.Escape)){
+                    BackOutOfTargetSelection();
                 }
                 break;
             case UIState.MAIN_MENU:

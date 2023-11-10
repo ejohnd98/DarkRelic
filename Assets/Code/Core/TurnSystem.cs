@@ -113,11 +113,24 @@ public class TurnSystem : MonoBehaviour
             playerAction = GetPlayerActionFromInput(gm, turnTaker);
             yield return null;
         }
-        if (playerAction.requiresFurtherInput){
-            //TODO: if playerAction requires input, wait as well
+
+        while (playerAction.RequiresInput()){
+            ActionInput actionInput = playerAction.GetNextNeededInput();
+            if (!actionInput.hasPrompted){
+                actionInput.hasPrompted = true;
+                LogSystem.instance.AddTextLog(actionInput.playerPrompt);
+                UISystem.instance.BeginTargetSelection(actionInput);
+            }
+            yield return null;
         }
 
-        HandleTurnAction(gm, turnTaker, playerAction);
+        if (playerAction.ShouldExitAction()){
+            TurnEnd(gm, turnTaker, false);
+        }else{
+            HandleTurnAction(gm, turnTaker, playerAction);
+        }
+
+        
     }
 
     void HandleTurnAction(DR_GameManager gm, DR_Entity turnTaker, DR_Action action){
@@ -158,6 +171,13 @@ public class TurnSystem : MonoBehaviour
             }
                 
             UISystem.instance.RefreshDetailsUI();
+
+            //TODO: merge popping of entity and spending of turn
+            DR_Entity poppedEntity = PopNextEntity().Entity;
+            if (poppedEntity != turnTaker){
+                //TODO: this will be hit if the player kills themselves
+                Debug.LogAssertion("TurnSystem.TurnEnd: Popped entity does not match turn taker!");
+            }
 
             turnTaker.GetComponent<TurnComponent>().SpendTurn();
             if (turnTaker.HasComponent<PlayerComponent>()){

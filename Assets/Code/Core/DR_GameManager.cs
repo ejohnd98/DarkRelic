@@ -137,7 +137,7 @@ public class DR_GameManager : MonoBehaviour
                 {
                     if (turnSystem.CanEntityAct())
                     {
-                        DR_Entity entity = turnSystem.PopNextEntity().Entity;
+                        DR_Entity entity = turnSystem.GetNextEntity().Entity;
                         turnSystem.HandleTurn(this, entity);
                     }
                     else
