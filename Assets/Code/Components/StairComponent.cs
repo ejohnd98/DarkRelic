@@ -6,6 +6,8 @@ public class StairComponent : DR_Component
 {
     public bool goesDeeper = false;
 
+    public StairComponent(){}
+
     public StairComponent(bool deeper = true){
         goesDeeper = deeper;
     }

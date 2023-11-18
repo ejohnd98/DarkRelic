@@ -40,6 +40,8 @@ public class HealingConsumableComponent : ConsumableComponent {
 
     public int healAmount = 4;
 
+    public HealingConsumableComponent(){}
+
     public HealingConsumableComponent(int amount){
         healAmount = amount;
     }
@@ -69,6 +71,8 @@ public class MagicConsumableComponent : ConsumableComponent {
 
     //todo: make enum of targeting types?
     public bool targetClosest = false;
+
+    public MagicConsumableComponent(){}
 
     public MagicConsumableComponent(int amount){
         damageAmount = amount;

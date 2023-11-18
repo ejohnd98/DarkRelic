@@ -11,6 +11,8 @@ public class AlignmentComponent : DR_Component
 {
     public Alignment alignment;
 
+    public AlignmentComponent(){}
+
     public AlignmentComponent(Alignment alignment){
         this.alignment = alignment;
     }

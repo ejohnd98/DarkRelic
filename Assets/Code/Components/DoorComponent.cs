@@ -8,6 +8,8 @@ public class DoorComponent : DR_Component
 
     bool isOpen = false;
 
+    public DoorComponent(){}
+
     public DoorComponent(Sprite openSpr, Sprite closeSpr, bool open = false){
         openSprite = openSpr;
         closeSprite = closeSpr;
