@@ -1,34 +1,124 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+public class ActionInput {
+    public string playerPrompt;
+    public bool hasInput = false;
+    public bool hasPrompted = false;
+    public bool hasExitInput = false;
+
+    //TODO: make this generic, and instead of just a validation check, set the value as well?
+    public Vector2Int inputValue = Vector2Int.zero;
+    private Func<Vector2Int, bool> validationCheck;
+
+    public ActionInput(Func<Vector2Int, bool> valCheck, string prompt = "Please enter a position"){
+        validationCheck = valCheck ?? DefaultValidationCheck;
+        playerPrompt = prompt;
+    }
+
+    public bool GiveInput(Vector2Int inputPos){
+        if (!validationCheck(inputPos)){
+            return false;
+        }
+        inputValue = inputPos;
+        hasInput = true;
+        return true;
+    }
+
+    private static bool DefaultValidationCheck(Vector2Int value){
+        return true;
+    }
+}
 
 public abstract class DR_Action {
     public bool loggable = false;
     public DR_Entity owner;
 
-    //TODO: create more robust way of multi step actions (array of input structs/classes?)
-    // could later autopopulate that array to streamline using items and targeting things
-    public bool requiresFurtherInput = false;
-    public bool hasReceivedFurtherInput = false;
+    // Right now this is only used for additional inputs not given when
+    // the action is created (ie. requires further input from player)
+    public List<ActionInput> actionInputs = new List<ActionInput>();
 
-    public virtual bool Perform(DR_GameManager gm){
-        //TODO: only log if action was successful (and log a different message if not?)
-        LogSystem.instance.AddLog(this);
+    public bool hasStarted = false;
+    public bool hasFinished = false;
+    public bool wasSuccess = true;
+
+    public bool RequiresInput(){
+        foreach (ActionInput actionInput in actionInputs){
+            if (actionInput.hasExitInput){
+                return false;
+            }
+            if (!actionInput.hasInput){
+                return true;
+            }
+        }
         return false;
+    }
+
+    public bool ShouldExitAction(){
+        foreach (ActionInput actionInput in actionInputs){
+            if (actionInput.hasExitInput){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ActionInput GetNextNeededInput(){
+        for (int i = 0; i < actionInputs.Count; i++){
+            if (!actionInputs[i].hasInput){
+                return actionInputs[i];
+            }
+        }
+        return null;
+    }
+
+    public virtual void StartAction(DR_GameManager gm){
+        hasStarted = true;
+    }
+
+    public virtual void ActionStep(DR_GameManager gm, float deltaTime){
+        if (!hasStarted || hasFinished){
+            return;
+        }
+        EndAction(gm);
+
+        //TODO: refactor action to have a list of subactions (or some other name)
+        // These would be the action itself, plus any animations. they would be executed sequentially
+        // use events for anims to call some TriggerNextSubaction method as they finish?
+        // for attacks, this event could be partway through (ie when sprite has just bumped into target)
+        // this will sync up removing sprites with attack anim
+    }
+
+    public virtual void EndAction(DR_GameManager gm){
+        if (wasSuccess){
+            LogSystem.instance.AddLog(this);
+        }
+        hasFinished = true;
     }
 
     public virtual string GetLogText(){
         return "";
     }
 
-    public virtual bool GiveAdditionalInput(DR_GameManager gm, Vector2Int pos){
-        Debug.LogError("GiveAdditionalInput not implemented!");
-        return false;
+    //TODO: DR_Animation: move existing animation components into this new class
+    // these animations will be stored in a list in a new AnimationSystem class.
+    // the renderer will iterate through them, but when possible perform multiple at once (can do that later though)
+
+    //TODO: make these work:
+    public virtual DR_Animation GetStartAnimation(){
+        return null;
+    }
+
+    public virtual DR_Animation GetEndAnimation(){
+        return null;
     }
 }
 
 public class MoveAction : DR_Action {
     public Vector2Int pos = Vector2Int.zero;
+    MoveAnimation moveAnim;
 
     public MoveAction (DR_Entity entity, int x, int y){
         this.owner = entity;
@@ -40,14 +130,44 @@ public class MoveAction : DR_Action {
         this.pos = pos;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
-        return gm.CurrentMap.MoveActor(owner, pos, true);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
+
+        Vector2Int posA = owner.Position;
+        if(!gm.CurrentMap.CanMoveActor(owner, pos)){
+            wasSuccess = false;
+            EndAction(gm);
+        }
+
+        if (gm.CurrentMap.IsVisible[owner.Position.y, owner.Position.x]){
+            moveAnim = owner.AddComponent<MoveAnimation>(new());
+            moveAnim.SetAnim(pos);
+            AnimationSystem.AddAnimation(moveAnim);
+
+            moveAnim.AnimFinished += (DR_Animation moveAnim) => {
+                EndAction(gm);
+            };
+
+            gm.CurrentMap.MoveActor(owner, pos, false);
+            //TODO: later have animation system return a bool if the action can be completed without the animation
+            // this will let multiple enemies animate at once
+        }else{
+            gm.CurrentMap.MoveActor(owner, pos, false);
+            EndAction(gm);
+        }
+    }
+
+    public override void ActionStep(DR_GameManager gm, float deltaTime)
+    {
+        if (!hasStarted || hasFinished){
+            return;
+        }
     }
 }
 
 public class AttackAction : DR_Action {
     public HealthComponent target;
+    public AttackAnimation attackAnim;
 
     public AttackAction (HealthComponent target, DR_Entity attacker = null){
         this.target = target;
@@ -59,23 +179,35 @@ public class AttackAction : DR_Action {
         return owner.Name + " attacked " + target.Entity.Name + "!";
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
-        
-        int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
 
-        DamageSystem.HandleAttack(gm, owner, target, baseDamage);
-
-        //TODO: check if this is still needed here
-        if (!target.IsAlive()){
-            gm.CurrentMap.RemoveActor(target.Entity);
-            target.Entity.DestroyEntity();
-        }
-
-        AttackAnimComponent attackAnim = owner.AddComponent<AttackAnimComponent>(new AttackAnimComponent());
+        attackAnim = owner.AddComponent<AttackAnimation>(new());
         attackAnim.SetAnim(target.Entity.Position);
+        AnimationSystem.AddAnimation(attackAnim);
 
-        return true;
+        attackAnim.AnimHalfway += (DR_Animation moveAnim) => {
+            int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+
+            DamageSystem.HandleAttack(gm, owner, target, baseDamage);
+
+            //TODO: check if this is still needed here
+            if (!target.IsAlive()){
+                gm.CurrentMap.RemoveActor(target.Entity);
+                target.Entity.DestroyEntity();
+            }
+        };
+
+        attackAnim.AnimFinished += (DR_Animation moveAnim) => {
+            EndAction(gm);
+        };
+    }
+
+    public override void ActionStep(DR_GameManager gm, float deltaTime)
+    {
+        if (!hasStarted || hasFinished){
+            return;
+        }
     }
 }
 
@@ -92,11 +224,11 @@ public class StairAction : DR_Action {
         return owner.Name + (stairs.goesDeeper ? " descended down a set of stairs." : " climbed up a set of stairs.");
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
         gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper);
-        return true;
+        //return true;
     }
 }
 
@@ -108,10 +240,10 @@ public class DoorAction : DR_Action {
         this.owner = opener;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         target.ToggleOpen();
-        return true;
+        EndAction(gm);
     }
 }
 
@@ -124,10 +256,10 @@ public class GoalAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         gm.OnGameWon();
-        return true;
+        //return true;
     }
 
     public override string GetLogText(){
@@ -139,6 +271,8 @@ public class ItemAction : DR_Action {
     public DR_Entity target;
     public DR_Entity item;
 
+    public MoveAnimation moveAnim;
+
     public ItemAction (DR_Entity item, DR_Entity user, DR_Entity target){
         this.item = item;
         this.owner = user;
@@ -146,29 +280,59 @@ public class ItemAction : DR_Action {
 
         ItemComponent itemComponent = item.GetComponent<ItemComponent>();
         if (itemComponent != null){
-            requiresFurtherInput = itemComponent.requireFurtherInputOnUse;
+            if (itemComponent.requireFurtherInputOnUse){
+
+                actionInputs.Add(new(
+                    //Input validation:
+                    pos => {
+                        DR_Entity newTarget = DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos);
+                        return newTarget != null;
+                    },
+                    "Please select a target, or press ESC to cancel."
+                ));
+            }
         }
 
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
-        ItemComponent itemComponent = item.GetComponent<ItemComponent>();
-        if (itemComponent != null){
-            return itemComponent.UseItem(gm, owner, target);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
+
+        if (actionInputs.Count > 0){
+            target = DR_GameManager.instance.CurrentMap.GetActorAtPosition(actionInputs[0].inputValue);
         }
-        return false;
+
+        MagicConsumableComponent magic = item.GetComponent<MagicConsumableComponent>();
+        if (magic != null){
+            Vector2Int targetPos;
+            if (magic.targetClosest){
+                targetPos = magic.GetTargetPosition(gm, owner, null);
+            }else{
+                targetPos = target.Position;
+            }
+            moveAnim = EntityFactory.CreateProjectileEntityAtPosition(
+                magic.projectileSprite, "Projectile", owner.Position,targetPos, magic.color).GetComponent<MoveAnimation>();
+        }
     }
 
-    public override bool GiveAdditionalInput(DR_GameManager gm, Vector2Int pos){
-        DR_Entity newTarget = gm.CurrentMap.GetActorAtPosition(pos);
-        if (newTarget != null){
-            target = newTarget;
-            hasReceivedFurtherInput = true;
-            return true;
+    public override void ActionStep(DR_GameManager gm, float deltaTime)
+    {
+        if (!hasStarted || hasFinished){
+            return;
         }
-        return false;
+        if (moveAnim == null || !moveAnim.isAnimating){
+            EndAction(gm);
+        }
+    }
+
+    public override void EndAction(DR_GameManager gm)
+    {
+        ItemComponent itemComponent = item.GetComponent<ItemComponent>();
+        if (itemComponent != null){
+            itemComponent.UseItem(gm, owner, target);
+        }
+        base.EndAction(gm);
     }
 
     public override string GetLogText(){
@@ -189,13 +353,12 @@ public class ChangeEquipmentAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
         if (inventory != null){
-            return equip? inventory.EquipItem(item) : inventory.UnequipItem(item);
+            bool success = equip? inventory.EquipItem(item) : inventory.UnequipItem(item);
         }
-        return false;
     }
 
     public override string GetLogText(){
@@ -212,19 +375,19 @@ public class PickupAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
         if (inventory != null){
             bool addedItem = inventory.AddItem(item);
             if (addedItem){
                 gm.CurrentMap.RemoveItem(item);
             }
-            return addedItem;
+            return;
         }else{
             Debug.LogError("Inventory is invalid!");
         }
-        return false;
+        return;
     }
 
     public override string GetLogText(){
@@ -241,19 +404,19 @@ public class DropAction : DR_Action {
         loggable = true;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
         InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
         if (inventory != null){
             if (gm.CurrentMap.GetItemAtPosition(owner.Position) == null){
                 inventory.RemoveItem(item);
-                return gm.CurrentMap.AddItem(item, owner.Position);
+                gm.CurrentMap.AddItem(item, owner.Position);
             }
             
         }else{
             Debug.LogError("Inventory is invalid!");
         }
-        return false;
+        return;
     }
 
     public override string GetLogText(){
@@ -269,9 +432,9 @@ public class WaitAction : DR_Action {
         loggable = logAction;
     }
 
-    public override bool Perform(DR_GameManager gm){
-        base.Perform(gm);
-        return true;
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
+        return;
     }
 
     public override string GetLogText(){

@@ -4,11 +4,7 @@ using UnityEngine;
 
 public class EquippableComponent : DR_Component
 {
-    public List<DR_Modifier> modifiers;
+    public List<DR_Modifier> modifiers = new List<DR_Modifier>();
 
     public bool isEquipped = false;
-
-    public EquippableComponent(){
-        modifiers = new List<DR_Modifier>();
-    }
 }

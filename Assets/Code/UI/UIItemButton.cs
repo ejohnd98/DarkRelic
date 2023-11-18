@@ -10,6 +10,6 @@ public class UIItemButton : UIButton {
 
     public void SetEntity(DR_Entity entity){
         SpriteComponent spriteComp = entity.GetComponent<SpriteComponent>();
-        ItemImage.sprite = spriteComp.Sprite;
+        ItemImage.sprite = spriteComp.GetCurrentSprite();
     }
 }

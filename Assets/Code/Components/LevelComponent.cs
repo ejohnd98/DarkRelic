@@ -19,6 +19,8 @@ public class LevelComponent : DR_Component
 
     int currentExp = 0;
 
+    public LevelComponent(){}
+
     // TODO: because this component is created before being added, the owning entity is not valid yet
     // should figure out a better way to handle this, but for now pass it in here
     public LevelComponent(int level, DR_Entity owner){

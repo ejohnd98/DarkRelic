@@ -1,19 +1,20 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurnSystem
+public class TurnSystem : MonoBehaviour
 {
-    // keep a list of all actors
-    // have a queue of any actors that are going to act in the current turn
-    // each turn loop through and add to a 
-
     List<TurnComponent> EligibleEntities;
     List<TurnComponent> CanAct;
+
+    DR_Action currentAction = null;
+    DR_GameManager gm = null;
 
     public TurnSystem(){
         EligibleEntities = new List<TurnComponent>();
         CanAct = new List<TurnComponent>();
+        gm = DR_GameManager.instance;
     }
 
     public void RemoveEntityTurnComponent(TurnComponent turnComp){
@@ -80,7 +81,7 @@ public class TurnSystem
         }
 
         // TODO: have entities properly remove themselves
-        // messy handling of entites which have been removed
+        // Messy handling of entites which have been removed:
         TurnComponent NextEntityTurn = GetNextEntity();
         DR_Entity NextEntity = NextEntityTurn.Entity;
 
@@ -91,5 +92,152 @@ public class TurnSystem
         }
 
         return NextEntity.HasComponent<PlayerComponent>();
+    }
+
+    public void HandleTurn(DR_GameManager gm, DR_Entity turnTaker){
+        //Debug.Log("Handling turn for " + turnTaker.Name);
+        gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
+
+        bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
+
+        if(isPlayer){
+            StartCoroutine(WaitForPlayerInput(gm, turnTaker));
+        }else{
+            HandleTurnAction(gm, turnTaker, AISystem.DetermineAIAction(gm, turnTaker));
+        }
+    }
+
+    IEnumerator WaitForPlayerInput(DR_GameManager gm, DR_Entity turnTaker){
+        DR_Action playerAction = null;
+        while(playerAction == null){
+            playerAction = GetPlayerActionFromInput(gm, turnTaker);
+            yield return null;
+        }
+
+        while (playerAction.RequiresInput()){
+            ActionInput actionInput = playerAction.GetNextNeededInput();
+            if (!actionInput.hasPrompted){
+                actionInput.hasPrompted = true;
+                LogSystem.instance.AddTextLog(actionInput.playerPrompt);
+                UISystem.instance.BeginTargetSelection(actionInput);
+            }
+            yield return null;
+        }
+
+        if (playerAction.ShouldExitAction()){
+            TurnEnd(gm, turnTaker, false);
+        }else{
+            HandleTurnAction(gm, turnTaker, playerAction);
+        }
+
+        
+    }
+
+    void HandleTurnAction(DR_GameManager gm, DR_Entity turnTaker, DR_Action action){
+        bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
+
+        if (action == null){
+            Debug.LogAssertion("TurnSystem.HandleTurnAction | action is null!");
+            return;
+        }
+        if (currentAction != null){
+            Debug.LogAssertion("TurnSystem.HandleTurnAction | currentAction is NOT null!");
+            return;
+        }
+        currentAction = action;
+        currentAction.StartAction(gm);
+        StartCoroutine(CheckIfActionFinished(gm, turnTaker));
+    }
+
+    void Update(){
+        if (currentAction != null){ //TODO: change to flag/state
+            currentAction.ActionStep(gm, Time.deltaTime);
+        }
+    }
+
+    IEnumerator CheckIfActionFinished(DR_GameManager gm, DR_Entity turnTaker){
+        yield return new WaitUntil(() => currentAction.hasFinished);
+        Debug.Log("action "+ currentAction.GetType() + " for " + turnTaker.Name + " succeeded: " + currentAction.wasSuccess);
+        TurnEnd(gm, turnTaker, currentAction.wasSuccess);
+    }
+
+    void TurnEnd(DR_GameManager gm, DR_Entity turnTaker, bool actionSucceeded){
+        if (actionSucceeded){
+
+            LevelComponent levelComp = turnTaker.GetComponent<LevelComponent>();
+            if (levelComp.RequiresLevelUp()){
+                LogSystem.instance.AddTextLog(turnTaker.Name + " leveled up!");
+                levelComp.AdvanceLevel();
+            }
+                
+            UISystem.instance.RefreshDetailsUI();
+
+            //TODO: merge popping of entity and spending of turn
+            DR_Entity poppedEntity = PopNextEntity().Entity;
+            if (poppedEntity != turnTaker){
+                //TODO: this will be hit if the player kills themselves
+                Debug.LogAssertion("TurnSystem.TurnEnd: Popped entity does not match turn taker!");
+            }
+
+            turnTaker.GetComponent<TurnComponent>().SpendTurn();
+            if (turnTaker.HasComponent<PlayerComponent>()){
+                SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
+                DR_Renderer.instance.UpdateTiles();
+            }
+        }
+        currentAction = null;
+        gm.OnTurnHandled();
+    }
+
+    //TODO: do this somewhere else (player component?)
+    //TODO: create struct that can be returned to break some of this up
+    private DR_Action GetPlayerActionFromInput(DR_GameManager gm, DR_Entity playerActor){
+        DR_Action selectedAction = null;
+
+        KeyCode key = KeyCode.None;
+
+        Vector2Int interactPos = Vector2Int.zero;
+        for (int i = 0; i < DR_GameManager.KeyDirections.Length; i++)
+        {
+            if (DR_InputHandler.GetKeyPressed(DR_GameManager.KeyDirections[i]))
+            {
+                key = DR_GameManager.KeyDirections[i];
+                interactPos = playerActor.Position + gm.Directions[i];
+            }
+        }
+
+        for (int i = 0; i < DR_GameManager.NumberKeys.Length; i++)
+        {
+            if (DR_InputHandler.GetKeyPressed(DR_GameManager.NumberKeys[i]))
+            {
+                key = DR_GameManager.NumberKeys[i];
+                interactPos = playerActor.Position;
+            }
+        }
+
+        if (DR_InputHandler.GetKeyPressed(KeyCode.Space)){
+            key = KeyCode.Space;
+            interactPos = playerActor.Position;
+        }
+
+        if (DR_InputHandler.GetKeyPressed(KeyCode.G)){
+            key = KeyCode.G;
+            interactPos = playerActor.Position;
+        }
+
+        DR_Action UIAction = UISystem.instance.GetUIAction();
+
+        if (key != KeyCode.None || UIAction != null)
+        {
+            List<DR_Action> possibleActions = InteractionSystem.GetPotentialActions(playerActor, gm.CurrentMap, interactPos, key);
+
+            if (UIAction != null){
+                selectedAction = UIAction;
+            }else if (possibleActions.Count > 0){
+                selectedAction = possibleActions[0] ;
+            }
+        }
+
+        return selectedAction;
     }
 }

@@ -7,6 +7,8 @@ public class HealthComponent : DR_Component
     public int maxHealth = 10;
     public int currentHealth = 0;
 
+    public HealthComponent(){}
+
     public HealthComponent(int MaxHealth){
         maxHealth = MaxHealth;
         currentHealth = maxHealth;

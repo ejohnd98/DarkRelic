@@ -4,6 +4,11 @@ using UnityEngine;
 
 // https://easings.net
 
+public enum EaseType{
+    QuadEaseOut,
+    Linear
+}
+
 public class Easings
 {
     public static Vector3 Slerp(Vector3 a, Vector3 b, float x) {
@@ -37,5 +42,15 @@ public class Easings
         const float c3 = c1 + 1.0f;
         float val = 1.0f - ((c3 * x * x * x) - (c1 * x * x));
         return (a * val) + (b * (1.0f - val));
+    }
+
+    public static Vector3 GetEasedValue(Vector3 a, Vector3 b, float time, EaseType type){
+        switch(type){
+            case EaseType.QuadEaseOut:
+                return QuadEaseOut(a,b, Mathf.Clamp01(time));
+            default:
+            case EaseType.Linear:
+                return Linear(a,b, Mathf.Clamp01(time));
+        }
     }
 }

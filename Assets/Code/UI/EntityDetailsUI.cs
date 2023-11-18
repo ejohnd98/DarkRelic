@@ -52,7 +52,7 @@ public class EntityDetailsUI : MonoBehaviour
         }
         SpriteComponent spriteComp = entity.GetComponent<SpriteComponent>();
         if (spriteComp != null){
-            DetailsImage.sprite = spriteComp.Sprite;
+            DetailsImage.sprite = spriteComp.GetCurrentSprite();
             DetailsImage.gameObject.SetActive(true);
         }else{
             DetailsImage.gameObject.SetActive(false);

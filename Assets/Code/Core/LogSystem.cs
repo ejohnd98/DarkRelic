@@ -7,27 +7,18 @@ public class LogEntry{
     public GameObject obj;
     public string content;
     public float visibleTime;
-    float counter;
+    public float alpha = 1.0f;
 
     public LogEntry(string content, float time, GameObject obj){
         visibleTime = time;
         this.content = content;
-        counter = 0.0f;
         this.obj = obj;
     }
 
-    public bool IsExpired(){
-        return counter >= visibleTime;
-    }
-
-    public bool UpdateTime(float deltaTime){
-        counter += deltaTime;
-        return IsExpired();
-    }
-
-    public float GetOpacity(){
-        float temp = (counter / visibleTime);
-        return 1.0f - Mathf.Clamp01(temp * temp);
+    public void UpdateAlpha(){
+        Color col = obj.GetComponent<TextMeshProUGUI>().color;
+        col.a = alpha;
+        obj.GetComponent<TextMeshProUGUI>().color = col;
     }
 }
 
@@ -36,7 +27,7 @@ public class LogSystem : MonoBehaviour
     public static LogSystem instance;
     public GameObject LogObj;
     public Transform LogParent;
-    public int maxVisibleLogs = 4;
+    public int maxVisibleLogs = 50;
 
     public List<LogEntry> LogObjs;
 
@@ -45,24 +36,6 @@ public class LogSystem : MonoBehaviour
     {
         instance = this;
         LogObjs = new List<LogEntry>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        for(int i = 0; i < LogObjs.Count; i++)
-        {
-            LogObjs[i].UpdateTime(Time.deltaTime);
-            if (LogObjs[i].IsExpired()){
-                Destroy(LogObjs[i].obj);
-                LogObjs.RemoveAt(i);
-                i--;
-            }else{
-                Color col = LogObjs[i].obj.GetComponent<TextMeshProUGUI>().color;
-                col.a = LogObjs[i].GetOpacity();
-                LogObjs[i].obj.GetComponent<TextMeshProUGUI>().color = col;
-            }
-        }
     }
 
     public void AddLog(DR_Action action){
@@ -79,6 +52,7 @@ public class LogSystem : MonoBehaviour
         log.obj.GetComponent<TextMeshProUGUI>().text = log.content;
 
         LogObjs.Add(log);
+        StartCoroutine(FadeLogText(log));
     }
 
     public void AddDamageLog(DamageEvent damageEvent){
@@ -92,6 +66,7 @@ public class LogSystem : MonoBehaviour
         log.obj.GetComponent<TextMeshProUGUI>().text = log.content;
 
         LogObjs.Add(log);
+        StartCoroutine(FadeLogText(log));
     }
 
     public void AddTextLog(string text){
@@ -104,5 +79,17 @@ public class LogSystem : MonoBehaviour
         log.obj.GetComponent<TextMeshProUGUI>().text = log.content;
 
         LogObjs.Add(log);
+        StartCoroutine(FadeLogText(log));
+    }
+
+    public IEnumerator FadeLogText(LogEntry logEntry){
+        yield return new WaitForSecondsRealtime(logEntry.visibleTime);
+
+        while (logEntry.alpha > 0.5f)
+        {
+            logEntry.alpha -= 0.5f * Time.deltaTime;
+            logEntry.UpdateAlpha();
+            yield return null;
+        }
     }
 }

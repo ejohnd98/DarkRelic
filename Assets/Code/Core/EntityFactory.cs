@@ -12,7 +12,7 @@ public class EntityFactory : MonoBehaviour
         NewActor.AddComponent<HealthComponent>(new HealthComponent(1)); //TODO: no longer should be providing maxhealth directly
         NewActor.AddComponent<InventoryComponent>(new InventoryComponent(25));
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
-        NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
+        //NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
         NewActor.AddComponent<AlignmentComponent>(new AlignmentComponent(alignment));
         NewActor.AddComponent<LevelComponent>(new LevelComponent(level, NewActor));
         
@@ -113,8 +113,8 @@ public class EntityFactory : MonoBehaviour
         NewActor.Name = Name;
         NewActor.Position = start;
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
-        MoveAnimComponent moveAnim = NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
-        moveAnim.AnimFinished += (MoveAnimComponent moveAnim) => {
+        MoveAnimation moveAnim = NewActor.AddComponent<MoveAnimation>(new());
+        moveAnim.AnimFinished += (DR_Animation moveAnim) => {
                 Debug.Log("AnimFinished!");
                 DR_GameManager.instance.CurrentMap.RemoveEntity(NewActor);
                 NewActor.noLongerValid = true;
@@ -126,7 +126,8 @@ public class EntityFactory : MonoBehaviour
         DR_GameManager.instance.CurrentMap.AddEntity(NewActor);
         NewActor.isOnMap = true;
 
-        moveAnim.SetAnim(end, 0.2f, true, EaseType.Linear);
+        moveAnim.SetAnim(end, 0.2f, EaseType.Linear);
+        AnimationSystem.AddAnimation(moveAnim);
         return NewActor;
     }
 }

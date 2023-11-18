@@ -40,6 +40,8 @@ public class HealingConsumableComponent : ConsumableComponent {
 
     public int healAmount = 4;
 
+    public HealingConsumableComponent(){}
+
     public HealingConsumableComponent(int amount){
         healAmount = amount;
     }
@@ -70,8 +72,51 @@ public class MagicConsumableComponent : ConsumableComponent {
     //todo: make enum of targeting types?
     public bool targetClosest = false;
 
+    public MagicConsumableComponent(){}
+
     public MagicConsumableComponent(int amount){
         damageAmount = amount;
+    }
+
+    public Vector2Int GetTargetPosition(DR_GameManager gm, DR_Entity user, DR_Entity target){
+        DR_Entity chosenTarget = null;
+        
+        if (targetClosest){
+            AlignmentComponent userAlignment = user.GetComponent<AlignmentComponent>();
+            if (userAlignment == null){
+                Debug.LogError("MagicDamageComponent.Consume: user (" + user.Name + ") alignment component is NULL!");
+                return Vector2Int.zero;
+            }
+
+            int closestDist = -1;
+            foreach (DR_Entity entity in gm.CurrentMap.Entities){
+
+                AlignmentComponent alignment = entity.GetComponent<AlignmentComponent>();
+                if (alignment != null && !alignment.IsFriendly(userAlignment)){
+                    
+                    int dist = entity.DistanceTo(user.Position);
+                    if (dist > maxRange){
+                        continue;
+                    }
+
+                    if (!gm.CurrentMap.IsVisible[entity.Position.y, entity.Position.x]){
+                        continue;
+                    }
+
+                    if (chosenTarget == null || dist < closestDist){
+                        closestDist = dist;
+                        chosenTarget = entity;
+                    }
+                }
+            }
+        }else{
+            chosenTarget = target;
+        }
+
+        if (chosenTarget != null){
+            return chosenTarget.Position;
+        }
+        return Vector2Int.zero;
     }
 
     public override bool Consume(DR_GameManager gm, DR_Entity user, DR_Entity target)
@@ -112,8 +157,6 @@ public class MagicConsumableComponent : ConsumableComponent {
         }
 
         if (chosenTarget != null){
-            EntityFactory.CreateProjectileEntityAtPosition(projectileSprite, "Projectile", user.Position, chosenTarget.Position, color);
-
             HealthComponent health = chosenTarget.GetComponent<HealthComponent>();
             if (health != null){
                 DamageSystem.HandleAttack(gm, user, health, damageAmount);
