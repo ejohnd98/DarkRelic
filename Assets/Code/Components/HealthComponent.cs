@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class HealthComponent : DR_Component
 {   
+    [Copy]
     public int maxHealth = 10;
+    [Copy]
     public int currentHealth = 0;
 
     public HealthComponent(){}
 
     public HealthComponent(int MaxHealth){
         maxHealth = MaxHealth;
+    }
+
+    public override void OnComponentAdded()
+    {
+        base.OnComponentAdded();
         currentHealth = maxHealth;
     }
 

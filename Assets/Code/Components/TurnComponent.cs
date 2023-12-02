@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TurnComponent : DR_Component
 {
+    [Copy]
     public int ActionDebt = 1;
     int CurrentDebt = 0;
 

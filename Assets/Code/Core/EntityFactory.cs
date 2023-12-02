@@ -1,9 +1,40 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EntityFactory : MonoBehaviour
 {
+    public static DR_Entity CreateEntityFromContent(Content content)
+    {
+        DR_Entity newEntity = new DR_Entity();
+
+        List<Type> componentTypes = new List<Type>();
+
+        for(int i = 0; i < content.components.Count; i++)
+        {
+            Type type = content.components[i].GetType();
+            componentTypes.Add(type);
+        }
+
+        for (int i = 0; i < componentTypes.Count; i++)
+        {
+            var type = componentTypes[i];
+            // Check if the type is a subtype of DR_Component
+            if (typeof(DR_Component).IsAssignableFrom(type) && type != typeof(DR_Component))
+            {
+                // Create an instance of the type
+                DR_Component newComponent = (DR_Component)Activator.CreateInstance(type);
+                DR_Component.CopyDataFromComponent(content.components[i], newComponent);
+                newEntity.AddComponent(newComponent);
+            }
+        }
+
+        newEntity.Name = content.contentName;
+
+        return newEntity;
+    }
+    
     public static DR_Entity CreateActor(Sprite Sprite, string Name, Alignment alignment = Alignment.ENEMY, int level = 1){
         DR_Entity NewActor = new DR_Entity();
 
@@ -14,7 +45,7 @@ public class EntityFactory : MonoBehaviour
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
         //NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
         NewActor.AddComponent<AlignmentComponent>(new AlignmentComponent(alignment));
-        NewActor.AddComponent<LevelComponent>(new LevelComponent(level, NewActor));
+        NewActor.AddComponent<LevelComponent>(new LevelComponent(level));
         
         return NewActor;
     }
@@ -115,7 +146,7 @@ public class EntityFactory : MonoBehaviour
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         MoveAnimation moveAnim = NewActor.AddComponent<MoveAnimation>(new());
         moveAnim.AnimFinished += (DR_Animation moveAnim) => {
-                Debug.Log("AnimFinished!");
+                //Debug.Log("AnimFinished!");
                 DR_GameManager.instance.CurrentMap.RemoveEntity(NewActor);
                 NewActor.noLongerValid = true;
                 NewActor.DestroyEntity();

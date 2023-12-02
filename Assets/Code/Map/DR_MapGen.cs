@@ -386,11 +386,12 @@ public class DR_MapGen
                         break;
                     case MapGenCellType.ENEMY:
                         newCell.bBlocksMovement = false;
-                        DR_Entity enemy = EntityFactory.CreateActor(gm.EnemyTexture, "Enemy", Alignment.ENEMY, generation.depth);
-                        enemy.GetComponent<SpriteComponent>().hasAnimation = true;
-                        enemy.GetComponent<SpriteComponent>().animFrames = gm.EnemyAnim;
-                        enemy.GetComponent<SpriteComponent>().animLength = 1.25f;
-                        enemy.AddComponent<AIComponent>(new AIComponent());
+                        DR_Entity enemy = EntityFactory.CreateEntityFromContent(gm.enemyContent);
+
+                        //set level from generation depth
+                        enemy.GetComponent<LevelComponent>().level = generation.depth;
+                        enemy.GetComponent<LevelComponent>().UpdateStats();
+
                         NewMap.AddActor(enemy, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.ITEM:

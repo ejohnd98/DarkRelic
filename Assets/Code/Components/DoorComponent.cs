@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class DoorComponent : DR_Component
 {
+    [Copy]
     public Sprite openSprite, closeSprite;
 
+    [Copy]
     bool isOpen = false;
 
     public DoorComponent(){}

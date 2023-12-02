@@ -157,7 +157,7 @@ public class TurnSystem : MonoBehaviour
 
     IEnumerator CheckIfActionFinished(DR_GameManager gm, DR_Entity turnTaker){
         yield return new WaitUntil(() => currentAction.hasFinished);
-        Debug.Log("action "+ currentAction.GetType() + " for " + turnTaker.Name + " succeeded: " + currentAction.wasSuccess);
+        //Debug.Log("action "+ currentAction.GetType() + " for " + turnTaker.Name + " succeeded: " + currentAction.wasSuccess);
         TurnEnd(gm, turnTaker, currentAction.wasSuccess);
     }
 

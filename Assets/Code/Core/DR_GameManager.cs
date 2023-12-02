@@ -7,7 +7,6 @@ public class DR_GameManager : MonoBehaviour
 {
     public enum GameState {
         ADVANCE_GAME,
-        FURTHER_INPUT_REQUIRED,
         ANIMATING,
         HANDLING_TURN,
         GAME_OVER,
@@ -24,10 +23,10 @@ public class DR_GameManager : MonoBehaviour
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
     public Texture2D DebugMap, DebugMap2, pathfindTestMap;
-    public Sprite PlayerTexture, EnemyTexture, OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
+    public Sprite OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
         PotionTexture, FireboltTexture, ShockTexture, GoalTexture, AmuletTexture, FireProjectile, SparkProjectile, BossTexture;
 
-    public Sprite[] PlayerAnim, EnemyAnim;
+    public Content playerContent, enemyContent;
 
     public bool debug_disableFOV = false;
 
@@ -61,13 +60,7 @@ public class DR_GameManager : MonoBehaviour
         CurrentDungeon = new DR_Dungeon();
         CurrentDungeon.name = "Testing Dungeon";
 
-        PlayerActor = EntityFactory.CreateActor(PlayerTexture, "Player", Alignment.PLAYER, 1);
-        PlayerActor.AddComponent<PlayerComponent>(new PlayerComponent());
-
-        //Temp sprite anim adding:
-        PlayerActor.GetComponent<SpriteComponent>().hasAnimation = true;
-        PlayerActor.GetComponent<SpriteComponent>().animFrames = PlayerAnim;
-        PlayerActor.GetComponent<SpriteComponent>().animLength = 1.0f;
+        PlayerActor = EntityFactory.CreateEntityFromContent(playerContent);
 
         UISystem.instance.UpdateInventoryUI(PlayerActor);
 
@@ -152,28 +145,6 @@ public class DR_GameManager : MonoBehaviour
                     }
                     break;
                 }
-            case GameState.FURTHER_INPUT_REQUIRED:
-            {
-                SetGameState(GameState.ADVANCE_GAME);
-                // if (currentActionEvent.action.hasReceivedFurtherInput){
-                //     bool actionSuccess = currentActionEvent.action.Perform(this);
-                //     if (!actionSuccess){
-                //         SetGameState(GameState.WAITING_FOR_INPUT);
-                //         currentActionEvent = null;
-                //         break;
-                //     }
-
-                //     PlayerActor.GetComponent<TurnComponent>().SpendTurn();
-                //     turnSystem.PopNextEntity();
-                //     SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-                //     DR_Renderer.instance.UpdateTiles();
-                //     UISystem.instance.RefreshDetailsUI();
-
-                //     SetGameState(GameState.RUNNING);
-                //     currentActionEvent = null;
-                // }
-                break;
-            }
             case GameState.ANIMATING:
             {
                 if (DR_Renderer.animsActive <= 0){
@@ -215,20 +186,6 @@ public class DR_GameManager : MonoBehaviour
 
     private void LateUpdate() {
         UpdateCamera();
-    }
-
-    public bool ProvideAdditionalInput(Vector2Int pos){
-        // if (CurrentState != GameState.FURTHER_INPUT_REQUIRED){
-        //     Debug.LogError("Tried to provide further input but not in correct state!");
-        //     return false;
-        // }
-        // if (currentActionEvent == null){
-        //     Debug.LogError("Tried to provide further input but currentAction is null!");
-        //     return false;
-        // }
-
-        // return currentActionEvent.action.GiveAdditionalInput(this, pos);
-        return true;
     }
 
     public void SetGameState(GameState newState){

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -42,6 +43,7 @@ public class DR_Entity
 
         ComponentList.Add(NewComponent);
         NewComponent.Entity = this;
+        NewComponent.OnComponentAdded();
 
         return NewComponent;
     }

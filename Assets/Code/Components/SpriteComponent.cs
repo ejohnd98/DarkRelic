@@ -5,10 +5,13 @@ using UnityEngine;
 [System.Serializable]
 public class SpriteComponent : DR_Component
 {
+    [Copy]
     public Sprite Sprite;
-
+    [Copy]
     public bool hasAnimation = false;
+    [Copy]
     public Sprite[] animFrames;
+    [Copy]
     public float animLength = 2.0f;
 
     public SpriteComponent(){}

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class StairComponent : DR_Component
 {
+    [Copy]
     public bool goesDeeper = false;
 
     public StairComponent(){}

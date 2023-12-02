@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
+  m_Name: Enemy
+  m_EditorClassIdentifier: 
+  contentName: Phantom
+  components:
+  - rid: 5068184619078123520
+  - rid: 5068184619078123521
+  - rid: 5068184619078123522
+  - rid: 5068184619078123524
+  - rid: 5068184619078123525
+  - rid: 5068184619078123527
+  references:
+    version: 2
+    RefIds:
+    - rid: 5068184619078123520
+      type: {class: AlignmentComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: AlignmentComponent
+        alignment: 1
+    - rid: 5068184619078123521
+      type: {class: HealthComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: HealthComponent
+        maxHealth: 10
+        currentHealth: 0
+    - rid: 5068184619078123522
+      type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: SpriteComponent
+        Sprite: {fileID: 1149762464, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        hasAnimation: 1
+        animFrames:
+        - {fileID: 1249172118, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        - {fileID: 1149762464, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        animLength: 1.25
+    - rid: 5068184619078123524
+      type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: TurnComponent
+        ActionDebt: 1
+    - rid: 5068184619078123525
+      type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: LevelComponent
+        level: 1
+        expGiven: 300
+    - rid: 5068184619078123527
+      type: {class: AIComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: AIComponent

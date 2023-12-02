@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class InventoryComponent : DR_Component
 {
+    [Copy]
     public int capacity = 0;
+    [Copy]
     public int maxEquips = 0;
+    
     public int equippedItems = 0;
     public List<DR_Entity> items = new List<DR_Entity>();
 

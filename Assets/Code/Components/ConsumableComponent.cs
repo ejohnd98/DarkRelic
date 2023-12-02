@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class ConsumableComponent : DR_Component {
 
+    [Copy]
     public bool RemoveAfterUse = true;
 
     public override bool Trigger(DR_GameManager gm, DR_Entity user, DR_Entity target){
@@ -38,6 +39,7 @@ public abstract class ConsumableComponent : DR_Component {
 
 public class HealingConsumableComponent : ConsumableComponent {
 
+    [Copy]
     public int healAmount = 4;
 
     public HealingConsumableComponent(){}
@@ -62,14 +64,19 @@ public class HealingConsumableComponent : ConsumableComponent {
 
 public class MagicConsumableComponent : ConsumableComponent {
 
+    [Copy]
     public int damageAmount = 5;
+    [Copy]
     public int maxRange = 6;
 
     //todo: figure out better spot for these
+    [Copy]
     public Color color = Color.white;
+    [Copy]
     public Sprite projectileSprite;
 
     //todo: make enum of targeting types?
+    [Copy]
     public bool targetClosest = false;
 
     public MagicConsumableComponent(){}

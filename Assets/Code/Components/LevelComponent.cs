@@ -13,19 +13,27 @@ public class LevelComponent : DR_Component
 {
     public event Action<LevelComponent> OnLevelUp;
 
+    [Copy]
     public int level = 1;
+    [Copy]
     public int expGiven = 300;
-    public Stats stats;
-
+    [Copy]
     int currentExp = 0;
+
+    // This should not be copied as it will be created in OnComponentAdded
+    public Stats stats;
 
     public LevelComponent(){}
 
     // TODO: because this component is created before being added, the owning entity is not valid yet
     // should figure out a better way to handle this, but for now pass it in here
-    public LevelComponent(int level, DR_Entity owner){
-        Entity = owner;
+    public LevelComponent(int level){
         this.level = level;
+    }
+
+    public override void OnComponentAdded()
+    {
+        base.OnComponentAdded();
         stats = new Stats();
         UpdateStats();
     }
@@ -55,8 +63,9 @@ public class LevelComponent : DR_Component
         return levelUpBase + (levelUpFactor * (level-1));
     }
 
-    void UpdateStats(){
+    public void UpdateStats(){
         //TODO: this should be defined somewhere else.
+        // Probably as its own scriptable object, which it itself would be set in the entity's content
         Stats level1Stats = new Stats();
         level1Stats.strength = 1;
         level1Stats.maxHealth = 5;

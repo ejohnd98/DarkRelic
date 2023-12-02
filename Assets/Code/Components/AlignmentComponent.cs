@@ -9,6 +9,7 @@ public enum Alignment {
 
 public class AlignmentComponent : DR_Component
 {
+    [Copy]
     public Alignment alignment;
 
     public AlignmentComponent(){}
