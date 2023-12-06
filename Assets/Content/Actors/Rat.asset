@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
-  m_Name: Enemy
+  m_Name: Rat
   m_EditorClassIdentifier: 
-  contentName: Phantom
+  contentName: Rat
   components:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
@@ -38,23 +38,22 @@ MonoBehaviour:
       type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
       data:
         key: SpriteComponent
-        Sprite: {fileID: 1149762464, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        hasAnimation: 1
-        animFrames:
-        - {fileID: 1249172118, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        - {fileID: 1149762464, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        animLength: 1.25
+        Sprite: {fileID: 228414793, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        hasAnimation: 0
+        animFrames: []
+        animLength: 1
     - rid: 5068184619078123524
       type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
       data:
         key: TurnComponent
-        ActionDebt: 1
+        ActionDebt: 8
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
       data:
         key: LevelComponent
         level: 1
         expGiven: 300
+        healthScale: 0.1
     - rid: 5068184619078123527
       type: {class: AIComponent, ns: , asm: Assembly-CSharp}
       data:

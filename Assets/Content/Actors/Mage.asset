@@ -10,17 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
-  m_Name: Player
+  m_Name: Mage
   m_EditorClassIdentifier: 
-  contentName: Player
+  contentName: Mage
   components:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
   - rid: 5068184619078123522
-  - rid: 5068184619078123523
   - rid: 5068184619078123524
   - rid: 5068184619078123525
-  - rid: 5068184619078123526
+  - rid: 5068184619078123527
   references:
     version: 2
     RefIds:
@@ -28,7 +27,7 @@ MonoBehaviour:
       type: {class: AlignmentComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AlignmentComponent
-        alignment: 0
+        alignment: 1
     - rid: 5068184619078123521
       type: {class: HealthComponent, ns: , asm: Assembly-CSharp}
       data:
@@ -39,32 +38,25 @@ MonoBehaviour:
       type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
       data:
         key: SpriteComponent
-        Sprite: {fileID: -2065779700, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        Sprite: {fileID: -389211833, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
         hasAnimation: 1
         animFrames:
-        - {fileID: -2065779700, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        - {fileID: -35984604, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        animLength: 1
-    - rid: 5068184619078123523
-      type: {class: InventoryComponent, ns: , asm: Assembly-CSharp}
-      data:
-        key: InventoryComponent
-        capacity: 25
-        maxEquips: 10
-        equippedItems: 0
+        - {fileID: -389211833, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        - {fileID: 757037227, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        animLength: 1.25
     - rid: 5068184619078123524
       type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
       data:
         key: TurnComponent
-        ActionDebt: 4
+        ActionDebt: 6
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
       data:
         key: LevelComponent
         level: 1
         expGiven: 300
-        healthScale: 2
-    - rid: 5068184619078123526
-      type: {class: PlayerComponent, ns: , asm: Assembly-CSharp}
+        healthScale: 0.5
+    - rid: 5068184619078123527
+      type: {class: AIComponent, ns: , asm: Assembly-CSharp}
       data:
-        key: PlayerComponent
+        key: AIComponent

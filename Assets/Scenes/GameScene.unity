@@ -3716,7 +3716,11 @@ MonoBehaviour:
   SparkProjectile: {fileID: -264209838, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   BossTexture: {fileID: 35848247, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   playerContent: {fileID: 11400000, guid: 896c023e61efd12489a2b78b0131caec, type: 2}
-  enemyContent: {fileID: 11400000, guid: 5da90d6ea2feca346b52263e4ee5651f, type: 2}
+  enemyContentArray:
+  - {fileID: 11400000, guid: 1a164c92514b4e24ca5e774571d2a948, type: 2}
+  - {fileID: 11400000, guid: 5da90d6ea2feca346b52263e4ee5651f, type: 2}
+  - {fileID: 11400000, guid: 04e475988e63fc84e889cba4e4f0776e, type: 2}
+  - {fileID: 11400000, guid: 601c95c9b77b71f44b8020e88aca5b7b, type: 2}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   cameraOffset: {x: 4, y: -3, z: 0}

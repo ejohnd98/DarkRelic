@@ -26,7 +26,8 @@ public class DR_GameManager : MonoBehaviour
     public Sprite OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
         PotionTexture, FireboltTexture, ShockTexture, GoalTexture, AmuletTexture, FireProjectile, SparkProjectile, BossTexture;
 
-    public Content playerContent, enemyContent;
+    public Content playerContent;
+    public List<Content> enemyContentArray;
 
     public bool debug_disableFOV = false;
 

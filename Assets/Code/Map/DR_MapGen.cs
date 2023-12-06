@@ -386,7 +386,10 @@ public class DR_MapGen
                         break;
                     case MapGenCellType.ENEMY:
                         newCell.bBlocksMovement = false;
-                        DR_Entity enemy = EntityFactory.CreateEntityFromContent(gm.enemyContent);
+
+                        int chosenIndex = Random.Range(0, gm.enemyContentArray.Count);
+                        Content chosenEnemy = gm.enemyContentArray[chosenIndex];
+                        DR_Entity enemy = EntityFactory.CreateEntityFromContent(chosenEnemy);
 
                         //set level from generation depth
                         enemy.GetComponent<LevelComponent>().level = generation.depth;

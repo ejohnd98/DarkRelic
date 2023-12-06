@@ -20,6 +20,10 @@ public class LevelComponent : DR_Component
     [Copy]
     int currentExp = 0;
 
+    //TODO: expand on this concept and have different enemies just have a scale applied to some generic set of stats
+    [Copy]
+    public float healthScale = 1.0f;
+
     // This should not be copied as it will be created in OnComponentAdded
     public Stats stats;
 
@@ -76,7 +80,7 @@ public class LevelComponent : DR_Component
 
         float levelFraction = (level-1) / 100.0f;
         stats.strength = (int)(((1.0f-levelFraction) * level1Stats.strength) + (levelFraction * level50Stats.strength));
-        stats.maxHealth = (int)(((1.0f-levelFraction) * level1Stats.maxHealth) + (levelFraction * level50Stats.maxHealth));
+        stats.maxHealth = Mathf.Max((int)(healthScale * (((1.0f-levelFraction) * level1Stats.maxHealth) + (levelFraction * level50Stats.maxHealth))), 1);
 
         HealthComponent healthComponent = Entity.GetComponent<HealthComponent>();
         healthComponent.SetMaxHealth(stats.maxHealth);
