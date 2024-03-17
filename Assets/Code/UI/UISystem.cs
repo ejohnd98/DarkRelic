@@ -17,7 +17,7 @@ public class UISystem : MonoBehaviour
 
     public UIState currentState = UIState.NORMAL;
 
-    public Texture2D cursorTexture;
+    public Texture2D cursorTexture, targetingCursorTexture;
 
     public static UISystem instance;
     public Transform HealthBarPivot; //TODO make healthbar wrapper class (so enemies can have health bars too)
@@ -111,12 +111,16 @@ public class UISystem : MonoBehaviour
     public void BeginTargetSelection(ActionInput actionInput){
         currentActionInput = actionInput;
         currentState = UIState.SELECTING_TARGET;
+
+        Cursor.SetCursor(targetingCursorTexture, Vector2.zero, CursorMode.Auto);
     }
 
     public void BackOutOfTargetSelection(){
         currentActionInput.hasExitInput = true;
         currentActionInput = null;
         currentState = UIState.NORMAL;
+
+        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
     }
 
 
@@ -132,6 +136,7 @@ public class UISystem : MonoBehaviour
                     if (currentActionInput.GiveInput(MousePos)){
                         currentState = UIState.NORMAL;
                         currentActionInput = null;
+                        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
                     }
                     //TODO: allow selecting other items in inventory?
                 }

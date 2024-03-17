@@ -468,6 +468,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentState: 0
   cursorTexture: {fileID: 2800000, guid: 374432b117b2e3e4e9efae1befa4822a, type: 3}
+  targetingCursorTexture: {fileID: 2800000, guid: 9756d82a1539b6e4b8d008f6953e07ea, type: 3}
   HealthBarPivot: {fileID: 724965681}
   detailsUI: {fileID: 66880690}
   inventoryUI: {fileID: 66880691}
@@ -1451,10 +1452,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+    x: 0.16666667
+    y: 0.13927856
+    width: 0.6666667
+    height: 0.7214429
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -2908,10 +2909,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+    x: 0.16666667
+    y: 0.13927856
+    width: 0.6666667
+    height: 0.7214429
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
