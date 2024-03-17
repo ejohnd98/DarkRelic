@@ -189,55 +189,68 @@ public class TurnSystem : MonoBehaviour
         gm.OnTurnHandled();
     }
 
-    //TODO: do this somewhere else (player component?)
-    //TODO: create struct that can be returned to break some of this up
     private DR_Action GetPlayerActionFromInput(DR_GameManager gm, DR_Entity playerActor){
-        DR_Action selectedAction = null;
 
-        KeyCode key = KeyCode.None;
+        DR_Action UIAction = UISystem.instance.GetUIAction();
+        if (UIAction != null){
+            return UIAction;
+        }
 
-        Vector2Int interactPos = Vector2Int.zero;
+        List<DR_Action> actionList = new List<DR_Action>();
+
         for (int i = 0; i < DR_GameManager.KeyDirections.Length; i++)
         {
             if (DR_InputHandler.GetKeyPressed(DR_GameManager.KeyDirections[i]))
             {
-                key = DR_GameManager.KeyDirections[i];
-                interactPos = playerActor.Position + gm.Directions[i];
-            }
-        }
+                Vector2Int interactPos = playerActor.Position + gm.Directions[i];
 
-        for (int i = 0; i < DR_GameManager.NumberKeys.Length; i++)
-        {
-            if (DR_InputHandler.GetKeyPressed(DR_GameManager.NumberKeys[i]))
-            {
-                key = DR_GameManager.NumberKeys[i];
-                interactPos = playerActor.Position;
+                DR_Cell targetCell = gm.CurrentMap.Cells[interactPos.y, interactPos.x];
+
+                if (targetCell.Actor != null){
+                    HealthComponent target = targetCell.Actor.GetComponent<HealthComponent>();
+                    if (target != null){
+                        actionList.Add(new AttackAction(target, playerActor));
+                    }
+                }
+
+                if (!targetCell.BlocksMovement()){
+                    actionList.Add(new MoveAction(playerActor, interactPos));
+                }
+
+                if (targetCell.Prop != null){
+                    DoorComponent door = targetCell.Prop.GetComponent<DoorComponent>();
+                    if (door != null){
+                        actionList.Add(new DoorAction(door, playerActor));
+                    }
+
+                    StairComponent stairs = targetCell.Prop.GetComponent<StairComponent>();
+                    if (stairs != null){
+                        actionList.Add(new StairAction(playerActor, stairs));
+                    }
+
+                    GoalComponent goal = targetCell.Prop.GetComponent<GoalComponent>();
+                    if (goal != null){
+                        actionList.Add(new GoalAction(goal, playerActor));
+                    }
+                }
             }
         }
 
         if (DR_InputHandler.GetKeyPressed(KeyCode.Space)){
-            key = KeyCode.Space;
-            interactPos = playerActor.Position;
+            actionList.Add(new WaitAction(playerActor, true));
         }
 
         if (DR_InputHandler.GetKeyPressed(KeyCode.G)){
-            key = KeyCode.G;
-            interactPos = playerActor.Position;
-        }
-
-        DR_Action UIAction = UISystem.instance.GetUIAction();
-
-        if (key != KeyCode.None || UIAction != null)
-        {
-            List<DR_Action> possibleActions = InteractionSystem.GetPotentialActions(playerActor, gm.CurrentMap, interactPos, key);
-
-            if (UIAction != null){
-                selectedAction = UIAction;
-            }else if (possibleActions.Count > 0){
-                selectedAction = possibleActions[0] ;
+            DR_Cell targetCell = gm.CurrentMap.Cells[playerActor.Position.y, playerActor.Position.x];
+            if (targetCell.Item != null){
+                actionList.Add(new PickupAction(targetCell.Item, playerActor));
             }
         }
 
-        return selectedAction;
+        if (actionList.Count > 0){
+            return actionList[0] ;
+        }
+
+        return null;
     }
 }
