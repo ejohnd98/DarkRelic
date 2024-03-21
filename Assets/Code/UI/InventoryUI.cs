@@ -21,6 +21,8 @@ public class InventoryUI : MonoBehaviour
     public Transform EquipmentButtonsParent;
     public GameObject EquipmentButtonPrefab;
     List<GameObject> EquipmentButtons;
+    
+    public TextMeshProUGUI tempRelicText;
 
     private void Awake() {
         ItemButtons = new List<GameObject>();
@@ -55,6 +57,21 @@ public class InventoryUI : MonoBehaviour
 
         InventoryComponent inventory = entity.GetComponent<InventoryComponent>();
         if (inventory != null){
+            
+            //temp relic text:
+            tempRelicText.text = "";
+            foreach (KeyValuePair<RelicType, int> pair in inventory.RelicInventory)
+            {
+                if (tempRelicText.text != "")
+                {
+                    tempRelicText.text += '\n';
+                }
+                if (pair.Value > 0)
+                {
+                    tempRelicText.text += pair.Key.ToString() + ": " + pair.Value;
+                }
+            }
+            
             for (int i = 0; i < inventory.items.Count; i++){
                 DR_Entity item = inventory.items[i];
                 EquippableComponent equippable = item.GetComponent<EquippableComponent>();

@@ -158,7 +158,7 @@ public class MapGeneration{
             case MapGenState.PLACING_ITEMS: {
                 //TODO: do anything but this:
                 for (int i=1; i < rooms.Count; i++){
-                    int itemCount = Random.Range(0, 2);
+                    int itemCount = Random.Range(0, 4);
 
                     int placedItems = 0;
                     while (placedItems < itemCount){
@@ -401,20 +401,24 @@ public class DR_MapGen
                         newCell.bBlocksMovement = false;
                         //very temp item generation:
                         DR_Entity item = null;
-                        int itemIndex = Random.Range(0, 3);
-                        switch(itemIndex){
-                            case 0:
-                                item = EntityFactory.CreateHealingItem(gm.PotionTexture, "Health Potion", 4);
-                                break;
-                            case 1:
-                                item = EntityFactory.CreateMagicItem(gm.ShockTexture, "Shock Scroll", 5);
-                                break;
-                            case 2:
-                                item = EntityFactory.CreateTargetedMagicItem(gm.FireboltTexture, "Firebolt Scroll", 5);
-                                break;
-                            default:
-                                break;
-                        }
+                        // int itemIndex = Random.Range(0, 3);
+                        // switch(itemIndex){
+                        //     case 0:
+                        //         item = EntityFactory.CreateHealingItem(gm.PotionTexture, "Health Potion", 4);
+                        //         break;
+                        //     case 1:
+                        //         item = EntityFactory.CreateMagicItem(gm.ShockTexture, "Shock Scroll", 5);
+                        //         break;
+                        //     case 2:
+                        //         item = EntityFactory.CreateTargetedMagicItem(gm.FireboltTexture, "Firebolt Scroll", 5);
+                        //         break;
+                        //     default:
+                        //         break;
+                        // }
+                        
+                        int itemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
+                        item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
+                        
                         NewMap.AddItem(item, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.STAIRS_UP:{

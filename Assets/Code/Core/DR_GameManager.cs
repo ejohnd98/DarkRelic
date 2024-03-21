@@ -28,6 +28,7 @@ public class DR_GameManager : MonoBehaviour
 
     public Content playerContent;
     public List<Content> enemyContentArray;
+    public List<Content> relicPickupContentArray;
 
     public bool debug_disableFOV = false;
 

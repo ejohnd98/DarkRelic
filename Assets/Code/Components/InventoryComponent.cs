@@ -11,6 +11,8 @@ public class InventoryComponent : DR_Component
     
     public int equippedItems = 0;
     public List<DR_Entity> items = new List<DR_Entity>();
+    
+    public Dictionary<RelicType, int> RelicInventory = new ();
 
     public InventoryComponent(){}
 
@@ -69,6 +71,22 @@ public class InventoryComponent : DR_Component
     }
 
     public bool AddItem(DR_Entity item){
+        if (item.GetComponent<RelicComponent>() is RelicComponent relicComponent)
+        {
+            RelicType relicType = relicComponent.relicType;
+            if (RelicInventory.ContainsKey(relicType))
+            {
+                RelicInventory[relicType] += 1;
+            }
+            else
+            {
+                RelicInventory[relicType] = 1;
+            }
+            UISystem.instance.RefreshInventoryUI();
+            return true;
+        }
+        
+        
         if (items.Count + 1 < capacity){
             items.Add(item);
 
