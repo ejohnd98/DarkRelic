@@ -43,9 +43,18 @@ public class DamageEvent
 
 public class DamageSystem
 {
-    public static DamageEvent HandleAttack(DR_GameManager gm, DR_Entity attacker, HealthComponent target, int damage){
+    public static DamageEvent HandleAttack(DR_GameManager gm, DR_Entity attacker, HealthComponent target, int damage)
+    {
 
-        DamageEvent damageEvent = new DamageEvent(attacker, target.Entity, damage);
+        int modifiedDamage = damage;
+        if (attacker.GetComponent<InventoryComponent>() is InventoryComponent inventory
+            && inventory.RelicInventory.ContainsKey(RelicType.DAMAGE_RELIC))
+        {
+            modifiedDamage += inventory.RelicInventory[RelicType.DAMAGE_RELIC];
+            Debug.Log("Orig: " + damage + ", modified: " + modifiedDamage);
+        }
+        
+        DamageEvent damageEvent = new DamageEvent(attacker, target.Entity, modifiedDamage);
         InventoryComponent attackerInventory = attacker.GetComponent<InventoryComponent>();
         if (attackerInventory != null){
             foreach (DR_Entity item in attackerInventory.items){
