@@ -22,7 +22,7 @@ public class DR_GameManager : MonoBehaviour
 
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
-    public Texture2D DebugMap, DebugMap2, pathfindTestMap;
+    public Texture2D DebugMap, DebugMap2, pathfindTestMap, balanceTestMap;
     public Sprite OpenDoorTexture, ClosedDoorTexture, StairsDownTexture, StairsUpTexture,
         PotionTexture, FireboltTexture, ShockTexture, GoalTexture, AmuletTexture, FireProjectile, SparkProjectile, BossTexture;
 
@@ -59,8 +59,8 @@ public class DR_GameManager : MonoBehaviour
     void Start()
     {
         // Create Dungeon
-        CurrentDungeon = new DR_Dungeon();
-        CurrentDungeon.name = "Testing Dungeon";
+        //CurrentDungeon = DR_MapGen.CreateDungeonTest(balanceTestMap);
+        CurrentDungeon = DungeonGenerator.GenerateDungeon();
 
         PlayerActor = EntityFactory.CreateEntityFromContent(playerContent);
 
@@ -69,21 +69,21 @@ public class DR_GameManager : MonoBehaviour
         BossActor = EntityFactory.CreateActor(BossTexture, "Boss", Alignment.ENEMY, 10);
         BossActor.AddComponent<AIComponent>(new AIComponent());
 
-        MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35), 1);
+        //MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35), 1);
 
         // pathfinding debug map
         //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(DebugMap2));
 
         // Add maps to Dungeon
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        mapGenInfo.depth = 2;
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        mapGenInfo.depth = 3;
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-
-        mapGenInfo.isLastFloor = true;
-        mapGenInfo.depth = 4;
-        CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        // mapGenInfo.depth = 2;
+        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        // mapGenInfo.depth = 3;
+        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
+        //
+        // mapGenInfo.isLastFloor = true;
+        // mapGenInfo.depth = 4;
+        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
 
         //temp:
         DR_Entity item1 = EntityFactory.CreateHealingItem(PotionTexture, "Health Potion", 10);
@@ -92,10 +92,10 @@ public class DR_GameManager : MonoBehaviour
         DR_Entity testEquipment = EntityFactory.CreateEquipmentItem(AmuletTexture, "Amulet of Double Damage");
         testEquipment.GetComponent<EquippableComponent>().modifiers.Add(new AttackMultiplierModifier(4.0f));
 
-        PlayerActor.GetComponent<InventoryComponent>().AddItem(item1);
-        PlayerActor.GetComponent<InventoryComponent>().AddItem(item2);
-        PlayerActor.GetComponent<InventoryComponent>().AddItem(item3);
-        PlayerActor.GetComponent<InventoryComponent>().AddItem(testEquipment);
+        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item1);
+        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item2);
+        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item3);
+        // PlayerActor.GetComponent<InventoryComponent>().AddItem(testEquipment);
         
         MoveLevels(null, CurrentDungeon.maps[0], true);
 

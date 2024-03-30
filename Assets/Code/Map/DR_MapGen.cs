@@ -316,11 +316,39 @@ public class DR_MapGen
         return CreateMapFromGeneration(mapGen);
     }
 
-    public static DR_Map CreateMapFromImage(Texture2D MapTexture){
+    public static DR_Dungeon CreateDungeonTest(Texture2D mapTest)
+    {
+        DungeonGenInfo dungeonGenInfo = new DungeonGenInfo();
+        
+        DR_Dungeon dungeon = new DR_Dungeon();
+        dungeon.name = "Balance Test Dungeon";
+
+        for (int i = 0; i < dungeonGenInfo.floors; i++)
+        {
+            //calculate exp per enemy from i and dungeonGenInfo.levelIncreasePerFloor
+            int expectedFloorExperience = dungeonGenInfo.getExpectedExperience(i+1);
+            int expPerRoom = Mathf.RoundToInt(expectedFloorExperience / (float) dungeonGenInfo.roomsOnShortPath);
+            
+            //TODO: before doing more here, add an exp field to level component. For now only spawn one enemy type so
+            // the exp per enemy can be hardcoded
+            
+            dungeon.maps.Add(DR_MapGen.CreateMapFromImage(mapTest, i+1, i == dungeonGenInfo.floors - 1));
+        }
+        
+        //TODO:
+        // Have ENEMY spaces just be possible spaces for enemies (same for relics later)
+        // actual placement and what enemies are determined in their own step based on calculations
+        
+        return dungeon;
+    }
+
+    public static DR_Map CreateMapFromImage(Texture2D MapTexture, int depth = 1, bool lastFloor = false){
         int Width = MapTexture.width;
         int Height = MapTexture.height;
 
         MapGeneration mapGen = new MapGeneration(new Vector2Int(Width, Height));
+        mapGen.depth = depth;
+        mapGen.isLastFloor = lastFloor;
 
         Color[] Pixels = MapTexture.GetPixels();
 
@@ -341,7 +369,7 @@ public class DR_MapGen
                 bool isStairsDeeper = color.r > 0.9f && color.g < 0.1f && color.b < 0.1f;
                 bool isStairsShallower= color.r < 0.1f && color.g < 0.1f && color.b > 0.9f;
                 if (isStairsDeeper || isStairsShallower){
-                    mapGen.cells[y,x].type = isStairsDeeper ? MapGenCellType.STAIRS_DOWN : MapGenCellType.STAIRS_UP;
+                    mapGen.cells[y,x].type = isStairsDeeper ? (lastFloor ? MapGenCellType.GOAL : MapGenCellType.STAIRS_DOWN) : MapGenCellType.STAIRS_UP;
                 }
 
                 bool isEnemy = color.r > 0.9f && color.g < 0.6f && color.g > 0.4f && color.b < 0.1f;
@@ -401,20 +429,6 @@ public class DR_MapGen
                         newCell.bBlocksMovement = false;
                         //very temp item generation:
                         DR_Entity item = null;
-                        // int itemIndex = Random.Range(0, 3);
-                        // switch(itemIndex){
-                        //     case 0:
-                        //         item = EntityFactory.CreateHealingItem(gm.PotionTexture, "Health Potion", 4);
-                        //         break;
-                        //     case 1:
-                        //         item = EntityFactory.CreateMagicItem(gm.ShockTexture, "Shock Scroll", 5);
-                        //         break;
-                        //     case 2:
-                        //         item = EntityFactory.CreateTargetedMagicItem(gm.FireboltTexture, "Firebolt Scroll", 5);
-                        //         break;
-                        //     default:
-                        //         break;
-                        // }
                         
                         int itemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
                         item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);

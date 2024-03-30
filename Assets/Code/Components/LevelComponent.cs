@@ -7,6 +7,7 @@ using Unity.Mathematics;
 public class Stats{
     public int strength = 1;
     public int maxHealth = 1;
+    public int expGiven = 1;
 }
 
 public class LevelComponent : DR_Component
@@ -16,7 +17,7 @@ public class LevelComponent : DR_Component
     [Copy]
     public int level = 1;
     [Copy]
-    public int expGiven = 300;
+    public float expScale = 1.0f;
     [Copy]
     int currentExp = 0;
 
@@ -47,7 +48,7 @@ public class LevelComponent : DR_Component
     }
 
     public void AdvanceLevel(){
-        int requiredExp = GetRequiredExpForLevelUp();
+        int requiredExp = GetRequiredExpForLevelUp(level);
         currentExp-=requiredExp;
 
         level++;
@@ -56,33 +57,42 @@ public class LevelComponent : DR_Component
     }
 
     public bool RequiresLevelUp(){
-        int requiredExp = GetRequiredExpForLevelUp();
+        int requiredExp = GetRequiredExpForLevelUp(level);
         return (currentExp >= requiredExp);
     }
 
-    int GetRequiredExpForLevelUp(){
+    public static int GetRequiredExpForLevelUp(int currentLevel){
         int levelUpBase = 200;
         int levelUpFactor = 150;
 
-        return levelUpBase + (levelUpFactor * (level-1));
+        return levelUpBase + (levelUpFactor * (currentLevel-1));
     }
 
-    public void UpdateStats(){
-        //TODO: this should be defined somewhere else.
-        // Probably as its own scriptable object, which it itself would be set in the entity's content
+    public void UpdateStats() {
+
+        stats = GetLevelStats(level, this);
+        
+        HealthComponent healthComponent = Entity.GetComponent<HealthComponent>();
+        healthComponent.SetMaxHealth(stats.maxHealth);
+    }
+
+    public static Stats GetLevelStats(int level, LevelComponent comp) {
         Stats level1Stats = new Stats();
         level1Stats.strength = 1;
         level1Stats.maxHealth = 5;
+        level1Stats.expGiven = 100;
 
         Stats level50Stats = new Stats();
         level50Stats.strength = 100;
         level50Stats.maxHealth = 500;
-
+        level50Stats.expGiven = 500;
+        
         float levelFraction = (level-1) / 100.0f;
-        stats.strength = (int)(((1.0f-levelFraction) * level1Stats.strength) + (levelFraction * level50Stats.strength));
-        stats.maxHealth = Mathf.Max((int)(healthScale * (((1.0f-levelFraction) * level1Stats.maxHealth) + (levelFraction * level50Stats.maxHealth))), 1);
 
-        HealthComponent healthComponent = Entity.GetComponent<HealthComponent>();
-        healthComponent.SetMaxHealth(stats.maxHealth);
+        return new Stats {
+            strength = Mathf.CeilToInt(Mathf.Lerp(level1Stats.strength, level50Stats.strength, levelFraction)),
+            maxHealth = Mathf.CeilToInt(comp.healthScale * Mathf.Lerp(level1Stats.maxHealth, level50Stats.maxHealth, levelFraction)),
+            expGiven = Mathf.CeilToInt(comp.expScale * Mathf.Lerp(level1Stats.expGiven, level50Stats.expGiven, levelFraction))
+        };
     }
 }

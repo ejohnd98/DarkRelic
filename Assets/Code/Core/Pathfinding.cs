@@ -104,7 +104,7 @@ public class Pathfinding {
             result.steps.Reverse();
         }
         else {
-            Debug.LogWarning("Path not found from: " + a.x + ", " + a.y + " to " + b.x + ", " + b.y);
+            //Debug.LogWarning("Path not found from: " + a.x + ", " + a.y + " to " + b.x + ", " + b.y);
         }
 
         return result;

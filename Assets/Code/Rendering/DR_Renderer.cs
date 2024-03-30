@@ -64,6 +64,7 @@ public class DR_Renderer : MonoBehaviour
             for(int x = 0; x < currentMap.MapSize.x; x++){
                 GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
                 CellObjects.Add(new Vector2Int(x,y), NewCellObj);
+                NewCellObj.name = "Cell (" + x + ", " + y + ")";
             }
         }
 
@@ -86,7 +87,7 @@ public class DR_Renderer : MonoBehaviour
         DR_Map currentMap = DR_GameManager.instance.CurrentMap;
 
         foreach(DR_Entity entity in currentMap.Entities){
-            bool isVisible = currentMap.IsVisible[entity.Position.y, entity.Position.x];
+            bool isVisible = currentMap.IsVisible[entity.Position.y, entity.Position.x] || DR_GameManager.instance.debug_disableFOV;
             if (isVisible && !EntityObjects.ContainsKey(entity)){
                 AddEntityObj(entity);
             }
@@ -94,7 +95,7 @@ public class DR_Renderer : MonoBehaviour
 
         List<DR_Entity> entitiesToRemove = new List<DR_Entity>();
         foreach(DR_Entity entity in EntityObjects.Keys){
-            bool isVisible = currentMap.IsVisible[entity.Position.y, entity.Position.x];
+            bool isVisible = currentMap.IsVisible[entity.Position.y, entity.Position.x] || DR_GameManager.instance.debug_disableFOV;
             if (entity.noLongerValid || !entity.isOnMap || !isVisible){
                 entitiesToRemove.Add(entity);
             }

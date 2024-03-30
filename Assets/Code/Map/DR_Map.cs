@@ -13,6 +13,19 @@ public class DR_Map
 
     public List<DR_Entity> Entities;
 
+
+    public DR_Map()
+    {
+    }
+
+    public DR_Map(Vector2Int size)
+    {
+        MapSize = size;
+        Cells = new DR_Cell[size.y,size.x];
+        IsVisible = new bool[size.y,size.x];
+        IsKnown = new bool[size.y,size.x];
+        Entities = new List<DR_Entity>();
+    }
     public bool AddActor(DR_Entity Actor, Vector2Int pos){
         DR_Cell Cell = Cells[pos.y, pos.x];
         if(!Cell.BlocksMovement() && Cell.Actor == null){

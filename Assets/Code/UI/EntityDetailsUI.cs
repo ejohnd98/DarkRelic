@@ -15,13 +15,14 @@ public class EntityDetailsUI : MonoBehaviour
     public Image DetailsImage;
 
     public void SetEntity(DR_Entity newEntity){
-        entity = newEntity;
+        entity = newEntity ?? DR_GameManager.instance.GetPlayer();
         UpdateUI();
     }
 
     public void HideUI(){
-        entity = null;
-        DetailsUIParent.SetActive(false);
+        //entity = null;
+        //DetailsUIParent.SetActive(false);
+        SetEntity(DR_GameManager.instance.GetPlayer());
     }
 
     private void UpdateUI(){

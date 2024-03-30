@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 // Classes/Enums to be used by DR_MapGen (in their own file for readability)
 
@@ -19,6 +20,41 @@ public class MapGenInfo{
     // - required rooms (min/max room size)
     // - margins between rooms?
     // - loot? enemies?
+}
+
+public class DungeonGenInfo
+{
+    public Vector2Int mapSize;
+    public int floors = 5;
+    public int itemsPerFloor = 3;
+    public int roomsOnShortPath = 5;
+    public int levelIncreasePerFloor = 5;
+
+    public int getExpectedExperience(int depth) {
+        Assert.AreNotEqual(depth, 0);
+        
+        int startLevel = levelIncreasePerFloor * depth;
+        int endLevel = startLevel + levelIncreasePerFloor;
+
+        int expRequired = 0;
+        for (int i = startLevel; i < endLevel; i++)
+        {
+            expRequired += LevelComponent.GetRequiredExpForLevelUp(i);
+        }
+
+        return expRequired;
+    }
+
+    public int getFloorEnemyLevel(int depth) {
+        Assert.AreNotEqual(depth, 0);
+        return levelIncreasePerFloor * depth;
+    }
+
+    public Vector2Int getFloorSize(int floor)
+    {
+        // temp hardcoded value
+        return new Vector2Int(35, 35);
+    }
 }
 
 public enum MapGenCellType{
@@ -53,16 +89,16 @@ public class MapGenCell{
         type = cellType;
     }
 
-    //TODO: link this up to room array when placing a room
-    public int associatedRoomIndex = -1;
+    public MapGenRoom associatedRoom;
 }
+
 
 
 public class MapGenRoom{
 
     public Vector2Int pos, size;
 
-    public MapGenRoom(Vector2Int pos, Vector2Int size, int id){
+    public MapGenRoom(Vector2Int pos, Vector2Int size, int id = -1){
         this.pos = pos;
         this.size = size;
         this.roomId = id;

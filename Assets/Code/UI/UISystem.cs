@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -36,11 +37,14 @@ public class UISystem : MonoBehaviour
     void Awake()
     {
         instance = this;
-        if (detailsUI != null){
-            detailsUI.SetEntity(null);
-        }
-
         Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
+    }
+
+    private void Start()
+    {
+        if (detailsUI != null){
+            detailsUI.HideUI();
+        }
     }
 
     public void RefreshDetailsUI(){

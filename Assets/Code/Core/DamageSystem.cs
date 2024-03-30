@@ -99,7 +99,7 @@ public class DamageSystem
                 LevelComponent targetLevel = target.Entity.GetComponent<LevelComponent>();
                 LevelComponent attackerLevel = attacker.GetComponent<LevelComponent>();
                 if (targetLevel != null && attackerLevel != null){
-                    attackerLevel.GiveExp(targetLevel.expGiven);
+                    attackerLevel.GiveExp(targetLevel.stats.expGiven);
                 }
 
                 damageEvent.OnKill?.Invoke();
