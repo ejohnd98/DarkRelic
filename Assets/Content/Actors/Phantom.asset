@@ -54,8 +54,9 @@ MonoBehaviour:
       data:
         key: LevelComponent
         level: 1
-        expGiven: 300
+        expScale: 0.5
         healthScale: 0.5
+        strengthScale: 0.5
     - rid: 5068184619078123527
       type: {class: AIComponent, ns: , asm: Assembly-CSharp}
       data:

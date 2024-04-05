@@ -28,12 +28,11 @@ public class DungeonGenInfo
     public int floors = 5;
     public int itemsPerFloor = 3;
     public int roomsOnShortPath = 5;
-    public int levelIncreasePerFloor = 5;
+    public int startingLevel = 5;
+    public int levelIncreasePerFloor = 2;
 
     public int getExpectedExperience(int depth) {
-        Assert.AreNotEqual(depth, 0);
-        
-        int startLevel = levelIncreasePerFloor * depth;
+        int startLevel = startingLevel + (levelIncreasePerFloor * depth);
         int endLevel = startLevel + levelIncreasePerFloor;
 
         int expRequired = 0;
@@ -46,8 +45,7 @@ public class DungeonGenInfo
     }
 
     public int getFloorEnemyLevel(int depth) {
-        Assert.AreNotEqual(depth, 0);
-        return levelIncreasePerFloor * depth;
+        return startingLevel + (levelIncreasePerFloor * depth);
     }
 
     public Vector2Int getFloorSize(int floor)
@@ -97,12 +95,38 @@ public class MapGenCell{
 public class MapGenRoom{
 
     public Vector2Int pos, size;
+    public MapBlueprint mapBlueprint;
 
-    public MapGenRoom(Vector2Int pos, Vector2Int size, int id = -1){
+    public MapGenRoom(Vector2Int pos, Vector2Int size, MapBlueprint mapBlueprint){
         this.pos = pos;
         this.size = size;
-        this.roomId = id;
+        this.mapBlueprint = mapBlueprint;
     }
 
-    public int roomId = -1;
+    private static readonly Vector2Int[] possibleEnemyPositions = new Vector2Int[] {
+        new(1,1),
+        new(-1,-1),
+        new(-1,1),
+        new(1,-1),
+        //new(0,1),
+        new(0,-1),
+        new(-1,0),
+        new(1,-0)
+    };
+
+    public Vector2Int GetCenterPosition() {
+        return pos + new Vector2Int((Mathf.FloorToInt(size.x * 0.5f)), Mathf.FloorToInt(size.y * 0.5f));
+    }
+
+    public Vector2Int ReserveEnemyPosition() {
+        // Could predetermine what spots to use? (such as defining those in a prefab image)
+        foreach (Vector2Int offset in possibleEnemyPositions) {
+            Vector2Int potentialPos = pos + offset + new Vector2Int((Mathf.FloorToInt(size.x * 0.5f)), Mathf.FloorToInt(size.y * 0.5f));
+            if (mapBlueprint.cells[potentialPos.y, potentialPos.x].type == MapGenCellType.FLOOR) {
+                mapBlueprint.cells[potentialPos.y, potentialPos.x].type = MapGenCellType.ENEMY;
+                return potentialPos;
+            }
+        }
+        return -Vector2Int.one;
+    }
 }

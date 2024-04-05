@@ -24,6 +24,8 @@ public class LevelComponent : DR_Component
     //TODO: expand on this concept and have different enemies just have a scale applied to some generic set of stats
     [Copy]
     public float healthScale = 1.0f;
+    [Copy]
+    public float strengthScale = 1.0f;
 
     // This should not be copied as it will be created in OnComponentAdded
     public Stats stats;
@@ -80,17 +82,17 @@ public class LevelComponent : DR_Component
         Stats level1Stats = new Stats();
         level1Stats.strength = 1;
         level1Stats.maxHealth = 5;
-        level1Stats.expGiven = 100;
+        level1Stats.expGiven = 300;
 
         Stats level50Stats = new Stats();
         level50Stats.strength = 100;
         level50Stats.maxHealth = 500;
-        level50Stats.expGiven = 500;
+        level50Stats.expGiven = 1500;
         
         float levelFraction = (level-1) / 100.0f;
 
         return new Stats {
-            strength = Mathf.CeilToInt(Mathf.Lerp(level1Stats.strength, level50Stats.strength, levelFraction)),
+            strength = Mathf.CeilToInt(comp.strengthScale * Mathf.Lerp(level1Stats.strength, level50Stats.strength, levelFraction)),
             maxHealth = Mathf.CeilToInt(comp.healthScale * Mathf.Lerp(level1Stats.maxHealth, level50Stats.maxHealth, levelFraction)),
             expGiven = Mathf.CeilToInt(comp.expScale * Mathf.Lerp(level1Stats.expGiven, level50Stats.expGiven, levelFraction))
         };

@@ -63,6 +63,8 @@ public class DR_GameManager : MonoBehaviour
         CurrentDungeon = DungeonGenerator.GenerateDungeon();
 
         PlayerActor = EntityFactory.CreateEntityFromContent(playerContent);
+        PlayerActor.GetComponent<LevelComponent>().level = 5;
+        PlayerActor.GetComponent<LevelComponent>().UpdateStats();
 
         UISystem.instance.UpdateInventoryUI(PlayerActor);
 

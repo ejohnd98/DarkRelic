@@ -274,7 +274,7 @@ public class MapGeneration{
         PlaceCellType(x+1, x+width-1, y+1, y+height-1, MapGenCellType.FLOOR);
         
         placedRooms++;
-        MapGenRoom newRoom = new MapGenRoom(new Vector2Int(x,y), new Vector2Int(width, height), placedRooms);
+        MapGenRoom newRoom = new MapGenRoom(new Vector2Int(x,y), new Vector2Int(width, height), null);
         rooms.Add(newRoom);
 
         return true;
