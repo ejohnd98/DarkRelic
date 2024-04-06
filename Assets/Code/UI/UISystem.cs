@@ -22,6 +22,7 @@ public class UISystem : MonoBehaviour
 
     public static UISystem instance;
     public Transform HealthBarPivot; //TODO make healthbar wrapper class (so enemies can have health bars too)
+    public Transform ExpBarPivot;
     public EntityDetailsUI detailsUI;
     public InventoryUI inventoryUI;
     public DepthGaugeUI depthUI;
@@ -68,6 +69,7 @@ public class UISystem : MonoBehaviour
             return;
         }
         UpdateHealthBar();
+        UpdateExpBar();
 
         if (!DR_InputHandler.instance.mouseIsInWorld){
             DR_Renderer.instance.ResetSelectedCell();
@@ -96,6 +98,13 @@ public class UISystem : MonoBehaviour
         float HealthFraction = Mathf.Clamp01(PlayerHealth.currentHealth / (float) PlayerHealth.maxHealth);
 
         HealthBarPivot.localScale = new Vector3(HealthFraction, 1.0f, 1.0f);
+    }
+    
+    void UpdateExpBar(){
+        LevelComponent levelComponent = DR_GameManager.instance.GetPlayer().GetComponent<LevelComponent>();
+        float ExpFraction = Mathf.Clamp01(levelComponent.currentExp / (float) LevelComponent.GetRequiredExpForLevelUp(levelComponent.level));
+
+        ExpBarPivot.localScale = new Vector3(ExpFraction, 1.0f, 1.0f);
     }
 
     public void SetUIAction(DR_Action action){
