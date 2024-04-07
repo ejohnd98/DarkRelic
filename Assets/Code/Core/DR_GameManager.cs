@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.SceneManagement;
@@ -14,11 +15,13 @@ public class DR_GameManager : MonoBehaviour
         INVALID
     }
 
+    public bool isFadeActive = false;
+
     public int entitesCreated = 0; //used to give IDs
 
     public static DR_GameManager instance;
 
-    GameState CurrentState = GameState.INVALID;
+    public GameState CurrentState = GameState.INVALID;
 
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
@@ -41,7 +44,9 @@ public class DR_GameManager : MonoBehaviour
     DR_Entity PlayerActor;
     DR_Entity BossActor;
 
+    [HideInInspector]
     public TurnSystem turnSystem;
+    public ImageFadeToggle blackOverlay;
 
     public static KeyCode[] KeyDirections = {KeyCode.UpArrow, KeyCode.RightArrow, KeyCode.DownArrow, KeyCode.LeftArrow};
     public static KeyCode[] NumberKeys = {KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5,
@@ -100,7 +105,7 @@ public class DR_GameManager : MonoBehaviour
         // PlayerActor.GetComponent<InventoryComponent>().AddItem(item3);
         // PlayerActor.GetComponent<InventoryComponent>().AddItem(testEquipment);
         
-        MoveLevels(null, CurrentDungeon.maps[0], true);
+        MoveLevels(null, CurrentDungeon.maps[0], true, false);
 
         //Temp placement of boss enemy besides goal
         DR_Map lastMap = CurrentDungeon.maps[CurrentDungeon.maps.Count-1];
@@ -125,6 +130,8 @@ public class DR_GameManager : MonoBehaviour
         SetGameState(GameState.ADVANCE_GAME);
         UISystem.instance.RefreshDetailsUI();
         UISystem.instance.UpdateDepthUI();
+
+        blackOverlay.SetShouldBeVisible(false);
     }
 
     void Update()
@@ -166,7 +173,7 @@ public class DR_GameManager : MonoBehaviour
                 break;
         }
 
-        if (CurrentState != GameState.ANIMATING && DR_Renderer.animsActive > 0){
+        if (CurrentState != GameState.ANIMATING && CurrentState != GameState.ANIMATING && DR_Renderer.animsActive > 0){
             SetGameState(GameState.ANIMATING);
         }
 
@@ -235,16 +242,45 @@ public class DR_GameManager : MonoBehaviour
     // they appear when mousing over in details panel, but have no sprite (perhaps not being removed from entities array)
     // they can still attack player
     // --- BUG! ---
-    public void MoveLevels(DR_Map origin, DR_Map destination, bool goingDeeper){
-        if (origin == destination){
+    public void MoveLevels(DR_Map origin, DR_Map destination, bool goingDeeper, bool useTransition = false) {
+        if (origin == destination) {
             return;
         }
 
+        if (!useTransition) {
+            LoadNextLevel(origin, destination, goingDeeper);
+            return;
+        }
+        
+        Action OnFadeOut = null;
+        OnFadeOut = () => {
+            blackOverlay.OnVisibleComplete -= OnFadeOut;
+            LoadNextLevel(origin, destination, goingDeeper);
+            blackOverlay.SetShouldBeVisible(false);
+            //turnSystem.UpdateEntityLists(CurrentMap);
+            //SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+            //DR_Renderer.instance.CreateTiles();
+            isFadeActive = false;
+        };
+        Action OnFadeIn = null;
+        OnFadeIn = () => {
+            blackOverlay.OnVisibleComplete -= OnFadeIn;
+        };
+        
+        blackOverlay.OnVisibleComplete += OnFadeOut;
+        blackOverlay.OnInvisibleComplete += OnFadeIn;
+        
+        isFadeActive = true;
+        blackOverlay.SetShouldBeVisible(true);
+    }
+
+    private void LoadNextLevel(DR_Map origin, DR_Map destination, bool goingDeeper) {
+        
         if (origin != null){
             origin.RemoveActor(PlayerActor);
             CurrentDungeon.SetNextMap(goingDeeper);
         }
-
+        
         Vector2Int newPos = destination.GetStairPosition(!goingDeeper);
         destination.AddActor(PlayerActor, newPos);
         

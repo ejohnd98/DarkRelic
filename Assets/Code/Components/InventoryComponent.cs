@@ -73,6 +73,7 @@ public class InventoryComponent : DR_Component
     public bool AddItem(DR_Entity item){
         if (item.GetComponent<RelicComponent>() is RelicComponent relicComponent)
         {
+            SoundSystem.instance.PlaySound("relic");
             RelicType relicType = relicComponent.relicType;
             if (RelicInventory.ContainsKey(relicType))
             {

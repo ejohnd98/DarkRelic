@@ -5,6 +5,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UISystem : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class UISystem : MonoBehaviour
         NORMAL, //come up with better name?
         SELECTING_TARGET,
         MAIN_MENU,
+        FADING,
 
         INVALID
     }

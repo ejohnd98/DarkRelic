@@ -86,6 +86,12 @@ public class DamageSystem
         }
 
         if(target != null){
+            //Debug testing
+            if (attacker.HasComponent<PlayerComponent>() && Input.GetKey(KeyCode.LeftShift)) {
+                damageEvent.addedDamage = 999;
+            }
+            
+            
             target.TakeDamage(damageEvent.GetResultingDamage());
 
             damageEvent.OnAttack?.Invoke();
@@ -114,6 +120,8 @@ public class DamageSystem
             if (target.Entity.HasComponent<PlayerComponent>()){
                 cameraShakeAmount *= 1.5f;
             }
+            
+            SoundSystem.instance.PlaySound(damageEvent.killed ? "death" : "attack");
 
             CameraShake.ShakeCamera(cameraShakeAmount);
         }

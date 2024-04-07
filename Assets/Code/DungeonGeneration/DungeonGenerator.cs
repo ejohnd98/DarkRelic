@@ -51,6 +51,7 @@ public class DungeonGenerator {
 
         mapBlueprint.GetCell(mapBlueprint.rooms[2].GetCenterPosition()).type = MapGenCellType.ALTAR;
         mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up).type = MapGenCellType.ALTAR;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.down).type = MapGenCellType.ITEM;
         
 
         // Create stairs + door entities
@@ -142,6 +143,10 @@ public class DungeonGenerator {
         
 
         // Create item entities
+        Vector2Int itemPos = mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.down;
+        int itemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
+        var item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
+        mapBlueprint.entitiesToPlace.Add(itemPos, item);
         
 
         DR_Map newMap = CreateMapFromBlueprint(mapBlueprint);

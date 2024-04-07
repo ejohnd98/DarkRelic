@@ -55,7 +55,7 @@ public class MoveAnimation : DR_Animation {
         return isAnimating? current : Entity.GetPosFloat(depth);
     }
 
-    public void SetAnim(Vector2Int target, float time = 0.15f, EaseType easeType = EaseType.QuadEaseOut){
+    public void SetAnim(Vector2Int target, float time = 0.1f, EaseType easeType = EaseType.QuadEaseOut){
         start = Entity.GetPosFloat(DR_Renderer.GetDepthForEntity(Entity));
         end = start;
         end.x = target.x;

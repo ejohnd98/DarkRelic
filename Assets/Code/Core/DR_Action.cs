@@ -143,6 +143,8 @@ public class MoveAction : DR_Action {
             moveAnim = owner.AddComponent<MoveAnimation>(new());
             moveAnim.SetAnim(pos);
             AnimationSystem.AddAnimation(moveAnim);
+            
+            SoundSystem.instance.PlaySound("move2");
 
             moveAnim.AnimFinished += (DR_Animation moveAnim) => {
                 EndAction(gm);
@@ -227,8 +229,19 @@ public class StairAction : DR_Action {
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
-        gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper);
+        gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper, true);
+        SoundSystem.instance.PlaySound(stairs.goesDeeper ? "descend" : "ascend");
         //return true;
+    }
+
+    public override void ActionStep(DR_GameManager gm, float deltaTime) {
+        if (!hasStarted || hasFinished){
+            return;
+        }
+
+        if (!DR_GameManager.instance.isFadeActive) {
+            EndAction(gm);
+        }
     }
 }
 
@@ -243,6 +256,7 @@ public class DoorAction : DR_Action {
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
         target.ToggleOpen();
+        SoundSystem.instance.PlaySound("door");
         EndAction(gm);
     }
 }
@@ -258,6 +272,7 @@ public class GoalAction : DR_Action {
 
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
+        SoundSystem.instance.PlaySound("relic");
         gm.OnGameWon();
         //return true;
     }
@@ -286,6 +301,9 @@ public class AltarAction : DR_Action {
         HealthComponent healthComponent = owner.GetComponent<HealthComponent>();
         healthRestored = healthComponent.HealFully();
         wasSuccess = healthRestored > 0;
+        if (wasSuccess) {
+            SoundSystem.instance.PlaySound("altar");
+        }
     }
 }
 
