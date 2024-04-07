@@ -49,6 +49,10 @@ public class DungeonGenerator {
         mapBlueprint.GetCell(mapBlueprint.rooms[0].GetCenterPosition()).type = MapGenCellType.STAIRS_UP;
         mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition()).type = (depth == dungeonGenInfo.floors-1) ? MapGenCellType.GOAL : MapGenCellType.STAIRS_DOWN;
 
+        mapBlueprint.GetCell(mapBlueprint.rooms[2].GetCenterPosition()).type = MapGenCellType.ALTAR;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up).type = MapGenCellType.ALTAR;
+        
+
         // Create stairs + door entities
         for (int y = 0; y < mapSize.y; y++) {
             for (int x = 0; x < mapSize.x; x++) {
@@ -67,6 +71,9 @@ public class DungeonGenerator {
                         break;
                     case MapGenCellType.GOAL:
                         newEntity = EntityFactory.CreateGoal(gm.GoalTexture);
+                        break;
+                    case MapGenCellType.ALTAR:
+                        newEntity = EntityFactory.CreateEntityFromContent(gm.altarContent);
                         break;
                 }
 

@@ -32,6 +32,10 @@ public class HealthComponent : DR_Component
         return recovered;
     }
 
+    public int HealFully() {
+        return Heal(maxHealth - currentHealth);
+    }
+
     public bool IsAlive(){
         return currentHealth > 0;
     }

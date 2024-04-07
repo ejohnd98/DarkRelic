@@ -267,6 +267,28 @@ public class GoalAction : DR_Action {
     }
 }
 
+public class AltarAction : DR_Action {
+    public AltarComponent altar;
+    private int healthRestored = 0;
+
+    public AltarAction (DR_Entity owner, AltarComponent altar){
+        this.owner = owner;
+        this.altar = altar;
+        loggable = true;
+    }
+
+    public override string GetLogText(){
+        return healthRestored + " health was restored to " + owner.Name + " by the altar.";
+    }
+
+    public override void StartAction(DR_GameManager gm){
+        base.StartAction(gm);
+        HealthComponent healthComponent = owner.GetComponent<HealthComponent>();
+        healthRestored = healthComponent.HealFully();
+        wasSuccess = healthRestored > 0;
+    }
+}
+
 public class ItemAction : DR_Action {
     public DR_Entity target;
     public DR_Entity item;

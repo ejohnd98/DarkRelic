@@ -1581,10 +1581,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+    x: 0.16666667
+    y: 0.13927856
+    width: 0.6666667
+    height: 0.7214429
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -3373,10 +3373,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
+    x: 0.16666667
+    y: 0.13927856
+    width: 0.6666667
+    height: 0.7214429
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -4266,6 +4266,7 @@ MonoBehaviour:
   relicPickupContentArray:
   - {fileID: 11400000, guid: adddb8fb11ad25b4f9849f82c804bb16, type: 2}
   - {fileID: 11400000, guid: 6431098bfc789704698a9e52856a17a2, type: 2}
+  altarContent: {fileID: 11400000, guid: 64c5dbd6b1226a147ba747fb89846ad1, type: 2}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   cameraOffset: {x: 4, y: -3, z: 0}

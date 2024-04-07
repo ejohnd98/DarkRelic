@@ -217,7 +217,12 @@ public class TurnSystem : MonoBehaviour
                     actionList.Add(new MoveAction(playerActor, interactPos));
                 }
 
-                if (targetCell.Prop != null){
+                if (targetCell.Prop != null) {
+                    AltarComponent altar = targetCell.Prop.GetComponent<AltarComponent>();
+                    if (altar != null) {
+                        actionList.Add(new AltarAction(playerActor, altar));
+                    }
+                    
                     DoorComponent door = targetCell.Prop.GetComponent<DoorComponent>();
                     if (door != null){
                         actionList.Add(new DoorAction(door, playerActor));

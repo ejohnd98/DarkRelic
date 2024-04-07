@@ -64,6 +64,7 @@ public enum MapGenCellType{
     ITEM,
     STAIRS_UP,
     STAIRS_DOWN,
+    ALTAR,
     GOAL
 }
 
