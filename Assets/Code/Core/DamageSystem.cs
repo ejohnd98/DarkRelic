@@ -111,6 +111,12 @@ public class DamageSystem
                 damageEvent.OnKill?.Invoke();
                 FXSpawner.instance.SpawnDeathFX(target.Entity);
 
+                //Handle blood
+                DR_Cell cell = gm.CurrentMap.GetCell(target.Entity.Position);
+                cell.blood += Mathf.CeilToInt(target.maxHealth / 2);
+                DR_Renderer.instance.SetCellBloodState(target.Entity.Position, cell.blood > 0);
+
+
                 //TODO: make this better. have class to handle "garbage collecting" of entities
                 target.Entity.noLongerValid = true;
                 gm.CurrentMap.RemoveActor(target.Entity);

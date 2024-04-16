@@ -24,6 +24,9 @@ public class InventoryUI : MonoBehaviour
     
     public TextMeshProUGUI tempRelicText;
 
+    public TextMeshProUGUI bloodText;
+    public TextMeshProUGUI bloodShadowText;
+
     private void Awake() {
         ItemButtons = new List<GameObject>();
         EquipmentButtons = new List<GameObject>();
@@ -71,6 +74,9 @@ public class InventoryUI : MonoBehaviour
                     tempRelicText.text += pair.Key.ToString() + ": " + pair.Value;
                 }
             }
+
+            bloodText.text = inventory.blood.ToString();
+            bloodShadowText.text = inventory.blood.ToString();
             
             for (int i = 0; i < inventory.items.Count; i++){
                 DR_Entity item = inventory.items[i];

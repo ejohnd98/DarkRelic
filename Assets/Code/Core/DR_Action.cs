@@ -165,6 +165,30 @@ public class MoveAction : DR_Action {
             return;
         }
     }
+
+    public override void EndAction(DR_GameManager gm)
+    {
+        base.EndAction(gm);
+        if (!wasSuccess){
+            return;
+        }
+
+        DR_Cell cell = gm.CurrentMap.GetCell(pos);
+
+        if (cell.blood > 0){
+            if (owner.GetComponent<InventoryComponent>() is InventoryComponent inventory && inventory.canCollectBlood){
+                //TODO: later have a handler for this as relics will affect stuff here when getting blood
+
+                inventory.blood += cell.blood;
+                UISystem.instance.RefreshInventoryUI();
+                cell.blood = 0;
+                DR_Renderer.instance.SetCellBloodState(pos, cell.blood > 0);
+            }
+        }
+
+
+        
+    }
 }
 
 public class AttackAction : DR_Action {

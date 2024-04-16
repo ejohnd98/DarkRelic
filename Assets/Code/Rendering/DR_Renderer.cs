@@ -182,6 +182,14 @@ public class DR_Renderer : MonoBehaviour
         }
     }
 
+    //TODO: this function should not be being called from elsewhere really
+    // instead perhaps each cell object can subscribe to an event on the DR_Cell?
+    public void SetCellBloodState(Vector2Int pos, bool isBloody){
+        if (CellObjects.ContainsKey(pos)){
+            CellObjects[pos].GetComponent<CellObj>().SetBlood(isBloody);
+        }
+    }
+
     public static float GetDepthForEntity(DR_Entity entity){
         if (entity.HasComponent<PropComponent>()){
             return PropDepth;

@@ -17,13 +17,22 @@ MonoBehaviour:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
   - rid: 5068184619078123522
-  - rid: 5068184619078123523
   - rid: 5068184619078123524
+  - rid: 3012876634216988672
   - rid: 5068184619078123525
   - rid: 5068184619078123526
   references:
     version: 2
     RefIds:
+    - rid: 3012876634216988672
+      type: {class: InventoryComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: InventoryComponent
+        capacity: 25
+        maxEquips: 10
+        canCollectBlood: 1
+        blood: 0
+        equippedItems: 0
     - rid: 5068184619078123520
       type: {class: AlignmentComponent, ns: , asm: Assembly-CSharp}
       data:
@@ -45,13 +54,6 @@ MonoBehaviour:
         - {fileID: -2065779700, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
         - {fileID: -35984604, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
         animLength: 1
-    - rid: 5068184619078123523
-      type: {class: InventoryComponent, ns: , asm: Assembly-CSharp}
-      data:
-        key: InventoryComponent
-        capacity: 25
-        maxEquips: 10
-        equippedItems: 0
     - rid: 5068184619078123524
       type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
       data:

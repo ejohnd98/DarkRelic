@@ -8,6 +8,7 @@ public class CellObj : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer overlayRenderer;
+    public SpriteRenderer bloodOverlay;
 
     public bool hasAnimation = false;
     public Sprite[] animFrames;
@@ -17,6 +18,11 @@ public class CellObj : MonoBehaviour
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
+    }
+
+    public void SetBlood(bool hasBlood){
+        //TODO: later could use different sprites depending on amount
+        bloodOverlay.gameObject.SetActive(hasBlood);
     }
 
     public void SetSelected(bool selected){
