@@ -179,7 +179,7 @@ public class MoveAction : DR_Action {
             if (owner.GetComponent<InventoryComponent>() is InventoryComponent inventory && inventory.canCollectBlood){
                 //TODO: later have a handler for this as relics will affect stuff here when getting blood
 
-                inventory.blood += cell.blood;
+                inventory.AddBlood(cell.blood);
                 UISystem.instance.RefreshInventoryUI();
                 cell.blood = 0;
                 DR_Renderer.instance.SetCellBloodState(pos, cell.blood > 0);
@@ -296,7 +296,7 @@ public class GoalAction : DR_Action {
 
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
-        SoundSystem.instance.PlaySound("relic");
+        SoundSystem.instance.PlaySound("altar");
         gm.OnGameWon();
         //return true;
     }
@@ -309,6 +309,7 @@ public class GoalAction : DR_Action {
 public class AltarAction : DR_Action {
     public AltarComponent altar;
     private int healthRestored = 0;
+    private int bloodCost = 0;
 
     public AltarAction (DR_Entity owner, AltarComponent altar){
         this.owner = owner;
@@ -317,13 +318,18 @@ public class AltarAction : DR_Action {
     }
 
     public override string GetLogText(){
-        return healthRestored + " health was restored to " + owner.Name + " by the altar.";
+        return owner.Name + " spent " + bloodCost + " blood at the altar to heal " + healthRestored + ".";
     }
 
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
         HealthComponent healthComponent = owner.GetComponent<HealthComponent>();
-        healthRestored = healthComponent.HealFully();
+        InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
+
+        bloodCost = Mathf.Min(healthComponent.maxHealth - healthComponent.currentHealth, inventoryComponent.blood);
+
+        healthRestored = healthComponent.Heal(bloodCost);
+        inventoryComponent.SpendBlood(healthRestored);
         wasSuccess = healthRestored > 0;
         if (wasSuccess) {
             SoundSystem.instance.PlaySound("altar");

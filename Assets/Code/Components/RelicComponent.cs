@@ -6,6 +6,7 @@ public enum RelicType
 {
     DAMAGE_RELIC,
     SPEED_RELIC,
+    HEALTH_RELIC,
     NONE
 }
 

@@ -50,7 +50,7 @@ public class DamageSystem
         if (attacker.GetComponent<InventoryComponent>() is InventoryComponent inventory
             && inventory.RelicInventory.ContainsKey(RelicType.DAMAGE_RELIC))
         {
-            modifiedDamage += inventory.RelicInventory[RelicType.DAMAGE_RELIC];
+            modifiedDamage = Mathf.CeilToInt(modifiedDamage * (1.0f + (inventory.RelicInventory[RelicType.DAMAGE_RELIC] * 0.05f)));
             Debug.Log("Orig: " + damage + ", modified: " + modifiedDamage);
         }
         
@@ -113,7 +113,7 @@ public class DamageSystem
 
                 //Handle blood
                 DR_Cell cell = gm.CurrentMap.GetCell(target.Entity.Position);
-                cell.blood += Mathf.CeilToInt(target.maxHealth / 2);
+                cell.blood += Mathf.CeilToInt(target.maxHealth / 4);
                 DR_Renderer.instance.SetCellBloodState(target.Entity.Position, cell.blood > 0);
 
 

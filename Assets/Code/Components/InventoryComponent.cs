@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -87,6 +88,7 @@ public class InventoryComponent : DR_Component
             {
                 RelicInventory[relicType] = 1;
             }
+            Entity.GetComponent<LevelComponent>().UpdateStats();
             UISystem.instance.RefreshInventoryUI();
             return true;
         }
@@ -101,5 +103,17 @@ public class InventoryComponent : DR_Component
             return true;
         }
         return false;
+    }
+
+    public void AddBlood(int amount)
+    {
+        blood += amount;
+        UISystem.instance.RefreshInventoryUI();
+    }
+
+    public void SpendBlood(int amount)
+    {
+        blood -= amount;
+        UISystem.instance.RefreshInventoryUI();
     }
 }

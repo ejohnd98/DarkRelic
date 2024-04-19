@@ -51,7 +51,9 @@ public class DungeonGenerator {
 
         mapBlueprint.GetCell(mapBlueprint.rooms[2].GetCenterPosition()).type = MapGenCellType.ALTAR;
         mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up).type = MapGenCellType.ALTAR;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.down).type = MapGenCellType.ITEM;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up * 3).type = MapGenCellType.ITEM;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.right * 3).type = MapGenCellType.ITEM;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.left * 3).type = MapGenCellType.ITEM;
         
 
         // Create stairs + door entities
@@ -76,6 +78,13 @@ public class DungeonGenerator {
                     case MapGenCellType.ALTAR:
                         newEntity = EntityFactory.CreateEntityFromContent(gm.altarContent);
                         break;
+                    // Temporarily do this here
+                    case MapGenCellType.ITEM:
+                        Vector2Int itemPos = new Vector2Int(x,y);
+                        int itemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
+                        var item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
+                        mapBlueprint.entitiesToPlace.Add(itemPos, item);
+                        break;
                 }
 
                 if (newEntity != null) {
@@ -85,9 +94,9 @@ public class DungeonGenerator {
         }
 
         // Create enemy entities
-        int experienceBudget = (int)(dungeonGenInfo.getExpectedExperience(depth));
+        int experienceBudget = dungeonGenInfo.getExpectedExperience(depth);
         
-        // Later: select enemies based on level, floor theme, etc
+        // TODO: select enemies based on level, floor theme, etc
         List<Content> floorEnemies = gm.enemyContentArray;
         
         // Figure out when we stop spawning enemies
@@ -142,11 +151,7 @@ public class DungeonGenerator {
         Debug.Log("Floor " + (depth + 1) + ": leftover budget " + experienceBudget + "/" + dungeonGenInfo.getExpectedExperience(depth+1) + ". lowest exp enemy is " + lowestExpEnemy);
         
 
-        // Create item entities
-        Vector2Int itemPos = mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.down;
-        int itemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
-        var item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
-        mapBlueprint.entitiesToPlace.Add(itemPos, item);
+        // TODO: Create item entities here later
         
 
         DR_Map newMap = CreateMapFromBlueprint(mapBlueprint);

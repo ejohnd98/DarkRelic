@@ -14,9 +14,14 @@ public class AnimationSystem {
 
     //TODO rework to allow queueing up of animations (like in C++ version of project)
     public static void UpdateAnims(float time){
+        float debugTimeMod = 1.0f;
+        if (Input.GetKey(KeyCode.LeftControl)){
+            debugTimeMod = 5.0f;
+        }
+
         for (int i = 0; i < animationList.Count; i++){
             DR_Animation anim = animationList[i];
-            anim.AnimStep(time);
+            anim.AnimStep(time * debugTimeMod);
             if (!anim.isAnimating){
                 animationList.RemoveAt(i);
                 anim.Entity.RemoveComponent(anim);

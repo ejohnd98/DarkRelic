@@ -73,6 +73,12 @@ public class LevelComponent : DR_Component
     public void UpdateStats() {
 
         stats = GetLevelStats(level, this);
+
+        if (Entity.GetComponent<InventoryComponent>() is InventoryComponent inventory
+            && inventory.RelicInventory.ContainsKey(RelicType.HEALTH_RELIC))
+        {
+            stats.maxHealth = Mathf.CeilToInt(stats.maxHealth * (1.0f + (inventory.RelicInventory[RelicType.HEALTH_RELIC] * 0.05f)));
+        }
         
         HealthComponent healthComponent = Entity.GetComponent<HealthComponent>();
         healthComponent.SetMaxHealth(stats.maxHealth);
