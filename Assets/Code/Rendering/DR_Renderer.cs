@@ -65,6 +65,8 @@ public class DR_Renderer : MonoBehaviour
                 GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
                 CellObjects.Add(new Vector2Int(x,y), NewCellObj);
                 NewCellObj.name = "Cell (" + x + ", " + y + ")";
+
+                NewCellObj.GetComponent<CellObj>().SetBlood(currentMap.GetCell(new Vector2Int(x,y)));
             }
         }
 
@@ -184,9 +186,9 @@ public class DR_Renderer : MonoBehaviour
 
     //TODO: this function should not be being called from elsewhere really
     // instead perhaps each cell object can subscribe to an event on the DR_Cell?
-    public void SetCellBloodState(Vector2Int pos, bool isBloody){
+    public void SetCellBloodState(Vector2Int pos, DR_Cell cell){
         if (CellObjects.ContainsKey(pos)){
-            CellObjects[pos].GetComponent<CellObj>().SetBlood(isBloody);
+            CellObjects[pos].GetComponent<CellObj>().SetBlood(cell);
         }
     }
 

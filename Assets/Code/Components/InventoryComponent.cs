@@ -108,6 +108,7 @@ public class InventoryComponent : DR_Component
     public void AddBlood(int amount)
     {
         blood += amount;
+        SoundSystem.instance.PlaySound("addBlood");
         UISystem.instance.RefreshInventoryUI();
     }
 

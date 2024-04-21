@@ -9,6 +9,7 @@ public class DR_Cell
     public DR_Entity Prop;
     public DR_Entity Item;
     public int blood = 0;
+    public bool bloodStained = false;
 
     public bool BlocksMovement(bool ignoreActor = false){
         if(!ignoreActor && Actor != null){

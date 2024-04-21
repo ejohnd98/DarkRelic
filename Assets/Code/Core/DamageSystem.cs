@@ -113,8 +113,9 @@ public class DamageSystem
 
                 //Handle blood
                 DR_Cell cell = gm.CurrentMap.GetCell(target.Entity.Position);
-                cell.blood += Mathf.CeilToInt(target.maxHealth / 4);
-                DR_Renderer.instance.SetCellBloodState(target.Entity.Position, cell.blood > 0);
+                cell.blood += Mathf.Max(Mathf.CeilToInt(target.maxHealth * 0.25f), 1);
+                cell.bloodStained = true;
+                DR_Renderer.instance.SetCellBloodState(target.Entity.Position, cell);
 
 
                 //TODO: make this better. have class to handle "garbage collecting" of entities

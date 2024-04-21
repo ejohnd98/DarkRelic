@@ -182,7 +182,7 @@ public class MoveAction : DR_Action {
                 inventory.AddBlood(cell.blood);
                 UISystem.instance.RefreshInventoryUI();
                 cell.blood = 0;
-                DR_Renderer.instance.SetCellBloodState(pos, cell.blood > 0);
+                DR_Renderer.instance.SetCellBloodState(pos, cell);
             }
         }
 

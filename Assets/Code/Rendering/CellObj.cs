@@ -8,6 +8,7 @@ public class CellObj : MonoBehaviour
 {
     public SpriteRenderer spriteRenderer;
     public SpriteRenderer overlayRenderer;
+    public SpriteRenderer bloodStainOverlay;
     public SpriteRenderer bloodOverlay;
 
     public bool hasAnimation = false;
@@ -20,9 +21,10 @@ public class CellObj : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    public void SetBlood(bool hasBlood){
+    public void SetBlood(DR_Cell cell){
         //TODO: later could use different sprites depending on amount
-        bloodOverlay.gameObject.SetActive(hasBlood);
+        bloodOverlay.gameObject.SetActive(cell.blood > 0);
+        bloodStainOverlay.gameObject.SetActive(cell.bloodStained);
     }
 
     public void SetSelected(bool selected){
