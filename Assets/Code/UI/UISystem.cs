@@ -87,11 +87,7 @@ public class UISystem : MonoBehaviour
 
             LastMousePos = MousePos;
             ShouldUpdateDetailsUI = false;
-            DR_Entity MousedOverEntity = DR_GameManager.instance.CurrentMap.GetActorAtPosition(MousePos);
-            if (MousedOverEntity == null){
-                MousedOverEntity = DR_GameManager.instance.CurrentMap.GetItemAtPosition(MousePos);
-            }
-            detailsUI.SetEntity(MousedOverEntity);
+            detailsUI.SetCell(DR_GameManager.instance.CurrentMap.GetCell(MousePos));
         }
     }
 

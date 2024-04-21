@@ -72,7 +72,7 @@ public class DR_GameManager : MonoBehaviour
         PlayerActor.GetComponent<LevelComponent>().level = 5;
         PlayerActor.GetComponent<LevelComponent>().UpdateStats();
 
-        UISystem.instance.UpdateInventoryUI(PlayerActor);
+        //UISystem.instance.UpdateInventoryUI(PlayerActor);
 
         BossActor = EntityFactory.CreateActor(BossTexture, "Boss", Alignment.ENEMY, 10);
         BossActor.AddComponent<AIComponent>(new AIComponent());

@@ -96,8 +96,10 @@ public class InventoryUI : MonoBehaviour
 
                 itemButton.SetEntity(item);
                 itemButton.OnMouseDownEvents.AddListener(() => {OnItemClicked(item, entity, entity);});
-                itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetEntity(item);});
-                itemButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.HideUI();});
+
+                // This no longer works, but items are TBD anyways. If wanting to do this again, allow details to focus on specific entity OR a tile
+                //itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetEntity(item);});
+                //itemButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.HideUI();});
             }
 
             for (int i = inventory.items.Count - inventory.equippedItems; i < inventory.capacity; i++){
