@@ -21,7 +21,7 @@ public class EntityDetailsUI : MonoBehaviour
 
     public void HideUI(){
         //entity = null;
-        SetCell(null);
+        //SetCell(null);
         //DetailsUIParent.SetActive(false);
         //SetEntity(DR_GameManager.instance.GetPlayer());
     }
