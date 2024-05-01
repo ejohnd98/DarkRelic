@@ -75,6 +75,11 @@ public class InventoryComponent : DR_Component
         return null;
     }
 
+    public bool AddItemFromContent(Content content){
+        DR_Entity newItem = EntityFactory.CreateEntityFromContent(content);
+        return AddItem(newItem);
+    }
+
     public bool AddItem(DR_Entity item){
         if (item.GetComponent<RelicComponent>() is RelicComponent relicComponent)
         {

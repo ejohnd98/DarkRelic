@@ -49,11 +49,11 @@ public class DungeonGenerator {
         mapBlueprint.GetCell(mapBlueprint.rooms[0].GetCenterPosition()).type = MapGenCellType.STAIRS_UP;
         mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition()).type = (depth == dungeonGenInfo.floors-1) ? MapGenCellType.GOAL : MapGenCellType.STAIRS_DOWN;
 
-        mapBlueprint.GetCell(mapBlueprint.rooms[2].GetCenterPosition()).type = MapGenCellType.ALTAR;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up).type = MapGenCellType.ALTAR;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up * 3).type = MapGenCellType.ITEM;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.right * 3).type = MapGenCellType.ITEM;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.left * 3).type = MapGenCellType.ITEM;
+        mapBlueprint.GetCell(mapBlueprint.rooms[2].GetCenterPosition()).type = MapGenCellType.HEALTH_ALTAR;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up).type = MapGenCellType.HEALTH_ALTAR;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up * 3).type = MapGenCellType.ITEM_ALTAR;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.right * 3).type = MapGenCellType.ITEM_ALTAR;
+        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.left * 3).type = MapGenCellType.ITEM_ALTAR;
         
 
         // Create stairs + door entities
@@ -75,8 +75,14 @@ public class DungeonGenerator {
                     case MapGenCellType.GOAL:
                         newEntity = EntityFactory.CreateGoal(gm.GoalTexture);
                         break;
-                    case MapGenCellType.ALTAR:
-                        newEntity = EntityFactory.CreateEntityFromContent(gm.altarContent);
+                    case MapGenCellType.HEALTH_ALTAR:
+                        newEntity = EntityFactory.CreateEntityFromContent(gm.healthAltarContent);
+                        break;
+                    case MapGenCellType.ITEM_ALTAR:
+                        newEntity = EntityFactory.CreateEntityFromContent(gm.itemAltarContent);
+                        //Temporarily do this here:
+                        int altarItemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
+                        newEntity.GetComponent<AltarComponent>().itemAltarContent = gm.relicPickupContentArray[altarItemIndex];
                         break;
                     // Temporarily do this here
                     case MapGenCellType.ITEM:

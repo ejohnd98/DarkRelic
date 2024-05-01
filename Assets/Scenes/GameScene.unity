@@ -4774,7 +4774,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: adddb8fb11ad25b4f9849f82c804bb16, type: 2}
   - {fileID: 11400000, guid: 6431098bfc789704698a9e52856a17a2, type: 2}
   - {fileID: 11400000, guid: e6202f6bd355102419dc9aec1c275c66, type: 2}
-  altarContent: {fileID: 11400000, guid: 64c5dbd6b1226a147ba747fb89846ad1, type: 2}
+  healthAltarContent: {fileID: 11400000, guid: 64c5dbd6b1226a147ba747fb89846ad1, type: 2}
+  itemAltarContent: {fileID: 11400000, guid: 25fe5b1a7fc3cb947939c6bcd6e8a210, type: 2}
   debug_disableFOV: 0
   MainCamera: {fileID: 519420031}
   cameraOffset: {x: 4, y: -3, z: 0}

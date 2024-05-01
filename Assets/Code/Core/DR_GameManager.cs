@@ -32,7 +32,7 @@ public class DR_GameManager : MonoBehaviour
     public Content playerContent;
     public List<Content> enemyContentArray;
     public List<Content> relicPickupContentArray;
-    public Content altarContent;
+    public Content healthAltarContent, itemAltarContent;
 
     public bool debug_disableFOV = false;
 

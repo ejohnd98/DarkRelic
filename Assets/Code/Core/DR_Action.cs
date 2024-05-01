@@ -318,19 +318,50 @@ public class AltarAction : DR_Action {
     }
 
     public override string GetLogText(){
-        return owner.Name + " spent " + bloodCost + " blood at the altar to heal " + healthRestored + ".";
+        switch (altar.altarType){
+            case AltarType.HEALTH:
+                return owner.Name + " spent " + bloodCost + " blood at the altar to heal " + healthRestored + ".";
+            
+            case AltarType.ITEM:
+                return owner.Name + " spent " + bloodCost + " blood at the altar to acquire a " + altar.itemAltarContent.name + ".";
+            default:
+                return "unknown altar type!";
+        }
     }
 
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
-        HealthComponent healthComponent = owner.GetComponent<HealthComponent>();
-        InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
+        switch (altar.altarType){
+            case AltarType.HEALTH:
+            {
+                HealthComponent healthComponent = owner.GetComponent<HealthComponent>();
+                InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
 
-        bloodCost = Mathf.Min(healthComponent.maxHealth - healthComponent.currentHealth, inventoryComponent.blood);
+                bloodCost = Mathf.Min(healthComponent.maxHealth - healthComponent.currentHealth, inventoryComponent.blood);
 
-        healthRestored = healthComponent.Heal(bloodCost);
-        inventoryComponent.SpendBlood(healthRestored);
-        wasSuccess = healthRestored > 0;
+                healthRestored = healthComponent.Heal(bloodCost);
+                inventoryComponent.SpendBlood(healthRestored);
+                wasSuccess = healthRestored > 0;
+                break;
+            }
+            
+            case AltarType.ITEM:
+            {
+                InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
+                bloodCost = 10; //TODO: determine this better
+                if (inventoryComponent.blood < bloodCost){
+                    wasSuccess = false;
+                    break;
+                }
+                inventoryComponent.SpendBlood(bloodCost);
+                inventoryComponent.AddItemFromContent(altar.itemAltarContent);
+
+                break;
+            }
+            default:
+            break;
+        }
+        
         if (wasSuccess) {
             SoundSystem.instance.PlaySound("altar");
         }
