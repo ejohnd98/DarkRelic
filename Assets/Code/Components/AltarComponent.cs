@@ -24,7 +24,7 @@ public class AltarComponent : DR_Component
                 return "Restores health at the cost of blood.";
             
             case AltarType.ITEM:
-                return "Grants a " + itemAltarContent.name + " in exchange for blood.";
+                return "Grants a " + itemAltarContent.contentName + " in exchange for blood.";
             default:
                 return "unknown altar type!";
         }
