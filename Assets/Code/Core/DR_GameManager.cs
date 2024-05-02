@@ -294,6 +294,14 @@ public class DR_GameManager : MonoBehaviour
         return PlayerActor;
     }
 
+    public DR_Cell TryGetPlayerCell()
+    {
+        if (PlayerActor != null && CurrentMap != null){
+            return CurrentMap.GetCell(PlayerActor.Position);
+        }
+        return null;
+    }
+
     public DR_Entity GetBoss(){
         return BossActor;
     }

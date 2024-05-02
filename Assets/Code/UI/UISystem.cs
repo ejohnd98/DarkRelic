@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Rendering;
 
 public class UISystem : MonoBehaviour
 {
@@ -43,13 +44,6 @@ public class UISystem : MonoBehaviour
         Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
     }
 
-    private void Start()
-    {
-        if (detailsUI != null){
-            detailsUI.HideUI();
-        }
-    }
-
     public void RefreshDetailsUI(){
         ShouldUpdateDetailsUI = true;
     }
@@ -85,9 +79,16 @@ public class UISystem : MonoBehaviour
             // may want to keep this when highlighting multiple cells though (spell target selection?)
             DR_Renderer.instance.SetSelectedCell(MousePos);
 
+
             LastMousePos = MousePos;
             ShouldUpdateDetailsUI = false;
-            detailsUI.SetCell(DR_GameManager.instance.CurrentMap.GetCell(MousePos));
+            
+            if (DR_GameManager.instance.CurrentMap.IsPosVisible(MousePos)){
+                detailsUI.SetCell(DR_GameManager.instance.CurrentMap.GetCell(MousePos));
+            }else{
+                detailsUI.SetCell(null);
+            }
+            
         }
     }
 

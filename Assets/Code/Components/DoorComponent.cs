@@ -39,4 +39,9 @@ public class DoorComponent : DR_Component
     public bool IsOpen(){
         return isOpen;
     }
+
+    public override string GetDetailsDescription()
+    {
+        return "The door is " + (IsOpen() ? "open." : "closed.");
+    }
 }

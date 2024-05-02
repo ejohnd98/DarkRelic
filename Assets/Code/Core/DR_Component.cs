@@ -62,4 +62,8 @@ public abstract class DR_Component
             }
         }
     }
+
+    public virtual string GetDetailsDescription(){
+        return "NOT IMPLEMENTED FOR " + this.GetType().Name;
+    }
 }

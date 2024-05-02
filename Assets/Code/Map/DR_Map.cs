@@ -188,6 +188,14 @@ public class DR_Map
         return Cells[y,x].BlocksSight();
     }
 
+    public bool IsPosVisible(Vector2Int pos){
+        if (!ValidPosition(pos)){
+            return false;
+        }
+
+        return IsVisible[pos.y, pos.x];
+    }
+
     // Messy temp function to get stair position
     public Vector2Int GetStairPosition(bool deeper){
         foreach (DR_Entity entity in Entities){

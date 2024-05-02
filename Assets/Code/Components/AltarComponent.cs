@@ -16,4 +16,17 @@ public class AltarComponent : DR_Component
 
     [DoNotSerialize]
     public Content itemAltarContent;
+
+    public override string GetDetailsDescription()
+    {
+        switch (altarType){
+            case AltarType.HEALTH:
+                return "Restores health at the cost of blood.";
+            
+            case AltarType.ITEM:
+                return "Grants a " + itemAltarContent.name + " in exchange for blood.";
+            default:
+                return "unknown altar type!";
+        }
+    }
 }

@@ -13,16 +13,19 @@ public class TurnComponent : DR_Component
         return CurrentDebt >= 0;
     }
 
-    public void SpendTurn()
-    {
+    public float GetTurnLength(){
         float debt = ActionDebt;
         if (Entity.GetComponent<InventoryComponent>() is InventoryComponent inventory
             && inventory.RelicInventory.ContainsKey(RelicType.SPEED_RELIC))
         {
             debt *= Mathf.Clamp(1.0f - (inventory.RelicInventory[RelicType.SPEED_RELIC] * 0.05f), 0.1f, 1.0f);
-            Debug.Log("Speed Orig: " + ActionDebt + ", modified: " + debt);
         }
-        CurrentDebt -= debt;
+        return debt;
+    }
+
+    public void SpendTurn()
+    {
+        CurrentDebt -= GetTurnLength();
     }
 
     public void RecoverDebt(int amount){
@@ -35,5 +38,10 @@ public class TurnComponent : DR_Component
 
         //todo: figure out a better way to do this
         DR_GameManager.instance.turnSystem.RemoveEntityTurnComponent(this);
+    }
+
+    public override string GetDetailsDescription()
+    {
+        return "Turn Length: " + GetTurnLength().ToString("F1");
     }
 }

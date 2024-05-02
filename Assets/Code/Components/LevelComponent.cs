@@ -103,4 +103,9 @@ public class LevelComponent : DR_Component
             expGiven = Mathf.CeilToInt(comp.expScale * Mathf.Lerp(level1Stats.expGiven, level50Stats.expGiven, levelFraction))
         };
     }
+
+    public override string GetDetailsDescription()
+    {
+        return "Level: " + level + "\nStr: " + stats.strength;
+    }
 }

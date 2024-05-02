@@ -55,4 +55,9 @@ public class HealthComponent : DR_Component
         }
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
     }
+
+    public override string GetDetailsDescription()
+    {
+        return "HP: " + currentHealth + " / " + maxHealth;
+    }
 }  
