@@ -16,20 +16,14 @@ public class InventoryUI : MonoBehaviour
     public GameObject ItemButtonPrefab;
     List<GameObject> ItemButtons;
 
-    public GameObject EquipmentUIParent;
-    public TextMeshProUGUI EquipmentText; 
-    public Transform EquipmentButtonsParent;
-    public GameObject EquipmentButtonPrefab;
-    List<GameObject> EquipmentButtons;
-    
-    public TextMeshProUGUI tempRelicText;
-
     public TextMeshProUGUI bloodText;
     public TextMeshProUGUI bloodShadowText;
 
+    //very temp:
+    public Sprite placeholderRelicSprite;
+
     private void Awake() {
         ItemButtons = new List<GameObject>();
-        EquipmentButtons = new List<GameObject>();
     }
 
     public void SetEntity(DR_Entity newEntity){
@@ -47,78 +41,31 @@ public class InventoryUI : MonoBehaviour
             Destroy(obj);
         }
         ItemButtons.Clear();
-        foreach (GameObject obj in EquipmentButtons){
-            Destroy(obj);
-        }
-        EquipmentButtons.Clear();
 
         string inventoryText = "--- Inventory ---";
         InventoryText.text = inventoryText;
 
-        string equipmentText = "--- Equipment ---";
-        EquipmentText.text = equipmentText;
-
         InventoryComponent inventory = entity.GetComponent<InventoryComponent>();
         if (inventory != null){
-            
-            //temp relic text:
-            tempRelicText.text = "";
-            foreach (KeyValuePair<RelicType, int> pair in inventory.RelicInventory)
-            {
-                if (tempRelicText.text != "")
-                {
-                    tempRelicText.text += '\n';
-                }
-                if (pair.Value > 0)
-                {
-                    tempRelicText.text += pair.Key.ToString() + ": " + pair.Value;
-                }
-            }
 
             bloodText.text = inventory.blood.ToString();
             bloodShadowText.text = inventory.blood.ToString();
             
-            for (int i = 0; i < inventory.items.Count; i++){
-                DR_Entity item = inventory.items[i];
-                EquippableComponent equippable = item.GetComponent<EquippableComponent>();
 
-                GameObject itemButtonObj;
-
-                if (equippable != null && equippable.isEquipped){
-                    itemButtonObj = Instantiate(EquipmentButtonPrefab, Vector3.zero, Quaternion.identity, EquipmentButtonsParent);
-                    EquipmentButtons.Add(itemButtonObj);
-                }else{
-                    itemButtonObj = Instantiate(ItemButtonPrefab, Vector3.zero, Quaternion.identity, ItemButtonsParent);
-                    ItemButtons.Add(itemButtonObj);
-                }
-
-                UIItemButton itemButton = itemButtonObj.GetComponent<UIItemButton>();
-
-                itemButton.SetEntity(item);
-                itemButton.OnMouseDownEvents.AddListener(() => {OnItemClicked(item, entity, entity);});
-
-                // This no longer works, but items are TBD anyways. If wanting to do this again, allow details to focus on specific entity OR a tile
-                //itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetEntity(item);});
-                //itemButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.HideUI();});
-            }
-
-            for (int i = inventory.items.Count - inventory.equippedItems; i < inventory.capacity; i++){
+            foreach (var pair in inventory.RelicInventory){
+                RelicType relicType = pair.Key;
                 GameObject itemButtonObj = Instantiate(ItemButtonPrefab, Vector3.zero, Quaternion.identity, ItemButtonsParent);
                 UIItemButton itemButton = itemButtonObj.GetComponent<UIItemButton>();
-                itemButton.ItemImage.gameObject.SetActive(false);
-                ItemButtons.Add(itemButtonObj);
-            }
+                itemButton.SetSprite(placeholderRelicSprite);
 
-            for (int i = inventory.equippedItems; i < inventory.maxEquips; i++){
-                GameObject itemButtonObj = Instantiate(ItemButtonPrefab, Vector3.zero, Quaternion.identity, EquipmentButtonsParent);
-                UIItemButton itemButton = itemButtonObj.GetComponent<UIItemButton>();
-                itemButton.ItemImage.gameObject.SetActive(false);
-                EquipmentButtons.Add(itemButtonObj);
+                itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetItem(relicType);});
+                itemButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
+
+                ItemButtons.Add(itemButtonObj);
             }
         }
         
         InventoryUIParent.SetActive(true);
-        EquipmentUIParent.SetActive(true);
     }
 
     public void OnItemClicked(DR_Entity item, DR_Entity user, DR_Entity target){

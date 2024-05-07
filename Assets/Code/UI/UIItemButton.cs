@@ -12,4 +12,8 @@ public class UIItemButton : UIButton {
         SpriteComponent spriteComp = entity.GetComponent<SpriteComponent>();
         ItemImage.sprite = spriteComp.GetCurrentSprite();
     }
+
+    public void SetSprite(Sprite spr){
+        ItemImage.sprite = spr;
+    }
 }

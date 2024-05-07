@@ -76,4 +76,13 @@ public class DetailsUIEntry : MonoBehaviour
         nameText.text = entityName;
         detailsText.text = details;
     }
+
+    public void Init(RelicType relic){
+        string entityName = relic.ToString();
+        int count = DR_GameManager.instance.GetPlayer().GetComponent<InventoryComponent>().RelicInventory[relic];
+        string details = "You possess " + count + " of this.";
+
+        nameText.text = entityName;
+        detailsText.text = details;
+    }
 }

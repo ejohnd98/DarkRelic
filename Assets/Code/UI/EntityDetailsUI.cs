@@ -13,10 +13,24 @@ public class EntityDetailsUI : MonoBehaviour
     public DetailsUIEntry DetailsEntryPrefab;
 
     private DR_Cell selectedCell = null;
+    //TEMP, should be an entity or content
+    private RelicType selectedRelic = RelicType.NONE;
+
     private List<DetailsUIEntry> detailsEntries = new List<DetailsUIEntry>();
 
     public void SetCell(DR_Cell newCell){
         selectedCell = newCell ?? DR_GameManager.instance.TryGetPlayerCell();
+        UpdateUI();
+    }
+
+    public void SetItem(RelicType relicType){
+        selectedRelic = relicType;
+        UpdateUI();
+    }
+
+    public void ClearItem(){
+        selectedRelic = RelicType.NONE;
+        selectedCell = DR_GameManager.instance.TryGetPlayerCell();
         UpdateUI();
     }
 
@@ -33,6 +47,12 @@ public class EntityDetailsUI : MonoBehaviour
         detailsEntries.Add(detailEntry);
     }
 
+    private void AddDetailsEntry(RelicType relic){
+        DetailsUIEntry detailEntry = Instantiate(DetailsEntryPrefab, EntryParent);
+        detailEntry.Init(relic);
+        detailsEntries.Add(detailEntry);
+    }
+
     private void ClearDetails(){
         foreach (var entry in detailsEntries){
             Destroy(entry.gameObject);
@@ -42,6 +62,12 @@ public class EntityDetailsUI : MonoBehaviour
 
     private void UpdateUI(){
         ClearDetails();
+        if (selectedRelic != RelicType.NONE){
+            AddDetailsEntry(selectedRelic);
+            DetailsUIParent.SetActive(true);
+            return;
+        }
+
         if (selectedCell == null){
             DetailsUIParent.SetActive(false);
             return;
