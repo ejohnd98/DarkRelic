@@ -50,7 +50,7 @@ public class DamageSystem
         if (attacker.GetComponent<InventoryComponent>() is InventoryComponent inventory
             && inventory.RelicInventory.ContainsKey(RelicType.DAMAGE_RELIC))
         {
-            modifiedDamage = Mathf.CeilToInt(modifiedDamage * (1.0f + (inventory.RelicInventory[RelicType.DAMAGE_RELIC] * 0.05f)));
+            modifiedDamage = Mathf.CeilToInt(modifiedDamage * (1.0f + (inventory.RelicInventory[RelicType.DAMAGE_RELIC].count * 0.05f)));
             Debug.Log("Orig: " + damage + ", modified: " + modifiedDamage);
         }
         

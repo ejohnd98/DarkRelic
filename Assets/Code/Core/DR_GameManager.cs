@@ -74,7 +74,7 @@ public class DR_GameManager : MonoBehaviour
 
         UISystem.instance.UpdateInventoryUI(PlayerActor);
 
-        BossActor = EntityFactory.CreateActor(BossTexture, "Boss", Alignment.ENEMY, 10);
+        BossActor = EntityFactory.CreateActor(BossTexture, "Boss", Alignment.ENEMY, 20);
         BossActor.AddComponent<AIComponent>(new AIComponent());
 
         //MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35), 1);

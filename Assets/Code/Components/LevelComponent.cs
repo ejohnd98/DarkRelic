@@ -77,7 +77,7 @@ public class LevelComponent : DR_Component
         if (Entity.GetComponent<InventoryComponent>() is InventoryComponent inventory
             && inventory.RelicInventory.ContainsKey(RelicType.HEALTH_RELIC))
         {
-            stats.maxHealth = Mathf.CeilToInt(stats.maxHealth * (1.0f + (inventory.RelicInventory[RelicType.HEALTH_RELIC] * 0.05f)));
+            stats.maxHealth = Mathf.CeilToInt(stats.maxHealth * (1.0f + (inventory.RelicInventory[RelicType.HEALTH_RELIC].count * 0.05f)));
         }
         
         HealthComponent healthComponent = Entity.GetComponent<HealthComponent>();
@@ -91,8 +91,8 @@ public class LevelComponent : DR_Component
         level1Stats.expGiven = 200;
 
         Stats level50Stats = new Stats();
-        level50Stats.strength = 100;
-        level50Stats.maxHealth = 500;
+        level50Stats.strength = 80;
+        level50Stats.maxHealth = 400;
         level50Stats.expGiven = 2000;
         
         float levelFraction = (level-1) / 100.0f;

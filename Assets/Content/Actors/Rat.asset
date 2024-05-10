@@ -46,13 +46,14 @@ MonoBehaviour:
       type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
       data:
         key: TurnComponent
-        ActionDebt: 8
+        ActionDebt: 4
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
       data:
         key: LevelComponent
         level: 1
         expScale: 0.2
+        currentExp: 0
         healthScale: 0.1
         strengthScale: 0.2
     - rid: 5068184619078123527

@@ -3,6 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//TODO: something other than this
+public class HeldRelic
+{
+    public DR_Entity relicEntity = null;
+    public int count = 0;
+}
+
 public class InventoryComponent : DR_Component
 {
     [Copy]
@@ -17,12 +24,12 @@ public class InventoryComponent : DR_Component
     public int equippedItems = 0;
     public List<DR_Entity> items = new List<DR_Entity>();
     
-    public Dictionary<RelicType, int> RelicInventory = new ();
+    public Dictionary<RelicType, HeldRelic> RelicInventory = new ();
 
     public InventoryComponent(){}
 
     public InventoryComponent(int capacity, int maxEquips = 10){
-        this.capacity = capacity;
+        this.capacity = 999;//capacity;
         this.maxEquips = maxEquips;
     }
 
@@ -87,17 +94,19 @@ public class InventoryComponent : DR_Component
             RelicType relicType = relicComponent.relicType;
             if (RelicInventory.ContainsKey(relicType))
             {
-                RelicInventory[relicType] += 1;
+                RelicInventory[relicType].count += 1;
             }
             else
             {
-                RelicInventory[relicType] = 1;
+                RelicInventory[relicType] = new HeldRelic(){
+                    relicEntity = item,
+                    count = 1
+                };
             }
             Entity.GetComponent<LevelComponent>().UpdateStats();
             UISystem.instance.RefreshInventoryUI();
             return true;
         }
-        
         
         if (items.Count + 1 < capacity){
             items.Add(item);

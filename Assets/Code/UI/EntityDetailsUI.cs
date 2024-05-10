@@ -14,7 +14,7 @@ public class EntityDetailsUI : MonoBehaviour
 
     private DR_Cell selectedCell = null;
     //TEMP, should be an entity or content
-    private RelicType selectedRelic = RelicType.NONE;
+    private HeldRelic selectedRelic = null;
 
     private List<DetailsUIEntry> detailsEntries = new List<DetailsUIEntry>();
 
@@ -23,13 +23,13 @@ public class EntityDetailsUI : MonoBehaviour
         UpdateUI();
     }
 
-    public void SetItem(RelicType relicType){
-        selectedRelic = relicType;
+    public void SetRelic(HeldRelic relic){
+        selectedRelic = relic;
         UpdateUI();
     }
 
     public void ClearItem(){
-        selectedRelic = RelicType.NONE;
+        selectedRelic = null;
         selectedCell = DR_GameManager.instance.TryGetPlayerCell();
         UpdateUI();
     }
@@ -47,7 +47,7 @@ public class EntityDetailsUI : MonoBehaviour
         detailsEntries.Add(detailEntry);
     }
 
-    private void AddDetailsEntry(RelicType relic){
+    private void AddDetailsEntry(HeldRelic relic){
         DetailsUIEntry detailEntry = Instantiate(DetailsEntryPrefab, EntryParent);
         detailEntry.Init(relic);
         detailsEntries.Add(detailEntry);
@@ -62,7 +62,7 @@ public class EntityDetailsUI : MonoBehaviour
 
     private void UpdateUI(){
         ClearDetails();
-        if (selectedRelic != RelicType.NONE){
+        if (selectedRelic != null){
             AddDetailsEntry(selectedRelic);
             DetailsUIParent.SetActive(true);
             return;

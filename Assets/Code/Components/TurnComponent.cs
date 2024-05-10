@@ -18,7 +18,7 @@ public class TurnComponent : DR_Component
         if (Entity.GetComponent<InventoryComponent>() is InventoryComponent inventory
             && inventory.RelicInventory.ContainsKey(RelicType.SPEED_RELIC))
         {
-            debt *= Mathf.Clamp(1.0f - (inventory.RelicInventory[RelicType.SPEED_RELIC] * 0.05f), 0.1f, 1.0f);
+            debt *= Mathf.Clamp(1.0f - (inventory.RelicInventory[RelicType.SPEED_RELIC].count * 0.05f), 0.1f, 1.0f);
         }
         return debt;
     }

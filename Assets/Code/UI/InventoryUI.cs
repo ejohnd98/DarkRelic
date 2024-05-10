@@ -53,12 +53,11 @@ public class InventoryUI : MonoBehaviour
             
 
             foreach (var pair in inventory.RelicInventory){
-                RelicType relicType = pair.Key;
                 GameObject itemButtonObj = Instantiate(ItemButtonPrefab, Vector3.zero, Quaternion.identity, ItemButtonsParent);
                 UIItemButton itemButton = itemButtonObj.GetComponent<UIItemButton>();
-                itemButton.SetSprite(placeholderRelicSprite);
+                itemButton.SetEntity(pair.Value.relicEntity);
 
-                itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetItem(relicType);});
+                itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetRelic(pair.Value);});
                 itemButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
 
                 ItemButtons.Add(itemButtonObj);
