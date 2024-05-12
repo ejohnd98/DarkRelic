@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
+using Unity.VisualScripting;
 
 public class UISystem : MonoBehaviour
 {
@@ -16,10 +17,10 @@ public class UISystem : MonoBehaviour
         MAIN_MENU,
         FADING,
 
-        INVALID
+        INVALID,
     }
 
-    public UIState currentState = UIState.NORMAL;
+    public UIState currentState = UIState.MAIN_MENU;
 
     public Texture2D cursorTexture, targetingCursorTexture;
 
@@ -138,6 +139,9 @@ public class UISystem : MonoBehaviour
 
     void Update()
     {
+        if (currentState == UIState.MAIN_MENU){
+            return;
+        }
         switch(currentState)
         {
             case UIState.NORMAL:

@@ -1,20 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class DungeonGenerator {
-    public static DR_Dungeon GenerateDungeon() {
-        DungeonGenInfo dungeonGenInfo = new DungeonGenInfo();
-        DR_Dungeon dungeon = new DR_Dungeon();
-        dungeon.name = "Balance Test Dungeon";
+public class DungeonGenerator : MonoBehaviour {
 
-        for (int i = 0; i < dungeonGenInfo.floors; i++) {
-            //calculate exp per enemy from i and dungeonGenInfo.levelIncreasePerFloor
-            //int expPerRoom = Mathf.RoundToInt(expectedFloorExperience / (float)dungeonGenInfo.roomsOnShortPath);
-            dungeon.maps.Add(GenerateMap(dungeonGenInfo, dungeon, i));
+    public delegate void DungeonGeneratedCallback(DR_Dungeon dungeon);
+    public delegate void MapGeneratedCallback(DR_Map map);
+
+    DungeonGenInfo dungeonGenInfo;
+    DR_Dungeon dungeon;
+    DungeonGeneratedCallback callback;
+    
+    bool generatingDungeon = false;
+
+    public void GenerateDungeon(DungeonGeneratedCallback callback) {
+        dungeonGenInfo = new DungeonGenInfo();
+        dungeon = new DR_Dungeon
+        {
+            name = "Balance Test Dungeon"
+        };
+        generatingDungeon = true;
+
+
+        this.callback = callback;
+    }
+
+    private float counter = 1.0f;
+    private void Update(){
+        if (generatingDungeon){
+            counter -= Time.deltaTime;
+            if (counter <= 0.0f){ //TEMP just to test decoupling dungeon gen from Start
+                for (int i = 0; i < dungeonGenInfo.floors; i++) {
+                    //calculate exp per enemy from i and dungeonGenInfo.levelIncreasePerFloor
+                    //int expPerRoom = Mathf.RoundToInt(expectedFloorExperience / (float)dungeonGenInfo.roomsOnShortPath);
+                    dungeon.maps.Add(GenerateMap(dungeonGenInfo, dungeon, i));
+                }
+                generatingDungeon = false;
+                callback(dungeon);
+            }
         }
-
-        return dungeon;
     }
 
     public static DR_Map GenerateMap(DungeonGenInfo dungeonGenInfo, DR_Dungeon dungeon, int depth) {

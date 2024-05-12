@@ -31,6 +31,9 @@ public class DR_Renderer : MonoBehaviour
     }
 
     void LateUpdate() {
+        if (DR_GameManager.instance.CurrentState == DR_GameManager.GameState.INVALID){
+            return;
+        }
         AnimationSystem.UpdateAnims(Time.deltaTime);
         UpdateEntities(Time.deltaTime);
     }

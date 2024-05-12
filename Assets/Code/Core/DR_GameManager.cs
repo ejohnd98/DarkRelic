@@ -12,7 +12,7 @@ public class DR_GameManager : MonoBehaviour
         HANDLING_TURN,
         GAME_OVER,
 
-        INVALID
+        INVALID,
     }
 
     public bool isFadeActive = false;
@@ -22,6 +22,8 @@ public class DR_GameManager : MonoBehaviour
     public static DR_GameManager instance;
 
     public GameState CurrentState = GameState.INVALID;
+
+    public DungeonGenerator dungeonGenerator;
 
     public DR_Dungeon CurrentDungeon;
     public DR_Map CurrentMap;
@@ -66,12 +68,16 @@ public class DR_GameManager : MonoBehaviour
     {
         // Create Dungeon
         //CurrentDungeon = DR_MapGen.CreateDungeonTest(balanceTestMap);
-        CurrentDungeon = DungeonGenerator.GenerateDungeon();
+        dungeonGenerator.GenerateDungeon(PostDungeonGenStep);
+    }
 
+    private void PostDungeonGenStep(DR_Dungeon dungeon){
+        CurrentDungeon = dungeon;
         PlayerActor = EntityFactory.CreateEntityFromContent(playerContent);
         PlayerActor.GetComponent<LevelComponent>().level = 5;
         PlayerActor.GetComponent<LevelComponent>().UpdateStats();
 
+        UISystem.instance.currentState = UISystem.UIState.NORMAL;
         UISystem.instance.UpdateInventoryUI(PlayerActor);
 
         BossActor = EntityFactory.CreateActor(BossTexture, "Boss", Alignment.ENEMY, 20);
@@ -136,6 +142,9 @@ public class DR_GameManager : MonoBehaviour
 
     void Update()
     {
+        if (CurrentState == GameState.INVALID){
+            return;
+        }
         switch (CurrentState)
         {
             case GameState.ADVANCE_GAME:
@@ -197,6 +206,9 @@ public class DR_GameManager : MonoBehaviour
     }
 
     private void LateUpdate() {
+        if (CurrentState == GameState.INVALID){
+            return;
+        }
         UpdateCamera();
     }
 
