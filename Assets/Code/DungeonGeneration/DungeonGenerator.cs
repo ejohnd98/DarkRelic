@@ -8,41 +8,36 @@ public class DungeonGenerator : MonoBehaviour {
     public delegate void DungeonGeneratedCallback(DR_Dungeon dungeon);
     public delegate void MapGeneratedCallback(DR_Map map);
 
-    DungeonGenInfo dungeonGenInfo;
-    DR_Dungeon dungeon;
-    DungeonGeneratedCallback callback;
-    
-    bool generatingDungeon = false;
-
     public void GenerateDungeon(DungeonGeneratedCallback callback) {
-        dungeonGenInfo = new DungeonGenInfo();
-        dungeon = new DR_Dungeon
+        StartCoroutine(GenerateDungeonCoroutine(callback));
+    }
+
+    IEnumerator GenerateDungeonCoroutine(DungeonGeneratedCallback callback){
+        DungeonGenInfo dungeonGenInfo = new DungeonGenInfo();
+        DR_Dungeon dungeon = new DR_Dungeon
         {
             name = "Balance Test Dungeon"
         };
-        generatingDungeon = true;
 
+        //TODO: inside loop, start a new GenerateMapCoroutine and then wait until some MapGenActive flag is cleared before moving onto the next
+        // Alongside this, put some VisualizeMapGen function in Update which is called if map gen is active (map gen specifically, not dungeon?)
 
-        this.callback = callback;
-    }
-
-    private float counter = 1.0f;
-    private void Update(){
-        if (generatingDungeon){
-            counter -= Time.deltaTime;
-            if (counter <= 0.0f){ //TEMP just to test decoupling dungeon gen from Start
-                for (int i = 0; i < dungeonGenInfo.floors; i++) {
-                    //calculate exp per enemy from i and dungeonGenInfo.levelIncreasePerFloor
-                    //int expPerRoom = Mathf.RoundToInt(expectedFloorExperience / (float)dungeonGenInfo.roomsOnShortPath);
-                    dungeon.maps.Add(GenerateMap(dungeonGenInfo, dungeon, i));
-                }
-                generatingDungeon = false;
-                callback(dungeon);
-            }
+        for (int i = 0; i < dungeonGenInfo.floors; i++) {
+            //calculate exp per enemy from i and dungeonGenInfo.levelIncreasePerFloor
+            //int expPerRoom = Mathf.RoundToInt(expectedFloorExperience / (float)dungeonGenInfo.roomsOnShortPath);
+            bool generatingMap = true; // Is this really okay?
+            StartCoroutine(GenerateMap(dungeonGenInfo, dungeon, i, (DR_Map map) => {
+                dungeon.maps.Add(map);
+                generatingMap = false;
+            }));
+            
+            yield return new WaitUntil(() => !generatingMap);
         }
+
+        callback(dungeon);
     }
 
-    public static DR_Map GenerateMap(DungeonGenInfo dungeonGenInfo, DR_Dungeon dungeon, int depth) {
+    public IEnumerator GenerateMap(DungeonGenInfo dungeonGenInfo, DR_Dungeon dungeon, int depth, MapGeneratedCallback callback) {
         Vector2Int mapSize = dungeonGenInfo.getFloorSize(depth);
         MapBlueprint mapBlueprint = new MapBlueprint(mapSize);
         DR_GameManager gm = DR_GameManager.instance;
@@ -186,8 +181,8 @@ public class DungeonGenerator : MonoBehaviour {
         
 
         DR_Map newMap = CreateMapFromBlueprint(mapBlueprint);
-
-        return newMap;
+        yield return null;
+        callback(newMap);
     }
     
     public static DR_Map CreateMapFromBlueprint(MapBlueprint mapBlueprint) {
@@ -230,8 +225,7 @@ public class DungeonGenerator : MonoBehaviour {
             }
 
             if (!success) {
-                Debug.LogError("CreateMapFromBlueprint: unable to place " + posEntityPair.Value.Name + " at " +
-                               posEntityPair.Key);
+                Debug.LogError("CreateMapFromBlueprint: unable to place " + posEntityPair.Value.Name + " at " + posEntityPair.Key);
             }
         }
 
