@@ -68,6 +68,8 @@ public class DR_GameManager : MonoBehaviour
     {
         // Create Dungeon
         //CurrentDungeon = DR_MapGen.CreateDungeonTest(balanceTestMap);
+        blackOverlay.SetShouldBeVisible(true);
+        UISystem.instance.gameObject.SetActive(false);
         dungeonGenerator.GenerateDungeon(PostDungeonGenStep);
     }
 
@@ -77,6 +79,7 @@ public class DR_GameManager : MonoBehaviour
         PlayerActor.GetComponent<LevelComponent>().level = 5;
         PlayerActor.GetComponent<LevelComponent>().UpdateStats();
 
+        UISystem.instance.gameObject.SetActive(true);
         UISystem.instance.currentState = UISystem.UIState.NORMAL;
         UISystem.instance.UpdateInventoryUI(PlayerActor);
 

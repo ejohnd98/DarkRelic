@@ -8,8 +8,82 @@ public class DungeonGenerator : MonoBehaviour {
     public delegate void DungeonGeneratedCallback(DR_Dungeon dungeon);
     public delegate void MapGeneratedCallback(DR_Map map);
 
+    public bool visualizeGeneration = true;
+
+    private MapBlueprint visualizationTarget = null; 
+    private List<GameObject> visualizationObjects = new();
+
+    public Transform visualizationParent;
+    public SpriteRenderer visualizationPrefab;
+    public Sprite wallSpr, floorSpr;
+    private const float maxVisualizationHeight = 22.0f;
+
+    private float visualizationSpeedMod = 1.0f;
+
     public void GenerateDungeon(DungeonGeneratedCallback callback) {
         StartCoroutine(GenerateDungeonCoroutine(callback));
+    }
+
+    void Update()
+    {
+        visualizationSpeedMod = visualizeGeneration ? (Input.GetKey(KeyCode.Space)? 0.1f : 1.0f) : 0.0f;
+    }
+
+
+    private IEnumerator VisualizationCoroutine(){
+        while(true){
+            VisualizeGeneration();
+            yield return new WaitForSeconds(0.2f);
+        }
+        
+    }
+
+    private void ClearVisualization(){
+        foreach (var obj in visualizationObjects) {
+            Destroy(obj);
+        }
+        visualizationObjects.Clear();
+    }
+
+    private void VisualizeGeneration(){
+        if (visualizationTarget == null){
+            return;
+        }
+
+        ClearVisualization();
+
+        for (int y = 0; y < visualizationTarget.mapSize.y; y++) {
+            for (int x = 0; x < visualizationTarget.mapSize.x; x++) {
+
+                switch (visualizationTarget.cells[y, x].type) {
+                    case MapGenCellType.NOT_SET:
+                    case MapGenCellType.WALL: {
+                        CreateSpriteAt(new Vector2Int(x,y), wallSpr, 0.0f);
+                        break;
+                    }
+                    default: {
+                        CreateSpriteAt(new Vector2Int(x,y), floorSpr, 0.0f);
+                        break;
+                    }
+                }
+            }
+        }
+
+        foreach (var posEntityPair in visualizationTarget.entitiesToPlace) {
+            CreateSpriteAt(posEntityPair.Key, posEntityPair.Value.GetComponent<SpriteComponent>().GetCurrentSprite(), -1.0f);
+        }
+
+        visualizationParent.localScale = Vector3.Min(Vector3.one, Vector3.one * (maxVisualizationHeight / visualizationTarget.mapSize.y));
+    }
+
+    private void CreateSpriteAt(Vector2Int pos, Sprite spr, float height){
+        Vector3 offset = new Vector3(-visualizationTarget.mapSize.x / 2.0f, -visualizationTarget.mapSize.y / 2.0f, -10);
+
+
+        SpriteRenderer spriteRenderer = Instantiate(visualizationPrefab, visualizationParent);
+        spriteRenderer.sprite = spr;
+        spriteRenderer.transform.localPosition = offset + new Vector3(pos.x, pos.y, height);
+        visualizationObjects.Add(spriteRenderer.gameObject);
     }
 
     IEnumerator GenerateDungeonCoroutine(DungeonGeneratedCallback callback){
@@ -18,9 +92,6 @@ public class DungeonGenerator : MonoBehaviour {
         {
             name = "Balance Test Dungeon"
         };
-
-        //TODO: inside loop, start a new GenerateMapCoroutine and then wait until some MapGenActive flag is cleared before moving onto the next
-        // Alongside this, put some VisualizeMapGen function in Update which is called if map gen is active (map gen specifically, not dungeon?)
 
         for (int i = 0; i < dungeonGenInfo.floors; i++) {
             //calculate exp per enemy from i and dungeonGenInfo.levelIncreasePerFloor
@@ -42,7 +113,14 @@ public class DungeonGenerator : MonoBehaviour {
         MapBlueprint mapBlueprint = new MapBlueprint(mapSize);
         DR_GameManager gm = DR_GameManager.instance;
         // Create map layout here
+
+        Coroutine visualizer = null;
+        if (visualizeGeneration){
+            visualizationTarget = mapBlueprint;
+            visualizer = StartCoroutine(VisualizationCoroutine());
+        }
         
+
         //VERY TEMP
         for (int i = 0; i < 5; i++) {
             Vector2Int roomPos = new Vector2Int(8, (i * 6));
@@ -64,6 +142,7 @@ public class DungeonGenerator : MonoBehaviour {
                 mapBlueprint.cells[roomPos.y, 11].type = MapGenCellType.DOOR;
                 mapBlueprint.cells[roomPos.y -1, 11].type = MapGenCellType.FLOOR;
             }
+            yield return new WaitForSeconds(0.3f * visualizationSpeedMod);
         }
 
         mapBlueprint.GetCell(mapBlueprint.rooms[0].GetCenterPosition()).type = MapGenCellType.STAIRS_UP;
@@ -115,6 +194,7 @@ public class DungeonGenerator : MonoBehaviour {
 
                 if (newEntity != null) {
                     mapBlueprint.entitiesToPlace.Add(new Vector2Int(x, y), newEntity);
+                    yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
                 }
             }
         }
@@ -165,6 +245,7 @@ public class DungeonGenerator : MonoBehaviour {
                 failedAttempts++;
                 continue;
             }
+            yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
             mapBlueprint.entitiesToPlace.Add(enemyPos, enemy);
 
             // Decrement room index, subtract exp cost
@@ -176,9 +257,13 @@ public class DungeonGenerator : MonoBehaviour {
         
         Debug.Log("Floor " + (depth + 1) + ": leftover budget " + experienceBudget + "/" + dungeonGenInfo.getExpectedExperience(depth+1) + ". lowest exp enemy is " + lowestExpEnemy);
         
+        yield return new WaitForSeconds(1.5f * visualizationSpeedMod);
 
-        // TODO: Create item entities here later
-        
+        if (visualizeGeneration){
+            StopCoroutine(visualizer);
+            visualizationTarget = null;
+            ClearVisualization();
+        }
 
         DR_Map newMap = CreateMapFromBlueprint(mapBlueprint);
         yield return null;
