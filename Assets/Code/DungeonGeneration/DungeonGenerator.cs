@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -11,10 +12,12 @@ public class DungeonGenerator : MonoBehaviour {
     public bool visualizeGeneration = true;
 
     private MapBlueprint visualizationTarget = null; 
+    private MapLayout visualizationLayoutTarget = null; 
     private List<GameObject> visualizationObjects = new();
 
     public Transform visualizationParent;
     public SpriteRenderer visualizationPrefab;
+    public Sprite roomSpr;
     public Sprite wallSpr, floorSpr;
     private const float maxVisualizationHeight = 22.0f;
 
@@ -46,34 +49,54 @@ public class DungeonGenerator : MonoBehaviour {
     }
 
     private void VisualizeGeneration(){
-        if (visualizationTarget == null){
+        if (visualizationTarget == null && visualizationLayoutTarget == null){
             return;
         }
 
         ClearVisualization();
 
-        for (int y = 0; y < visualizationTarget.mapSize.y; y++) {
-            for (int x = 0; x < visualizationTarget.mapSize.x; x++) {
+        if (visualizationTarget != null){
+            for (int y = 0; y < visualizationTarget.mapSize.y; y++) {
+                for (int x = 0; x < visualizationTarget.mapSize.x; x++) {
 
-                switch (visualizationTarget.cells[y, x].type) {
-                    case MapGenCellType.NOT_SET:
-                    case MapGenCellType.WALL: {
-                        CreateSpriteAt(new Vector2Int(x,y), wallSpr, 0.0f);
-                        break;
-                    }
-                    default: {
-                        CreateSpriteAt(new Vector2Int(x,y), floorSpr, 0.0f);
-                        break;
+                    switch (visualizationTarget.cells[y, x].type) {
+                        case MapGenCellType.NOT_SET:
+                        case MapGenCellType.WALL: {
+                            CreateSpriteAt(new Vector2Int(x,y), wallSpr, 0.0f);
+                            break;
+                        }
+                        default: {
+                            CreateSpriteAt(new Vector2Int(x,y), floorSpr, 0.0f);
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        foreach (var posEntityPair in visualizationTarget.entitiesToPlace) {
-            CreateSpriteAt(posEntityPair.Key, posEntityPair.Value.GetComponent<SpriteComponent>().GetCurrentSprite(), -1.0f);
-        }
+            foreach (var posEntityPair in visualizationTarget.entitiesToPlace) {
+                CreateSpriteAt(posEntityPair.Key, posEntityPair.Value.GetComponent<SpriteComponent>().GetCurrentSprite(), -1.0f);
+            }
 
-        visualizationParent.localScale = Vector3.Min(Vector3.one, Vector3.one * (maxVisualizationHeight / visualizationTarget.mapSize.y));
+            visualizationParent.localScale = Vector3.Min(Vector3.one, Vector3.one * (maxVisualizationHeight / visualizationTarget.mapSize.y));
+        }
+        else if (visualizationLayoutTarget != null){
+            foreach (var node in visualizationLayoutTarget.nodes){
+                DrawLayoutNode(node);
+            }
+
+            visualizationParent.localScale = Vector3.Min(Vector3.one, Vector3.one * (maxVisualizationHeight / visualizationLayoutTarget.mapSize.y));
+        }
+        
+    }
+
+    private void DrawLayoutNode(MapLayoutNode node){
+        Vector3 offset = new Vector3(-visualizationLayoutTarget.mapSize.x / 2.0f, -visualizationLayoutTarget.mapSize.y / 2.0f, -10);
+        offset += new Vector3(node.size.x, node.size.y, 0) * 0.5f;
+        SpriteRenderer spriteRenderer = Instantiate(visualizationPrefab, visualizationParent);
+        spriteRenderer.sprite = roomSpr;
+        spriteRenderer.transform.localPosition = offset + new Vector3(node.position.x, node.position.y, 0.0f);
+        spriteRenderer.transform.localScale = node.size - (Vector2.one*2);
+        visualizationObjects.Add(spriteRenderer.gameObject);
     }
 
     private void CreateSpriteAt(Vector2Int pos, Sprite spr, float height){
@@ -110,14 +133,39 @@ public class DungeonGenerator : MonoBehaviour {
 
     public IEnumerator GenerateMap(DungeonGenInfo dungeonGenInfo, DR_Dungeon dungeon, int depth, MapGeneratedCallback callback) {
         Vector2Int mapSize = dungeonGenInfo.getFloorSize(depth);
-        MapBlueprint mapBlueprint = new MapBlueprint(mapSize);
         DR_GameManager gm = DR_GameManager.instance;
-        // Create map layout here
-
+        // TODO: Create map layout here
+        MapLayout mapLayout = new MapLayout(mapSize);
+        MapBlueprint mapBlueprint = new MapBlueprint(mapSize);
         Coroutine visualizer = null;
         if (visualizeGeneration){
-            visualizationTarget = mapBlueprint;
+            visualizationLayoutTarget = mapLayout;
             visualizer = StartCoroutine(VisualizationCoroutine());
+        }
+
+        for (int i = 0; i < 5; i++) {
+            Vector2Int roomPos = new Vector2Int(8, (i * 6));
+            Vector2Int roomSize = new Vector2Int(7, 7);
+            
+            var node = new MapLayoutNode();
+            node.position = roomPos;
+            node.size = roomSize;
+            if (i > 0){
+                mapLayout.connections.Add(new (mapLayout.nodes[^1], node));
+            }
+            mapLayout.nodes.Add(node);
+
+            yield return new WaitForSeconds(0.3f * visualizationSpeedMod);
+        }
+
+        yield return new WaitForSeconds(2.0f * visualizationSpeedMod);
+
+        // TODO: Convert layout to cells
+
+
+        if (visualizeGeneration){
+            visualizationLayoutTarget = null;
+            visualizationTarget = mapBlueprint;
         }
         
 
@@ -180,13 +228,13 @@ public class DungeonGenerator : MonoBehaviour {
                     case MapGenCellType.ITEM_ALTAR:
                         newEntity = EntityFactory.CreateEntityFromContent(gm.itemAltarContent);
                         //Temporarily do this here:
-                        int altarItemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
+                        int altarItemIndex = UnityEngine.Random.Range(0, gm.relicPickupContentArray.Count);
                         newEntity.GetComponent<AltarComponent>().itemAltarContent = gm.relicPickupContentArray[altarItemIndex];
                         break;
                     // Temporarily do this here
                     case MapGenCellType.ITEM:
                         Vector2Int itemPos = new Vector2Int(x,y);
-                        int itemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
+                        int itemIndex = UnityEngine.Random.Range(0, gm.relicPickupContentArray.Count);
                         var item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
                         mapBlueprint.entitiesToPlace.Add(itemPos, item);
                         break;
@@ -229,7 +277,7 @@ public class DungeonGenerator : MonoBehaviour {
             // TODO: more properly choose enemy to use based on available budget
             if (experienceBudget > lowestExpEnemy) {
                 // Choose enemy type
-                int chosenIndex = Random.Range(0, floorEnemies.Count);
+                int chosenIndex = UnityEngine.Random.Range(0, floorEnemies.Count);
                 chosenEnemy = floorEnemies[chosenIndex];
             }
             
@@ -360,5 +408,18 @@ public class MapBlueprint {
                 cells[y,x].type = type;
             }
         }
+    }
+}
+
+
+
+public class MapLayout {
+    public Vector2Int mapSize;
+
+    public List<MapLayoutNode> nodes = new();
+    public List<Tuple<MapLayoutNode, MapLayoutNode>> connections = new();
+
+    public MapLayout(Vector2Int size){
+        mapSize = size;
     }
 }

@@ -132,3 +132,8 @@ public class MapGenRoom{
         return -Vector2Int.one;
     }
 }
+
+public class MapLayoutNode{
+    public Vector2 position;
+    public Vector2 size = Vector2.one;
+}
