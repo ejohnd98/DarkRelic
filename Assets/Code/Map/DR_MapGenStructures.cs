@@ -92,12 +92,19 @@ public class MapGenCell{
     public MapGenRoom associatedRoom;
 }
 
+//TODO: possibly expand this into base class + implementations for any data needed alongside tag?
+public enum RoomTag{
+    START,
+    END,
 
+    NONE
+}
 
 public class MapGenRoom{
 
     public Vector2Int pos, size;
     public MapBlueprint mapBlueprint;
+    public RoomTag roomTag = RoomTag.NONE;
 
     public MapGenRoom(Vector2Int pos, Vector2Int size, MapBlueprint mapBlueprint){
         this.pos = pos;
@@ -120,6 +127,11 @@ public class MapGenRoom{
         return pos + new Vector2Int((Mathf.FloorToInt(size.x * 0.5f)), Mathf.FloorToInt(size.y * 0.5f));
     }
 
+    public bool IsPositionInsideRoom(Vector2Int testPos){
+        return testPos.x >= pos.x && testPos.x < pos.x + size.x
+            && testPos.y >= pos.y && testPos.y < pos.y + size.y;
+    }
+
     public Vector2Int ReserveEnemyPosition() {
         // Could predetermine what spots to use? (such as defining those in a prefab image)
         foreach (Vector2Int offset in possibleEnemyPositions) {
@@ -131,9 +143,25 @@ public class MapGenRoom{
         }
         return -Vector2Int.one;
     }
+
+    public Vector2Int GetEdgePositionAtDir(Vector2 roomDiff){
+        Vector2 center = GetCenterPosition();
+        Vector2 edgePos = center;
+        Vector2 dir = roomDiff.normalized; 
+        Vector2Int result = Vector2Int.RoundToInt(edgePos);
+
+        while(IsPositionInsideRoom(Vector2Int.RoundToInt(edgePos + dir))){
+            edgePos += dir;
+            result = Vector2Int.RoundToInt(edgePos);
+        }
+        return result;
+    }
 }
 
 public class MapLayoutNode{
-    public Vector2 position;
-    public Vector2 size = Vector2.one;
+    public Vector2Int position;
+    public Vector2Int size = Vector2Int.one;
+    public RoomTag roomTag = RoomTag.NONE;
+
+    public MapGenRoom resultingRoom = null;
 }

@@ -18,7 +18,7 @@ public class DungeonGenerator : MonoBehaviour {
     public Transform visualizationParent;
     public SpriteRenderer visualizationPrefab;
     public Sprite roomSpr;
-    public Sprite wallSpr, floorSpr;
+    public Sprite wallSpr, floorSpr, notSetSpr;
     private const float maxVisualizationHeight = 22.0f;
 
     private float visualizationSpeedMod = 1.0f;
@@ -60,7 +60,10 @@ public class DungeonGenerator : MonoBehaviour {
                 for (int x = 0; x < visualizationTarget.mapSize.x; x++) {
 
                     switch (visualizationTarget.cells[y, x].type) {
-                        case MapGenCellType.NOT_SET:
+                        case MapGenCellType.NOT_SET:{
+                            CreateSpriteAt(new Vector2Int(x,y), notSetSpr, 0.0f);
+                            break;
+                        }
                         case MapGenCellType.WALL: {
                             CreateSpriteAt(new Vector2Int(x,y), wallSpr, 0.0f);
                             break;
@@ -134,7 +137,10 @@ public class DungeonGenerator : MonoBehaviour {
     public IEnumerator GenerateMap(DungeonGenInfo dungeonGenInfo, DR_Dungeon dungeon, int depth, MapGeneratedCallback callback) {
         Vector2Int mapSize = dungeonGenInfo.getFloorSize(depth);
         DR_GameManager gm = DR_GameManager.instance;
-        // TODO: Create map layout here
+
+        // TODO: separate steps out into their own coroutines?
+
+        // Create map layout here
         MapLayout mapLayout = new MapLayout(mapSize);
         MapBlueprint mapBlueprint = new MapBlueprint(mapSize);
         Coroutine visualizer = null;
@@ -143,9 +149,15 @@ public class DungeonGenerator : MonoBehaviour {
             visualizer = StartCoroutine(VisualizationCoroutine());
         }
 
-        for (int i = 0; i < 5; i++) {
-            Vector2Int roomPos = new Vector2Int(8, (i * 6));
+        // Hardcoded layout
+        for (int i = 0; i < 4; i++) {
+            Vector2Int roomPos = new Vector2Int(8, (i * 9));
             Vector2Int roomSize = new Vector2Int(7, 7);
+
+            if (i == 3){
+                roomPos = new Vector2Int(8 + 9, ((i-1) * 9));
+            }
+            
             
             var node = new MapLayoutNode();
             node.position = roomPos;
@@ -157,26 +169,28 @@ public class DungeonGenerator : MonoBehaviour {
 
             yield return new WaitForSeconds(0.3f * visualizationSpeedMod);
         }
+        mapLayout.nodes[0].roomTag = RoomTag.START;
+        mapLayout.nodes[^1].roomTag = RoomTag.END;
 
         yield return new WaitForSeconds(2.0f * visualizationSpeedMod);
-
-        // TODO: Convert layout to cells
 
 
         if (visualizeGeneration){
             visualizationLayoutTarget = null;
             visualizationTarget = mapBlueprint;
         }
-        
 
-        //VERY TEMP
-        for (int i = 0; i < 5; i++) {
-            Vector2Int roomPos = new Vector2Int(8, (i * 6));
-            Vector2Int roomSize = new Vector2Int(7, 7);
-            MapGenRoom room = new MapGenRoom(roomPos, roomSize, mapBlueprint);
+
+        // Create rooms based on nodes and carve out
+        foreach(var node in mapLayout.nodes){
+            Vector2Int roomPos = node.position;
+            Vector2Int roomSize = node.size;
+            MapGenRoom room = new(roomPos, roomSize, mapBlueprint);
+            node.resultingRoom = room;
+            room.roomTag = node.roomTag;
             mapBlueprint.rooms.Add(room);
             mapBlueprint.AssignRoomToCells(room);
-            
+
             mapBlueprint.PlaceCellType(
                 roomPos.x, roomPos.x+roomSize.x, 
                 roomPos.y, roomPos.y+roomSize.y, 
@@ -185,23 +199,58 @@ public class DungeonGenerator : MonoBehaviour {
                 roomPos.x+1, roomPos.x+roomSize.x-1, 
                 roomPos.y+1, roomPos.y+roomSize.y-1, 
                 MapGenCellType.FLOOR);
-
-            if (i != 0) {
-                mapBlueprint.cells[roomPos.y, 11].type = MapGenCellType.DOOR;
-                mapBlueprint.cells[roomPos.y -1, 11].type = MapGenCellType.FLOOR;
+            
+            switch (room.roomTag){
+                case RoomTag.START:
+                    mapBlueprint.GetCell(room.GetCenterPosition()).type = MapGenCellType.STAIRS_UP;
+                    break;
+                case RoomTag.END:
+                    mapBlueprint.GetCell(room.GetCenterPosition()).type = (depth == dungeonGenInfo.floors-1) ? MapGenCellType.GOAL : MapGenCellType.STAIRS_DOWN;
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.up).type = MapGenCellType.HEALTH_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.up * 3).type = MapGenCellType.ITEM_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.right * 3).type = MapGenCellType.ITEM_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.down * 3).type = MapGenCellType.ITEM_ALTAR;
+                    break;
+                default:
+                break;
             }
+            
+
             yield return new WaitForSeconds(0.3f * visualizationSpeedMod);
         }
 
-        mapBlueprint.GetCell(mapBlueprint.rooms[0].GetCenterPosition()).type = MapGenCellType.STAIRS_UP;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition()).type = (depth == dungeonGenInfo.floors-1) ? MapGenCellType.GOAL : MapGenCellType.STAIRS_DOWN;
+        // Mark door tiles and carve out hallways:
+        foreach(var connection in mapLayout.connections){
+            var roomA = connection.Item1.resultingRoom;
+            var roomB = connection.Item2.resultingRoom;
+            Vector2Int posDiff = roomB.pos - roomA.pos;
+            
+            Vector2Int dir = new Vector2Int(
+                (int)Mathf.Sign(posDiff.x), 
+                (int)Mathf.Sign(posDiff.y));
+            
+            Vector2Int doorPosA = roomA.GetEdgePositionAtDir(posDiff);
+            Vector2Int doorPosB = roomB.GetEdgePositionAtDir(-posDiff);
 
-        mapBlueprint.GetCell(mapBlueprint.rooms[2].GetCenterPosition()).type = MapGenCellType.HEALTH_ALTAR;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up).type = MapGenCellType.HEALTH_ALTAR;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.up * 3).type = MapGenCellType.ITEM_ALTAR;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.right * 3).type = MapGenCellType.ITEM_ALTAR;
-        mapBlueprint.GetCell(mapBlueprint.rooms[^1].GetCenterPosition() + Vector2Int.left * 3).type = MapGenCellType.ITEM_ALTAR;
-        
+            Vector2Int currentPos = doorPosA;
+            while(currentPos != doorPosB){
+                Vector2Int diff = doorPosB - currentPos;
+                if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y) && diff.x != 0){
+                    currentPos.x +=  MathF.Sign(diff.x);
+                }else if(diff.y != 0){
+                    currentPos.y += MathF.Sign(diff.y);
+                }
+
+                mapBlueprint.GetCell(currentPos).type = MapGenCellType.FLOOR;
+                yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
+            }
+
+            yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
+
+            mapBlueprint.GetCell(doorPosA).type = MapGenCellType.DOOR;
+            mapBlueprint.GetCell(doorPosB).type = MapGenCellType.DOOR;
+        }
+
 
         // Create stairs + door entities
         for (int y = 0; y < mapSize.y; y++) {
