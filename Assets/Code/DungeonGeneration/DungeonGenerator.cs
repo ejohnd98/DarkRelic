@@ -29,14 +29,14 @@ public class DungeonGenerator : MonoBehaviour {
 
     void Update()
     {
-        visualizationSpeedMod = visualizeGeneration ? (Input.GetKey(KeyCode.Space)? 0.1f : 1.0f) : 0.0f;
+        visualizationSpeedMod = visualizeGeneration ? (Input.GetKey(KeyCode.Space)? 0.1f : 0.5f) : 0.0f;
     }
 
 
     private IEnumerator VisualizationCoroutine(){
         while(true){
             VisualizeGeneration();
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.1f);
         }
         
     }
@@ -151,11 +151,15 @@ public class DungeonGenerator : MonoBehaviour {
 
         // Hardcoded layout
         for (int i = 0; i < 4; i++) {
-            Vector2Int roomPos = new Vector2Int(8, (i * 9));
+            Vector2Int roomPos = new Vector2Int(8 + i*2, (i * 9));
             Vector2Int roomSize = new Vector2Int(7, 7);
 
+            if (i == 0){
+                roomPos = new Vector2Int(2, (2 * 9));
+            }
+
             if (i == 3){
-                roomPos = new Vector2Int(8 + 9, ((i-1) * 9));
+                roomPos = new Vector2Int(9 + i*2 + 9, ((i-1) * 9));
             }
             
             
@@ -167,12 +171,15 @@ public class DungeonGenerator : MonoBehaviour {
             }
             mapLayout.nodes.Add(node);
 
-            yield return new WaitForSeconds(0.3f * visualizationSpeedMod);
+            yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
         }
+
+        mapLayout.connections.Add(new (mapLayout.nodes[0], mapLayout.nodes[2]));
+
         mapLayout.nodes[0].roomTag = RoomTag.START;
         mapLayout.nodes[^1].roomTag = RoomTag.END;
 
-        yield return new WaitForSeconds(2.0f * visualizationSpeedMod);
+        yield return new WaitForSeconds(0.5f * visualizationSpeedMod);
 
 
         if (visualizeGeneration){
@@ -216,7 +223,7 @@ public class DungeonGenerator : MonoBehaviour {
             }
             
 
-            yield return new WaitForSeconds(0.3f * visualizationSpeedMod);
+            yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
         }
 
         // Mark door tiles and carve out hallways:
@@ -245,7 +252,7 @@ public class DungeonGenerator : MonoBehaviour {
                 yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
             }
 
-            yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
+            yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
 
             mapBlueprint.GetCell(doorPosA).type = MapGenCellType.DOOR;
             mapBlueprint.GetCell(doorPosB).type = MapGenCellType.DOOR;
@@ -291,7 +298,7 @@ public class DungeonGenerator : MonoBehaviour {
 
                 if (newEntity != null) {
                     mapBlueprint.entitiesToPlace.Add(new Vector2Int(x, y), newEntity);
-                    yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
+                    yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
                 }
             }
         }
@@ -342,7 +349,7 @@ public class DungeonGenerator : MonoBehaviour {
                 failedAttempts++;
                 continue;
             }
-            yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
+            yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
             mapBlueprint.entitiesToPlace.Add(enemyPos, enemy);
 
             // Decrement room index, subtract exp cost
@@ -354,7 +361,7 @@ public class DungeonGenerator : MonoBehaviour {
         
         Debug.Log("Floor " + (depth + 1) + ": leftover budget " + experienceBudget + "/" + dungeonGenInfo.getExpectedExperience(depth+1) + ". lowest exp enemy is " + lowestExpEnemy);
         
-        yield return new WaitForSeconds(1.5f * visualizationSpeedMod);
+        yield return new WaitForSeconds(0.5f * visualizationSpeedMod);
 
         if (visualizeGeneration){
             StopCoroutine(visualizer);

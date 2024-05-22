@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -144,7 +145,16 @@ public class MapGenRoom{
         return -Vector2Int.one;
     }
 
-    public Vector2Int GetEdgePositionAtDir(Vector2 roomDiff){
+    public bool IsCorner(Vector2Int testPos){
+        Vector2Int lowerCorner = pos;
+        Vector2Int upperCorner = pos + size - Vector2Int.one;
+        return testPos.Equals(lowerCorner) 
+            || testPos.Equals(upperCorner) 
+            || (testPos.x == lowerCorner.x && testPos.y == upperCorner.y) 
+            || (testPos.x == upperCorner.x && testPos.y == lowerCorner.y);
+    }
+
+    public Vector2Int GetEdgePositionAtDir(Vector2 roomDiff, bool avoidCorners = true){
         Vector2 center = GetCenterPosition();
         Vector2 edgePos = center;
         Vector2 dir = roomDiff.normalized; 
@@ -154,6 +164,12 @@ public class MapGenRoom{
             edgePos += dir;
             result = Vector2Int.RoundToInt(edgePos);
         }
+
+        if(avoidCorners && IsCorner(result)){
+            result.x -= (int)Mathf.Sign(dir.x);
+            //result.y -= (int)Mathf.Sign(dir.y);
+        }
+
         return result;
     }
 }
