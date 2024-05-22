@@ -155,6 +155,10 @@ public class DR_GameManager : MonoBehaviour
                     if (turnSystem.CanEntityAct())
                     {
                         DR_Entity entity = turnSystem.GetNextEntity().Entity;
+                        if (entity.HasComponent<PlayerComponent>() && AnimationSystem.HasPendingAnimations()){
+                            AnimationSystem.PlayAllPendingAnimations();
+                            break;
+                        }
                         turnSystem.HandleTurn(this, entity);
                     }
                     else
@@ -171,7 +175,7 @@ public class DR_GameManager : MonoBehaviour
                 }
             case GameState.ANIMATING:
             {
-                if (DR_Renderer.animsActive <= 0){
+                if (!AnimationSystem.IsAnimating()){
                     SetGameState(GameState.ADVANCE_GAME);
                 }
                 break;
@@ -185,7 +189,7 @@ public class DR_GameManager : MonoBehaviour
                 break;
         }
 
-        if (CurrentState != GameState.ANIMATING && CurrentState != GameState.ANIMATING && DR_Renderer.animsActive > 0){
+        if (CurrentState != GameState.ANIMATING && AnimationSystem.IsAnimating()){
             SetGameState(GameState.ANIMATING);
         }
 

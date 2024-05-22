@@ -75,25 +75,6 @@ public class TurnSystem : MonoBehaviour
         return turnComp;
     }
 
-    public bool IsPlayerTurn(){
-        if (!CanEntityAct()){
-            return false;
-        }
-
-        // TODO: have entities properly remove themselves
-        // Messy handling of entites which have been removed:
-        TurnComponent NextEntityTurn = GetNextEntity();
-        DR_Entity NextEntity = NextEntityTurn.Entity;
-
-        if (NextEntity == null){
-            CanAct.Remove(NextEntityTurn);
-            EligibleEntities.Remove(NextEntityTurn);
-            return IsPlayerTurn(); //recursively call to remove all null entities
-        }
-
-        return NextEntity.HasComponent<PlayerComponent>();
-    }
-
     public void HandleTurn(DR_GameManager gm, DR_Entity turnTaker){
         //Debug.Log("Handling turn for " + turnTaker.Name);
         gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
@@ -183,6 +164,7 @@ public class TurnSystem : MonoBehaviour
             if (turnTaker.HasComponent<PlayerComponent>()){
                 SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
                 DR_Renderer.instance.UpdateTiles();
+                AnimationSystem.PlayAllPendingAnimations();
             }
         }
         currentAction = null;

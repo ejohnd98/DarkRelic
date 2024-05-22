@@ -1599,10 +1599,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.16666667
-    y: 0.13927856
-    width: 0.6666667
-    height: 0.7214429
+    x: 0
+    y: 0
+    width: 1
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -2709,10 +2709,10 @@ Camera:
   m_LensShift: {x: 0, y: 0}
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.16666667
-    y: 0.13927856
-    width: 0.6666667
-    height: 0.7214429
+    x: 0
+    y: 0
+    width: 1
+    height: 1
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 34
@@ -4461,7 +4461,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f435638a63c5474395755738dbd8fc72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visualizeGeneration: 1
+  visualizeGeneration: 0
   visualizationParent: {fileID: 1825417453}
   visualizationPrefab: {fileID: 2227962700054437479, guid: d6192717655c4254fb44f0ce4c70c817, type: 3}
   roomSpr: {fileID: -1211660134, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}

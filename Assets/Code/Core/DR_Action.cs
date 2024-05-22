@@ -142,19 +142,20 @@ public class MoveAction : DR_Action {
         if (gm.CurrentMap.IsVisible[owner.Position.y, owner.Position.x]){
             moveAnim = owner.AddComponent<MoveAnimation>(new());
             moveAnim.SetAnim(pos);
-            AnimationSystem.AddAnimation(moveAnim);
+            AnimationSystem.AddAnimation(moveAnim, owner);
             
             SoundSystem.instance.PlaySound("move2");
 
-            moveAnim.AnimFinished += (DR_Animation moveAnim) => {
-                EndAction(gm);
-            };
+            // moveAnim.AnimFinished += (DR_Animation moveAnim) => {
+            //     EndAction(gm);
+            // };
 
-            gm.CurrentMap.MoveActor(owner, pos, false);
+            gm.CurrentMap.MoveActor(owner, pos);
             //TODO: later have animation system return a bool if the action can be completed without the animation
             // this will let multiple enemies animate at once
+            EndAction(gm);
         }else{
-            gm.CurrentMap.MoveActor(owner, pos, false);
+            gm.CurrentMap.MoveActor(owner, pos);
             EndAction(gm);
         }
     }
@@ -210,7 +211,7 @@ public class AttackAction : DR_Action {
 
         attackAnim = owner.AddComponent<AttackAnimation>(new());
         attackAnim.SetAnim(target.Entity.Position);
-        AnimationSystem.AddAnimation(attackAnim);
+        AnimationSystem.AddAnimation(attackAnim, owner);
 
         attackAnim.AnimHalfway += (DR_Animation moveAnim) => {
             int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;

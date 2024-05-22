@@ -5,7 +5,6 @@ using UnityEngine;
 public class DR_Renderer : MonoBehaviour
 {
     public static DR_Renderer instance;
-    public static int animsActive = 0;
 
     public static float ActorDepth = -1.0f;
     public static float ItemDepth = -0.75f;
