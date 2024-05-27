@@ -147,7 +147,7 @@ public class TurnSystem : MonoBehaviour
 
             LevelComponent levelComp = turnTaker.GetComponent<LevelComponent>();
             if (levelComp.RequiresLevelUp()){
-                LogSystem.instance.AddTextLog(turnTaker.Name + " leveled up!");
+                //LogSystem.instance.AddTextLog(turnTaker.Name + " leveled up!");
                 levelComp.AdvanceLevel();
             }
                 
@@ -163,7 +163,7 @@ public class TurnSystem : MonoBehaviour
             turnTaker.GetComponent<TurnComponent>().SpendTurn();
             if (turnTaker.HasComponent<PlayerComponent>()){
                 SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
-                DR_Renderer.instance.UpdateTiles();
+                //ance.UpdateTiles();
                 AnimationSystem.PlayAllPendingAnimations();
             }
         }

@@ -109,13 +109,13 @@ public class DamageSystem
                 }
 
                 damageEvent.OnKill?.Invoke();
-                FXSpawner.instance.SpawnDeathFX(target.Entity);
+                //FXSpawner.instance.SpawnDeathFX(target.Entity);
 
                 //Handle blood
                 DR_Cell cell = gm.CurrentMap.GetCell(target.Entity.Position);
                 cell.blood += Mathf.Max(Mathf.CeilToInt(target.maxHealth * 0.25f), 1);
                 cell.bloodStained = true;
-                DR_Renderer.instance.SetCellBloodState(target.Entity.Position, cell);
+                //DR_Renderer.instance.SetCellBloodState(target.Entity.Position, cell);
 
 
                 //TODO: make this better. have class to handle "garbage collecting" of entities
@@ -128,12 +128,12 @@ public class DamageSystem
                 cameraShakeAmount *= 1.5f;
             }
             
-            SoundSystem.instance.PlaySound(damageEvent.killed ? "death" : "attack");
+            //SoundSystem.instance.PlaySound(damageEvent.killed ? "death" : "attack");
 
-            CameraShake.ShakeCamera(cameraShakeAmount);
+            //CameraShake.ShakeCamera(cameraShakeAmount);
         }
 
-        LogSystem.instance.AddDamageLog(damageEvent);
+        //LogSystem.instance.AddDamageLog(damageEvent);
 
         return damageEvent;
     }

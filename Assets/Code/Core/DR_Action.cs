@@ -93,7 +93,7 @@ public abstract class DR_Action {
 
     public virtual void EndAction(DR_GameManager gm){
         if (wasSuccess){
-            LogSystem.instance.AddLog(this);
+            //LogSystem.instance.AddLog(this);
         }
         hasFinished = true;
     }
@@ -140,11 +140,11 @@ public class MoveAction : DR_Action {
         }
 
         if (gm.CurrentMap.IsVisible[owner.Position.y, owner.Position.x]){
-            moveAnim = owner.AddComponent<MoveAnimation>(new());
-            moveAnim.SetAnim(pos);
-            AnimationSystem.AddAnimation(moveAnim, owner);
+            //moveAnim = owner.AddComponent<MoveAnimation>(new());
+            //moveAnim.SetAnim(pos);
+            //AnimationSystem.AddAnimation(moveAnim, owner);
             
-            SoundSystem.instance.PlaySound("move2");
+            //SoundSystem.instance.PlaySound("move2");
 
             // moveAnim.AnimFinished += (DR_Animation moveAnim) => {
             //     EndAction(gm);
@@ -183,7 +183,7 @@ public class MoveAction : DR_Action {
                 inventory.AddBlood(cell.blood);
                 UISystem.instance.RefreshInventoryUI();
                 cell.blood = 0;
-                DR_Renderer.instance.SetCellBloodState(pos, cell);
+                //DR_Renderer.instance.SetCellBloodState(pos, cell);
             }
         }
 
@@ -209,25 +209,37 @@ public class AttackAction : DR_Action {
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
 
-        attackAnim = owner.AddComponent<AttackAnimation>(new());
-        attackAnim.SetAnim(target.Entity.Position);
-        AnimationSystem.AddAnimation(attackAnim, owner);
+        //attackAnim = owner.AddComponent<AttackAnimation>(new());
+        //attackAnim.SetAnim(target.Entity.Position);
+        //AnimationSystem.AddAnimation(attackAnim, owner);
 
-        attackAnim.AnimHalfway += (DR_Animation moveAnim) => {
-            int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+        //attackAnim.AnimHalfway += (DR_Animation moveAnim) => {
+            // int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
 
-            DamageSystem.HandleAttack(gm, owner, target, baseDamage);
+            // DamageSystem.HandleAttack(gm, owner, target, baseDamage);
 
-            //TODO: check if this is still needed here
-            if (!target.IsAlive()){
-                gm.CurrentMap.RemoveActor(target.Entity);
-                target.Entity.DestroyEntity();
-            }
-        };
+            // //TODO: check if this is still needed here
+            // if (!target.IsAlive()){
+            //     gm.CurrentMap.RemoveActor(target.Entity);
+            //     target.Entity.DestroyEntity();
+            // }
+        //};
 
-        attackAnim.AnimFinished += (DR_Animation moveAnim) => {
-            EndAction(gm);
-        };
+        int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+
+        DamageSystem.HandleAttack(gm, owner, target, baseDamage);
+
+        //TODO: check if this is still needed here
+        if (!target.IsAlive()){
+            gm.CurrentMap.RemoveActor(target.Entity);
+            target.Entity.DestroyEntity();
+        }
+
+        EndAction(gm);
+
+        // attackAnim.AnimFinished += (DR_Animation moveAnim) => {
+        //     EndAction(gm);
+        // };
     }
 
     public override void ActionStep(DR_GameManager gm, float deltaTime)
@@ -255,7 +267,7 @@ public class StairAction : DR_Action {
         base.StartAction(gm);
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
         gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper, true);
-        SoundSystem.instance.PlaySound(stairs.goesDeeper ? "descend" : "ascend");
+        //SoundSystem.instance.PlaySound(stairs.goesDeeper ? "descend" : "ascend");
         //return true;
     }
 
@@ -281,7 +293,7 @@ public class DoorAction : DR_Action {
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
         target.ToggleOpen();
-        SoundSystem.instance.PlaySound("door");
+        //SoundSystem.instance.PlaySound("door");
         EndAction(gm);
     }
 }
@@ -297,7 +309,7 @@ public class GoalAction : DR_Action {
 
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
-        SoundSystem.instance.PlaySound("altar");
+        //SoundSystem.instance.PlaySound("altar");
         gm.OnGameWon();
         //return true;
     }
@@ -364,7 +376,7 @@ public class AltarAction : DR_Action {
         }
         
         if (wasSuccess) {
-            SoundSystem.instance.PlaySound("altar");
+            //SoundSystem.instance.PlaySound("altar");
         }
     }
 }

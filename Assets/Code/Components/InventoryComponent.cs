@@ -90,7 +90,7 @@ public class InventoryComponent : DR_Component
     public bool AddItem(DR_Entity item){
         if (item.GetComponent<RelicComponent>() is RelicComponent relicComponent)
         {
-            SoundSystem.instance.PlaySound("relic");
+            //SoundSystem.instance.PlaySound("relic");
             RelicType relicType = relicComponent.relicType;
             if (RelicInventory.ContainsKey(relicType))
             {
@@ -122,7 +122,7 @@ public class InventoryComponent : DR_Component
     public void AddBlood(int amount)
     {
         blood += amount;
-        SoundSystem.instance.PlaySound("addBlood");
+        //SoundSystem.instance.PlaySound("addBlood");
         UISystem.instance.RefreshInventoryUI();
     }
 

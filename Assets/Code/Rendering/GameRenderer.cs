@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DR_Renderer : MonoBehaviour
+public class GameRenderer : MonoBehaviour
 {
-    public static DR_Renderer instance;
+    public static GameRenderer instance;
 
     public static float ActorDepth = -1.0f;
     public static float ItemDepth = -0.75f;
@@ -16,7 +16,7 @@ public class DR_Renderer : MonoBehaviour
     Dictionary<DR_Entity, GameObject> EntityObjects;
     Dictionary<Vector2Int, GameObject> CellObjects;
 
-    Vector2Int selectedCellPos;
+    //Vector2Int selectedCellPos;
 
     void Awake()
     {
@@ -30,30 +30,24 @@ public class DR_Renderer : MonoBehaviour
     }
 
     void LateUpdate() {
-        // if (DR_GameManager.instance.CurrentState == DR_GameManager.GameState.INVALID){
-        //     return;
-        // }
-        // AnimationSystem.UpdateAnims(Time.deltaTime);
-        // UpdateEntities(Time.deltaTime);
-    }
-
-    public void UpdateTiles(){
-        DR_Map currentMap = DR_GameManager.instance.CurrentMap;
-
-        foreach (var (pos, obj) in CellObjects){
-            Sprite CellSprite = FogTexture;
-            if (currentMap.IsVisible[pos.y, pos.x] || DR_GameManager.instance.debug_disableFOV){
-                CellSprite = currentMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
-                obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
-            }else if (currentMap.IsKnown[pos.y, pos.x]){
-                CellSprite = currentMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
-                obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
-            }
-            obj.GetComponent<SpriteRenderer>().sprite = CellSprite;
+        if (DR_GameManager.instance.CurrentState == DR_GameManager.GameState.INVALID){
+            return;
         }
+        //AnimationSystem.UpdateAnims(Time.deltaTime);
+        //UpdateEntities(Time.deltaTime);
     }
 
-    public void CreateTiles(){
+    public void FullyUpdateRenderer(bool createTiles = false){
+        if (createTiles){
+            CreateTiles();
+        }else{
+            UpdateTiles();
+        }
+        
+        UpdateEntities();
+    }
+
+    private void CreateTiles(){
         DR_Map currentMap = DR_GameManager.instance.CurrentMap;
 
         foreach(GameObject obj in CellObjects.Values){
@@ -68,11 +62,34 @@ public class DR_Renderer : MonoBehaviour
                 CellObjects.Add(new Vector2Int(x,y), NewCellObj);
                 NewCellObj.name = "Cell (" + x + ", " + y + ")";
 
+                // Should this be in UpdateTiles instead?
                 NewCellObj.GetComponent<CellObj>().SetBlood(currentMap.GetCell(new Vector2Int(x,y)));
             }
         }
 
         UpdateTiles();
+    }
+
+    private void UpdateTiles(){
+        DR_Map currentMap = DR_GameManager.instance.CurrentMap;
+
+        foreach (var (pos, obj) in CellObjects){
+            Sprite CellSprite = FogTexture;
+            if (currentMap.IsVisible[pos.y, pos.x] || DR_GameManager.instance.debug_disableFOV){
+                CellSprite = currentMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
+                obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
+
+                CellObjects[pos].GetComponent<CellObj>().SetBlood(currentMap.Cells[pos.y, pos.x]);
+
+            }else if (currentMap.IsKnown[pos.y, pos.x]){
+                CellSprite = currentMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
+                obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
+                CellObjects[pos].GetComponent<CellObj>().SetBlood(null);
+            }else{
+                CellObjects[pos].GetComponent<CellObj>().SetBlood(null);
+            }
+            obj.GetComponent<SpriteRenderer>().sprite = CellSprite;
+        }
     }
 
     public void ClearAllObjects(){
@@ -87,7 +104,7 @@ public class DR_Renderer : MonoBehaviour
         EntityObjects.Clear();
     }
 
-    public void UpdateEntities(float deltaTime){
+    private void UpdateEntities(){
         DR_Map currentMap = DR_GameManager.instance.CurrentMap;
 
         foreach(DR_Entity entity in currentMap.Entities){
@@ -132,16 +149,7 @@ public class DR_Renderer : MonoBehaviour
             EntityObjects[Entity].SetActive(true);
 
             // TODO: make proper system to determine z depth for each entity
-            Vector3 pos;
-            MoveAnimation moveAnim = Entity.GetComponent<MoveAnimation>();
-            AttackAnimation attackAnim = Entity.GetComponent<AttackAnimation>();
-            if (moveAnim != null){
-                pos = moveAnim.GetAnimPosition(GetDepthForEntity(Entity));
-            }else if (attackAnim != null){
-                pos = attackAnim.GetAnimPosition(GetDepthForEntity(Entity));
-            }else{
-                pos = Entity.GetPosFloat(GetDepthForEntity(Entity));
-            }
+            Vector3 pos = Entity.GetPosFloat(GetDepthForEntity(Entity));;
             
             EntityObjects[Entity].transform.position = pos;
 
@@ -170,29 +178,21 @@ public class DR_Renderer : MonoBehaviour
         }
     }
 
-    public void ResetSelectedCell(){
-        if (CellObjects.ContainsKey(selectedCellPos)){
-            GameObject selectedCell = CellObjects[selectedCellPos];
-            selectedCell.GetComponent<CellObj>().SetSelected(false);
-        }
-    }
+    // public void ResetSelectedCell(){
+    //     if (CellObjects.ContainsKey(selectedCellPos)){
+    //         GameObject selectedCell = CellObjects[selectedCellPos];
+    //         selectedCell.GetComponent<CellObj>().SetSelected(false);
+    //     }
+    // }
 
-    public void SetSelectedCell(Vector2Int pos){
-        ResetSelectedCell();
-        if (CellObjects.ContainsKey(pos)){
-            GameObject selectedCell = CellObjects[pos];
-            selectedCell.GetComponent<CellObj>().SetSelected(true);
-            selectedCellPos = pos;
-        }
-    }
-
-    //TODO: this function should not be being called from elsewhere really
-    // instead perhaps each cell object can subscribe to an event on the DR_Cell?
-    public void SetCellBloodState(Vector2Int pos, DR_Cell cell){
-        if (CellObjects.ContainsKey(pos)){
-            CellObjects[pos].GetComponent<CellObj>().SetBlood(cell);
-        }
-    }
+    // public void SetSelectedCell(Vector2Int pos){
+    //     ResetSelectedCell();
+    //     if (CellObjects.ContainsKey(pos)){
+    //         GameObject selectedCell = CellObjects[pos];
+    //         selectedCell.GetComponent<CellObj>().SetSelected(true);
+    //         selectedCellPos = pos;
+    //     }
+    // }
 
     public static float GetDepthForEntity(DR_Entity entity){
         if (entity.HasComponent<PropComponent>()){

@@ -134,13 +134,14 @@ public class DR_GameManager : MonoBehaviour
         turnSystem = gameObject.AddComponent<TurnSystem>();
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-        DR_Renderer.instance.CreateTiles();
+        //DR_Renderer.instance.CreateTiles();
 
         SetGameState(GameState.ADVANCE_GAME);
         UISystem.instance.RefreshDetailsUI();
         UISystem.instance.UpdateDepthUI();
 
         blackOverlay.SetShouldBeVisible(false);
+        GameRenderer.instance.FullyUpdateRenderer(true);
     }
 
     void Update()
@@ -155,9 +156,10 @@ public class DR_GameManager : MonoBehaviour
                     if (turnSystem.CanEntityAct())
                     {
                         DR_Entity entity = turnSystem.GetNextEntity().Entity;
-                        if (entity.HasComponent<PlayerComponent>() && AnimationSystem.HasPendingAnimations()){
-                            AnimationSystem.PlayAllPendingAnimations();
-                            break;
+                        if (entity.HasComponent<PlayerComponent>()){// && AnimationSystem.HasPendingAnimations()){
+                            GameRenderer.instance.FullyUpdateRenderer(); //should then wait until all anims are done before allowing player input
+                            //AnimationSystem.PlayAllPendingAnimations();
+                            //break;
                         }
                         turnSystem.HandleTurn(this, entity);
                     }
@@ -189,9 +191,9 @@ public class DR_GameManager : MonoBehaviour
                 break;
         }
 
-        if (CurrentState != GameState.ANIMATING && AnimationSystem.IsAnimating()){
-            SetGameState(GameState.ANIMATING);
-        }
+        // if (CurrentState != GameState.ANIMATING && AnimationSystem.IsAnimating()){
+        //     SetGameState(GameState.ANIMATING);
+        // }
 
         if (CurrentState != GameState.GAME_OVER && !PlayerActor.GetComponent<HealthComponent>().IsAlive()){
             OnPlayerDied();
@@ -276,8 +278,9 @@ public class DR_GameManager : MonoBehaviour
             blackOverlay.OnVisibleComplete -= OnFadeOut;
             LoadNextLevel(origin, destination, goingDeeper);
             blackOverlay.SetShouldBeVisible(false);
-            //turnSystem.UpdateEntityLists(CurrentMap);
-            //SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+            turnSystem.UpdateEntityLists(CurrentMap);
+            SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+            GameRenderer.instance.FullyUpdateRenderer(true);
             //DR_Renderer.instance.CreateTiles();
             isFadeActive = false;
         };
@@ -305,8 +308,9 @@ public class DR_GameManager : MonoBehaviour
         
         UpdateCurrentMap();
         UpdateCamera(true);
-        DR_Renderer.instance.ClearAllObjects();
-        DR_Renderer.instance.CreateTiles();
+        GameRenderer.instance.ClearAllObjects();
+        //DR_Renderer.instance.ClearAllObjects();
+        //DR_Renderer.instance.CreateTiles();
     }
     
     public DR_Entity GetPlayer(){

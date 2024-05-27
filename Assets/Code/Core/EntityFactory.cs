@@ -158,7 +158,7 @@ public class EntityFactory : MonoBehaviour
         NewActor.isOnMap = true;
 
         moveAnim.SetAnim(end, 0.2f, EaseType.Linear);
-        AnimationSystem.AddAnimation(moveAnim, NewActor);
+        //AnimationSystem.AddAnimation(moveAnim, NewActor);
         return NewActor;
     }
 }
