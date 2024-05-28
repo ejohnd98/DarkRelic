@@ -156,10 +156,10 @@ public class DR_GameManager : MonoBehaviour
                     if (turnSystem.CanEntityAct())
                     {
                         DR_Entity entity = turnSystem.GetNextEntity().Entity;
-                        if (entity.HasComponent<PlayerComponent>()){// && AnimationSystem.HasPendingAnimations()){
-                            GameRenderer.instance.FullyUpdateRenderer(); //should then wait until all anims are done before allowing player input
-                            //AnimationSystem.PlayAllPendingAnimations();
-                            //break;
+                        if (entity.HasComponent<PlayerComponent>() && GameRenderer.instance.HasActionsQueued()){
+                            GameRenderer.instance.FullyUpdateRenderer();
+                            SetGameState(GameState.ANIMATING);
+                            break;
                         }
                         turnSystem.HandleTurn(this, entity);
                     }
@@ -177,7 +177,7 @@ public class DR_GameManager : MonoBehaviour
                 }
             case GameState.ANIMATING:
             {
-                if (!AnimationSystem.IsAnimating()){
+                if (!GameRenderer.instance.currentlyUpdating){
                     SetGameState(GameState.ADVANCE_GAME);
                 }
                 break;
@@ -195,7 +195,7 @@ public class DR_GameManager : MonoBehaviour
         //     SetGameState(GameState.ANIMATING);
         // }
 
-        if (CurrentState != GameState.GAME_OVER && !PlayerActor.GetComponent<HealthComponent>().IsAlive()){
+        if (CurrentState != GameState.GAME_OVER && CurrentState != GameState.ANIMATING &&!PlayerActor.GetComponent<HealthComponent>().IsAlive()){
             OnPlayerDied();
         }
     }

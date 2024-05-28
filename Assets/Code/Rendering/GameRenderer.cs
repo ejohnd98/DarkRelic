@@ -2,6 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class RenderedAction {
+
+    public DR_Action originalAction;
+
+    public RenderedAction(DR_Action action){
+        originalAction = action;
+    }
+}
+
 public class GameRenderer : MonoBehaviour
 {
     public static GameRenderer instance;
@@ -16,7 +25,14 @@ public class GameRenderer : MonoBehaviour
     Dictionary<DR_Entity, GameObject> EntityObjects;
     Dictionary<Vector2Int, GameObject> CellObjects;
 
+    Queue<RenderedAction> actionQueue = new();
+
     //Vector2Int selectedCellPos;
+    public bool currentlyUpdating = false;
+
+    public bool HasActionsQueued(){
+        return actionQueue.Count > 0;
+    }
 
     void Awake()
     {
@@ -37,13 +53,61 @@ public class GameRenderer : MonoBehaviour
         //UpdateEntities(Time.deltaTime);
     }
 
+    public void AddAction(DR_Action action){
+        actionQueue.Enqueue(new(action));
+    }
+
     public void FullyUpdateRenderer(bool createTiles = false){
+        if (currentlyUpdating){
+            Debug.LogAssertion("Tried to update renderer mid-update");
+            return;
+        }
+        currentlyUpdating = true;
+
+        StartCoroutine(RenderActions(createTiles));
+    }
+
+    private IEnumerator RenderActions(bool createTiles){
+        DR_GameManager gm = DR_GameManager.instance;
+        DR_Map currentMap = gm.CurrentMap;
+
+        //TODO: use this
+        List<RenderedAction> actionsToBeRendered = new();
+
+        while (actionQueue.Count > 0){
+            RenderedAction action = actionQueue.Dequeue();
+
+            if (action.originalAction is WaitAction){
+                // Temp while anims aren't implemented yet
+                continue;
+            }
+
+            Vector2Int actionPos = action.originalAction.owner.Position;
+            //Skip rendering action if entity not visible (could be made more robust as actions can affect multiple spaces)
+            if (!currentMap.IsVisible[actionPos.y, actionPos.x] && !DR_GameManager.instance.debug_disableFOV){
+                continue;
+            }
+
+            //TODO: implement method in RenderedAction to check compatability with provided list of other actions
+            // These are incompatabile if they use the same entities in any ways (idea for later, implement functions in actions to return a list of all entities affected)
+            // Keep adding actions to actionsToBeRendered until an incompatability or queue is empty
+            // Then, create animation objects to actually visualize these actions.
+            // Once that is done, if queue has more, repeat the process. Do this until queue is empty.
+
+
+            Debug.Log("processing action of type " + action.originalAction.GetType().Name);
+            yield return new WaitForSeconds(0.25f);
+        }
+
+
+        // Bring map up to date (this may become redundant if the action animations make the same changes?)
+        currentlyUpdating = false;
+
         if (createTiles){
             CreateTiles();
         }else{
             UpdateTiles();
         }
-        
         UpdateEntities();
     }
 

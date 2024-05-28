@@ -94,6 +94,7 @@ public abstract class DR_Action {
     public virtual void EndAction(DR_GameManager gm){
         if (wasSuccess){
             //LogSystem.instance.AddLog(this);
+            GameRenderer.instance.AddAction(this);
         }
         hasFinished = true;
     }
