@@ -115,6 +115,10 @@ public abstract class DR_Action {
     public virtual DR_Animation GetEndAnimation(){
         return null;
     }
+
+    public virtual List<DR_Entity> GetRelatedEntities(){
+        return new List<DR_Entity>(){owner};
+    }
 }
 
 public class MoveAction : DR_Action {
@@ -201,6 +205,10 @@ public class AttackAction : DR_Action {
         this.target = target;
         this.owner = attacker;
         loggable = false; //handle this separately for attacks
+    }
+
+    public override List<DR_Entity> GetRelatedEntities(){
+        return new List<DR_Entity>(){owner, target.Entity};
     }
 
     public override string GetLogText(){
@@ -291,6 +299,10 @@ public class DoorAction : DR_Action {
         this.owner = opener;
     }
 
+    public override List<DR_Entity> GetRelatedEntities(){
+        return new List<DR_Entity>(){owner, target.Entity};
+    }
+
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
         target.ToggleOpen();
@@ -329,6 +341,10 @@ public class AltarAction : DR_Action {
         this.owner = owner;
         this.altar = altar;
         loggable = true;
+    }
+
+    public override List<DR_Entity> GetRelatedEntities(){
+        return new List<DR_Entity>(){owner, altar.Entity};
     }
 
     public override string GetLogText(){
@@ -488,6 +504,10 @@ public class PickupAction : DR_Action {
         this.item = item;
         this.owner = user;
         loggable = true;
+    }
+
+    public override List<DR_Entity> GetRelatedEntities(){
+        return new List<DR_Entity>(){owner, item};
     }
 
     public override void StartAction(DR_GameManager gm){

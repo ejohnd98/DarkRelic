@@ -9,6 +9,21 @@ public class RenderedAction {
     public RenderedAction(DR_Action action){
         originalAction = action;
     }
+
+    public override string ToString(){
+        return originalAction.owner.Name + ": " + originalAction.GetType().Name;
+    }
+
+    public bool OverlapsWith(RenderedAction other){
+        List<DR_Entity> relatedEntities = originalAction.GetRelatedEntities();
+
+        foreach (DR_Entity entity in other.originalAction.GetRelatedEntities()){
+            if (relatedEntities.Contains(entity)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 public class GameRenderer : MonoBehaviour
@@ -54,6 +69,10 @@ public class GameRenderer : MonoBehaviour
     }
 
     public void AddAction(DR_Action action){
+        if (action is WaitAction){
+            return;    
+        }
+
         actionQueue.Enqueue(new(action));
     }
 
@@ -74,18 +93,44 @@ public class GameRenderer : MonoBehaviour
         //TODO: use this
         List<RenderedAction> actionsToBeRendered = new();
 
+        // Loop until all actions are taken care of
         while (actionQueue.Count > 0){
-            RenderedAction action = actionQueue.Dequeue();
 
-            if (action.originalAction is WaitAction){
-                // Temp while anims aren't implemented yet
-                continue;
+            actionsToBeRendered.Clear();
+
+            // Determine which actions can be visualized at the same time
+            while (actionQueue.Count > 0){
+                RenderedAction nextAction = actionQueue.Peek();
+
+                bool canAddActionToList = true;//actionsToBeRendered.Count == 0;
+
+                foreach (var queuedAction in actionsToBeRendered){
+                    if (nextAction.OverlapsWith(queuedAction)){
+                        canAddActionToList = false;
+                        break;
+                    }
+                }
+
+                if (canAddActionToList){
+
+                    Vector2Int nextActionPos = nextAction.originalAction.owner.Position;
+                    //Skip rendering action if entity not visible (could be made more robust as actions can affect multiple spaces)
+                    if (!currentMap.IsVisible[nextActionPos.y, nextActionPos.x] && !DR_GameManager.instance.debug_disableFOV){
+                        actionQueue.Dequeue();
+                        continue;
+                    }
+
+                    actionsToBeRendered.Add(actionQueue.Dequeue());
+                }else{
+                    break;
+                }
+                
             }
 
-            Vector2Int actionPos = action.originalAction.owner.Position;
-            //Skip rendering action if entity not visible (could be made more robust as actions can affect multiple spaces)
-            if (!currentMap.IsVisible[actionPos.y, actionPos.x] && !DR_GameManager.instance.debug_disableFOV){
-                continue;
+            // Create and start current group of animations
+            if (actionsToBeRendered.Count > 0){
+                Debug.Log("Playing animations for: " + ActionListToString(actionsToBeRendered));
+                yield return new WaitForSeconds(1.0f);
             }
 
             //TODO: implement method in RenderedAction to check compatability with provided list of other actions
@@ -93,10 +138,6 @@ public class GameRenderer : MonoBehaviour
             // Keep adding actions to actionsToBeRendered until an incompatability or queue is empty
             // Then, create animation objects to actually visualize these actions.
             // Once that is done, if queue has more, repeat the process. Do this until queue is empty.
-
-
-            Debug.Log("processing action of type " + action.originalAction.GetType().Name);
-            yield return new WaitForSeconds(0.25f);
         }
 
 
@@ -109,6 +150,14 @@ public class GameRenderer : MonoBehaviour
             UpdateTiles();
         }
         UpdateEntities();
+    }
+
+    private static string ActionListToString(List<RenderedAction> list){
+        string result = "[";
+        foreach (RenderedAction action in list){
+            result += "(" + action.ToString() + "), ";
+        }
+        return result + "]";
     }
 
     private void CreateTiles(){
