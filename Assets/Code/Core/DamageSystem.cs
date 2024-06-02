@@ -96,11 +96,9 @@ public class DamageSystem
 
             damageEvent.OnAttack?.Invoke();
 
-            float cameraShakeAmount = 0.5f;
 
             if(!target.IsAlive()){
                 damageEvent.killed = true;
-                cameraShakeAmount *= 2.0f;
 
                 LevelComponent targetLevel = target.Entity.GetComponent<LevelComponent>();
                 LevelComponent attackerLevel = attacker.GetComponent<LevelComponent>();
@@ -109,31 +107,18 @@ public class DamageSystem
                 }
 
                 damageEvent.OnKill?.Invoke();
-                //FXSpawner.instance.SpawnDeathFX(target.Entity);
 
                 //Handle blood
                 DR_Cell cell = gm.CurrentMap.GetCell(target.Entity.Position);
                 cell.blood += Mathf.Max(Mathf.CeilToInt(target.maxHealth * 0.25f), 1);
                 cell.bloodStained = true;
-                //DR_Renderer.instance.SetCellBloodState(target.Entity.Position, cell);
 
 
                 //TODO: make this better. have class to handle "garbage collecting" of entities
                 target.Entity.noLongerValid = true;
                 gm.CurrentMap.RemoveActor(target.Entity);
-                target.Entity.DestroyEntity();
             }
-
-            if (target.Entity.HasComponent<PlayerComponent>()){
-                cameraShakeAmount *= 1.5f;
-            }
-            
-            //SoundSystem.instance.PlaySound(damageEvent.killed ? "death" : "attack");
-
-            //CameraShake.ShakeCamera(cameraShakeAmount);
         }
-
-        //LogSystem.instance.AddDamageLog(damageEvent);
 
         return damageEvent;
     }

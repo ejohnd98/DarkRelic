@@ -11,6 +11,7 @@ public class DR_InputHandler : MonoBehaviour
     class InputState {
         public KeyCode key;
         public float persistCounter = 0.0f;
+        public float heldCounter = 0.0f;
         public bool held = false;
 
         public InputState(KeyCode k){
@@ -21,8 +22,8 @@ public class DR_InputHandler : MonoBehaviour
             return persistCounter > 0.0f;
         }
 
-        public bool KeyHeld(){
-            return held;
+        public bool KeyHeld(float threshold = 0.0f){
+            return held && heldCounter >= threshold;
         }
 
         public void ConsumePress(){
@@ -34,7 +35,7 @@ public class DR_InputHandler : MonoBehaviour
 
     public Camera cameraObj;
 
-    public float inputPersistLength = 0.2f;
+    public float inputPersistLength = 0.5f;
 
     KeyCode[] KeysToCheck = {
         KeyCode.UpArrow,
@@ -88,8 +89,10 @@ public class DR_InputHandler : MonoBehaviour
 
             if (Input.GetKey(InputStates[i].key)){
                 InputStates[i].held = true;
+                InputStates[i].heldCounter += Time.deltaTime;
             }else{
                 InputStates[i].held = false;
+                InputStates[i].heldCounter = 0.0f;
             }
         }
 
@@ -110,11 +113,11 @@ public class DR_InputHandler : MonoBehaviour
         return false;
     }
 
-    public static bool GetKeyHeld(KeyCode key){
+    public static bool GetKeyHeld(KeyCode key, float threshold = 0.0f){
         if (!instance.KeyDictionary.ContainsKey(key)){
             return false;
         }
-        return instance.KeyDictionary[key].KeyHeld();
+        return instance.KeyDictionary[key].KeyHeld(threshold);
     }
 
     private Vector2Int GetMouseCellPosition()

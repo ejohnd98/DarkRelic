@@ -83,17 +83,10 @@ public abstract class DR_Action {
             return;
         }
         EndAction(gm);
-
-        //TODO: refactor action to have a list of subactions (or some other name)
-        // These would be the action itself, plus any animations. they would be executed sequentially
-        // use events for anims to call some TriggerNextSubaction method as they finish?
-        // for attacks, this event could be partway through (ie when sprite has just bumped into target)
-        // this will sync up removing sprites with attack anim
     }
 
     public virtual void EndAction(DR_GameManager gm){
         if (wasSuccess){
-            //LogSystem.instance.AddLog(this);
             GameRenderer.instance.AddAction(this);
         }
         hasFinished = true;
@@ -101,19 +94,6 @@ public abstract class DR_Action {
 
     public virtual string GetLogText(){
         return "";
-    }
-
-    //TODO: DR_Animation: move existing animation components into this new class
-    // these animations will be stored in a list in a new AnimationSystem class.
-    // the renderer will iterate through them, but when possible perform multiple at once (can do that later though)
-
-    //TODO: make these work:
-    public virtual DR_Animation GetStartAnimation(){
-        return null;
-    }
-
-    public virtual DR_Animation GetEndAnimation(){
-        return null;
     }
 
     public virtual List<DR_Entity> GetRelatedEntities(){
@@ -143,26 +123,9 @@ public class MoveAction : DR_Action {
             wasSuccess = false;
             EndAction(gm);
         }
-
-        if (gm.CurrentMap.IsVisible[owner.Position.y, owner.Position.x]){
-            //moveAnim = owner.AddComponent<MoveAnimation>(new());
-            //moveAnim.SetAnim(pos);
-            //AnimationSystem.AddAnimation(moveAnim, owner);
-            
-            //SoundSystem.instance.PlaySound("move2");
-
-            // moveAnim.AnimFinished += (DR_Animation moveAnim) => {
-            //     EndAction(gm);
-            // };
-
-            gm.CurrentMap.MoveActor(owner, pos);
-            //TODO: later have animation system return a bool if the action can be completed without the animation
-            // this will let multiple enemies animate at once
-            EndAction(gm);
-        }else{
-            gm.CurrentMap.MoveActor(owner, pos);
-            EndAction(gm);
-        }
+        
+        gm.CurrentMap.MoveActor(owner, pos);
+        EndAction(gm);
     }
 
     public override void ActionStep(DR_GameManager gm, float deltaTime)
@@ -201,6 +164,9 @@ public class AttackAction : DR_Action {
     public HealthComponent target;
     public AttackAnimation attackAnim;
 
+    public bool killed = false;
+    public DamageEvent damageEvent;
+
     public AttackAction (HealthComponent target, DR_Entity attacker = null){
         this.target = target;
         this.owner = attacker;
@@ -236,12 +202,15 @@ public class AttackAction : DR_Action {
 
         int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
 
-        DamageSystem.HandleAttack(gm, owner, target, baseDamage);
+        damageEvent = DamageSystem.HandleAttack(gm, owner, target, baseDamage);
 
         //TODO: check if this is still needed here
         if (!target.IsAlive()){
+            killed = true;
             gm.CurrentMap.RemoveActor(target.Entity);
-            target.Entity.DestroyEntity();
+
+            // Animations may be referencing the entity so can't destroy yet
+            //target.Entity.DestroyEntity();
         }
 
         EndAction(gm);
@@ -276,7 +245,7 @@ public class StairAction : DR_Action {
         base.StartAction(gm);
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
         gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper, true);
-        //SoundSystem.instance.PlaySound(stairs.goesDeeper ? "descend" : "ascend");
+        SoundSystem.instance.PlaySound(stairs.goesDeeper ? "descend" : "ascend");
         //return true;
     }
 
@@ -306,7 +275,7 @@ public class DoorAction : DR_Action {
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
         target.ToggleOpen();
-        //SoundSystem.instance.PlaySound("door");
+        SoundSystem.instance.PlaySound("door");
         EndAction(gm);
     }
 }
@@ -322,7 +291,7 @@ public class GoalAction : DR_Action {
 
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
-        //SoundSystem.instance.PlaySound("altar");
+        SoundSystem.instance.PlaySound("altar");
         gm.OnGameWon();
         //return true;
     }
@@ -393,7 +362,7 @@ public class AltarAction : DR_Action {
         }
         
         if (wasSuccess) {
-            //SoundSystem.instance.PlaySound("altar");
+            SoundSystem.instance.PlaySound("altar");
         }
     }
 }
@@ -442,8 +411,8 @@ public class ItemAction : DR_Action {
             }else{
                 targetPos = target.Position;
             }
-            moveAnim = EntityFactory.CreateProjectileEntityAtPosition(
-                magic.projectileSprite, "Projectile", owner.Position,targetPos, magic.color).GetComponent<MoveAnimation>();
+            // moveAnim = EntityFactory.CreateProjectileEntityAtPosition(
+            //     magic.projectileSprite, "Projectile", owner.Position,targetPos, magic.color).GetComponent<MoveAnimation>();
         }
     }
 
@@ -569,6 +538,8 @@ public class WaitAction : DR_Action {
 
     public override void StartAction(DR_GameManager gm){
         base.StartAction(gm);
+        wasSuccess = true;
+        EndAction(gm);
         return;
     }
 

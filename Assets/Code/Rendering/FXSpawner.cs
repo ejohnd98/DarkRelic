@@ -26,9 +26,9 @@ public class FXSpawner : MonoBehaviour
         main.startColor = color;
     }
 
-    public void SpawnDeathFX(DR_Entity killedEntity){
+    public void SpawnDeathFX(DR_Entity killedEntity, Vector3 pos){
         GameObject deathSprite = new GameObject(killedEntity.Name + " deathSprite");
-        deathSprite.transform.position = killedEntity.GetPosFloat(DR_Renderer.GetDepthForEntity(killedEntity));
+        deathSprite.transform.position = pos - Vector3.forward * 0.02f;
         SpriteRenderer newRenderer = deathSprite.AddComponent<SpriteRenderer>();
         newRenderer.sprite = killedEntity.GetComponent<SpriteComponent>().GetCurrentSprite();
         newRenderer.material = whiteMat;

@@ -144,20 +144,20 @@ public class EntityFactory : MonoBehaviour
         NewActor.Name = Name;
         NewActor.Position = start;
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
-        MoveAnimation moveAnim = NewActor.AddComponent<MoveAnimation>(new());
-        moveAnim.AnimFinished += (DR_Animation moveAnim) => {
-                //Debug.Log("AnimFinished!");
-                DR_GameManager.instance.CurrentMap.RemoveEntity(NewActor);
-                NewActor.noLongerValid = true;
-                NewActor.DestroyEntity();
-                NewActor.isOnMap = false;
-                FXSpawner.instance.SpawnParticleFX(end, color);
-            };
+        // MoveAnimation moveAnim = NewActor.AddComponent<MoveAnimation>(new());
+        // moveAnim.AnimFinished += (DR_Animation moveAnim) => {
+        //         //Debug.Log("AnimFinished!");
+        //         DR_GameManager.instance.CurrentMap.RemoveEntity(NewActor);
+        //         NewActor.noLongerValid = true;
+        //         NewActor.DestroyEntity();
+        //         NewActor.isOnMap = false;
+        //         FXSpawner.instance.SpawnParticleFX(end, color);
+        //     };
 
         DR_GameManager.instance.CurrentMap.AddEntity(NewActor);
         NewActor.isOnMap = true;
 
-        moveAnim.SetAnim(end, 0.2f, EaseType.Linear);
+        //moveAnim.SetAnim(end, 0.2f, EaseType.Linear);
         //AnimationSystem.AddAnimation(moveAnim, NewActor);
         return NewActor;
     }

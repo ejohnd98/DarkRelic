@@ -77,9 +77,8 @@ public class TurnSystem : MonoBehaviour
 
     public void HandleTurn(DR_GameManager gm, DR_Entity turnTaker){
         //Debug.Log("Handling turn for " + turnTaker.Name);
-        gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
-
         bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
+        gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
 
         if(isPlayer){
             StartCoroutine(WaitForPlayerInput(gm, turnTaker));
@@ -137,6 +136,8 @@ public class TurnSystem : MonoBehaviour
     }
 
     IEnumerator CheckIfActionFinished(DR_GameManager gm, DR_Entity turnTaker){
+        // TODO: this is probably the source of slowness right now.
+        // TODO: now that animations are detached completely from actions, make all actions synchronous!
         yield return new WaitUntil(() => currentAction.hasFinished);
         //Debug.Log("action "+ currentAction.GetType() + " for " + turnTaker.Name + " succeeded: " + currentAction.wasSuccess);
         TurnEnd(gm, turnTaker, currentAction.wasSuccess);
@@ -147,7 +148,7 @@ public class TurnSystem : MonoBehaviour
 
             LevelComponent levelComp = turnTaker.GetComponent<LevelComponent>();
             if (levelComp.RequiresLevelUp()){
-                //LogSystem.instance.AddTextLog(turnTaker.Name + " leveled up!");
+                LogSystem.instance.AddTextLog(turnTaker.Name + " leveled up!");
                 levelComp.AdvanceLevel();
             }
                 
@@ -163,8 +164,6 @@ public class TurnSystem : MonoBehaviour
             turnTaker.GetComponent<TurnComponent>().SpendTurn();
             if (turnTaker.HasComponent<PlayerComponent>()){
                 SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
-                //ance.UpdateTiles();
-                AnimationSystem.PlayAllPendingAnimations();
             }
         }
         currentAction = null;
@@ -182,7 +181,10 @@ public class TurnSystem : MonoBehaviour
 
         for (int i = 0; i < DR_GameManager.KeyDirections.Length; i++)
         {
-            if (DR_InputHandler.GetKeyPressed(DR_GameManager.KeyDirections[i]))
+            //TODO: allow holding direction to move, but only if held for a minimum time?
+
+            if (DR_InputHandler.GetKeyPressed(DR_GameManager.KeyDirections[i])
+                || DR_InputHandler.GetKeyHeld(DR_GameManager.KeyDirections[i], 0.3f))
             {
                 Vector2Int interactPos = playerActor.Position + gm.Directions[i];
 

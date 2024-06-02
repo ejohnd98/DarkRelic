@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 public class RenderedAction {
@@ -34,13 +36,20 @@ public class GameRenderer : MonoBehaviour
     public static float ItemDepth = -0.75f;
     public static float PropDepth = -0.5f;
 
+    public Camera MainCamera;
+    public Vector3 cameraOffset;
+    public Transform renderedPlayer;
+
     public Sprite WallTexture, FloorTexture, FogTexture;
     public GameObject CellObj;
 
     Dictionary<DR_Entity, GameObject> EntityObjects;
     Dictionary<Vector2Int, GameObject> CellObjects;
 
+    Vector2Int selectedCellPos;
+
     Queue<RenderedAction> actionQueue = new();
+    List<ActionAnimation> activeAnimations = new();
 
     //Vector2Int selectedCellPos;
     public bool currentlyUpdating = false;
@@ -60,9 +69,27 @@ public class GameRenderer : MonoBehaviour
         CellObjects = new Dictionary<Vector2Int, GameObject>();
     }
 
-    void LateUpdate() {
+    void Update() {
         if (DR_GameManager.instance.CurrentState == DR_GameManager.GameState.INVALID){
             return;
+        }
+
+        float debugTimeMod = 1.0f;
+        if (Input.GetKey(KeyCode.LeftControl)){
+            debugTimeMod = 5.0f;
+        }
+
+        if (activeAnimations.Count > 0){
+            for (int i = 0; i < activeAnimations.Count; i++){
+                
+                var anim = activeAnimations[i];
+                anim.AnimStep(Time.deltaTime * debugTimeMod);
+
+                if (!anim.isAnimating){
+                    activeAnimations.RemoveAt(i);
+                    i--;
+                }
+            }
         }
         //AnimationSystem.UpdateAnims(Time.deltaTime);
         //UpdateEntities(Time.deltaTime);
@@ -90,7 +117,6 @@ public class GameRenderer : MonoBehaviour
         DR_GameManager gm = DR_GameManager.instance;
         DR_Map currentMap = gm.CurrentMap;
 
-        //TODO: use this
         List<RenderedAction> actionsToBeRendered = new();
 
         // Loop until all actions are taken care of
@@ -130,14 +156,38 @@ public class GameRenderer : MonoBehaviour
             // Create and start current group of animations
             if (actionsToBeRendered.Count > 0){
                 Debug.Log("Playing animations for: " + ActionListToString(actionsToBeRendered));
-                yield return new WaitForSeconds(1.0f);
             }
 
-            //TODO: implement method in RenderedAction to check compatability with provided list of other actions
-            // These are incompatabile if they use the same entities in any ways (idea for later, implement functions in actions to return a list of all entities affected)
-            // Keep adding actions to actionsToBeRendered until an incompatability or queue is empty
-            // Then, create animation objects to actually visualize these actions.
-            // Once that is done, if queue has more, repeat the process. Do this until queue is empty.
+            for (int i = 0; i < actionsToBeRendered.Count; i++)
+            {
+                var anim = CreateActionAnimation(actionsToBeRendered[i]);
+
+                if (anim != null){
+                    activeAnimations.Add(anim);
+                    anim.StartAnim();
+
+                    
+                    if (anim.action.originalAction is AttackAction attack){
+                        if (attack.killed && i != actionsToBeRendered.Count - 1)
+                        {
+                            // Briefly pause anim if killed and there are more actions to be performed
+                            // This is a hacky attempt to prevent move anims from overlapping with death FX
+                            yield return new WaitForSeconds(0.1f);
+                        }
+
+                        LogSystem.instance.AddDamageLog(attack.damageEvent);
+                        
+                    }else{
+                        LogSystem.instance.AddLog(actionsToBeRendered[i].originalAction);
+                    }
+                }else{
+                    LogSystem.instance.AddLog(actionsToBeRendered[i].originalAction);
+                }
+            }
+
+            yield return new WaitUntil(() => activeAnimations.Count == 0);
+
+            //TODO: How should fov be shown per-step (maybe it doesn't need to be if it will always be updated after a player moves?)
         }
 
 
@@ -150,6 +200,40 @@ public class GameRenderer : MonoBehaviour
             UpdateTiles();
         }
         UpdateEntities();
+    }
+
+    private ActionAnimation CreateActionAnimation(RenderedAction renderedAction){
+
+        // With any luck as long as the anims move everything to where they're supposed to be, this will be good enough for keeping map in sync
+        // Stuff going out of or coming into visibility MIGHT need special care though
+        GameObject entityObj;
+        EntityObjects.TryGetValue(renderedAction.originalAction.owner, out entityObj);
+        if (entityObj == null){
+            return null;
+        }
+
+        Transform entityTransform = entityObj.transform;
+        Vector2Int startPos = new(Mathf.RoundToInt(entityTransform.position.x), Mathf.RoundToInt(entityTransform.position.y));
+
+        var action = renderedAction.originalAction;
+        if (action is MoveAction moveAction){
+            Vector2Int endPos = moveAction.pos;
+            return new MoveAnimation(renderedAction, entityTransform, startPos, endPos);
+        }
+        if (action is AttackAction attackAction){
+
+            GameObject targetEntityObj;
+            EntityObjects.TryGetValue(attackAction.target.Entity, out targetEntityObj);
+            if (targetEntityObj == null){
+                Debug.LogError("CreateActionAnimation: Could not get targeted entity obj for attack anim");
+                return null;
+            }
+            Transform targetEntityTransform = targetEntityObj.transform;
+            Vector2Int endPos = new(Mathf.RoundToInt(targetEntityTransform.position.x), Mathf.RoundToInt(targetEntityTransform.position.y));
+            return new AttackAnimation(renderedAction, entityTransform, targetEntityTransform, startPos, endPos);
+        }
+
+        return null;
     }
 
     private static string ActionListToString(List<RenderedAction> list){
@@ -171,6 +255,10 @@ public class GameRenderer : MonoBehaviour
         // Add new visuals
         for(int y = 0; y < currentMap.MapSize.y; y++){
             for(int x = 0; x < currentMap.MapSize.x; x++){
+                if (currentMap.GetCell(new Vector2Int(x,y)).neverRender){
+                    continue;
+                }
+
                 GameObject NewCellObj = Instantiate(CellObj,new Vector3(x, y, 0),Quaternion.identity, transform);
                 CellObjects.Add(new Vector2Int(x,y), NewCellObj);
                 NewCellObj.name = "Cell (" + x + ", " + y + ")";
@@ -262,7 +350,7 @@ public class GameRenderer : MonoBehaviour
             EntityObjects[Entity].SetActive(true);
 
             // TODO: make proper system to determine z depth for each entity
-            Vector3 pos = Entity.GetPosFloat(GetDepthForEntity(Entity));;
+            Vector3 pos = Entity.GetPosFloat(GetDepthForEntity(Entity));
             
             EntityObjects[Entity].transform.position = pos;
 
@@ -289,23 +377,59 @@ public class GameRenderer : MonoBehaviour
         if (entity.GetComponent<SpriteComponent>() is SpriteComponent spriteComp && spriteComp.hasAnimation){
             NewEntityObj.GetComponent<CellObj>().SetAnim(spriteComp);
         }
+
+        if (entity.HasComponent<PlayerComponent>()){
+            renderedPlayer = NewEntityObj.transform;
+        }
     }
 
-    // public void ResetSelectedCell(){
-    //     if (CellObjects.ContainsKey(selectedCellPos)){
-    //         GameObject selectedCell = CellObjects[selectedCellPos];
-    //         selectedCell.GetComponent<CellObj>().SetSelected(false);
-    //     }
-    // }
+    public void RemoveEntityObj(DR_Entity entity)
+    {
+        if (EntityObjects.ContainsKey(entity)){
+            Destroy(EntityObjects[entity]);
+            EntityObjects.Remove(entity);
+        }
+    }
 
-    // public void SetSelectedCell(Vector2Int pos){
-    //     ResetSelectedCell();
-    //     if (CellObjects.ContainsKey(pos)){
-    //         GameObject selectedCell = CellObjects[pos];
-    //         selectedCell.GetComponent<CellObj>().SetSelected(true);
-    //         selectedCellPos = pos;
-    //     }
-    // }
+    public void ResetSelectedCell(){
+        if (CellObjects.ContainsKey(selectedCellPos)){
+            GameObject selectedCell = CellObjects[selectedCellPos];
+            selectedCell.GetComponent<CellObj>().SetSelected(false);
+        }
+    }
+
+    public void SetSelectedCell(Vector2Int pos){
+        ResetSelectedCell();
+        if (CellObjects.ContainsKey(pos)){
+            GameObject selectedCell = CellObjects[pos];
+            selectedCell.GetComponent<CellObj>().SetSelected(true);
+            selectedCellPos = pos;
+        }
+    }
+
+    public void SetBlood(Vector2Int pos){
+        CellObjects[pos].GetComponent<CellObj>().SetBlood(DR_GameManager.instance.CurrentMap.Cells[pos.y, pos.x]);
+    }
+
+    public void UpdateCamera(bool forcePos = false)
+    {
+        //TODO: do not move camera when player attacks
+
+        Vector3 DesiredPos = MainCamera.transform.position;
+        if (renderedPlayer != null){
+            DesiredPos.x = renderedPlayer.position.x;
+            DesiredPos.y = renderedPlayer.position.y;
+        }
+        DesiredPos += cameraOffset;
+        
+        if (forcePos){
+            MainCamera.transform.position = DesiredPos;
+            return;
+        }
+
+        float LerpAmount = Time.deltaTime * 3.0f;
+        MainCamera.transform.position = Easings.QuadEaseOut(MainCamera.transform.position, DesiredPos, LerpAmount);
+    }
 
     public static float GetDepthForEntity(DR_Entity entity){
         if (entity.HasComponent<PropComponent>()){
