@@ -56,34 +56,34 @@ public class DamageSystem
         
         DamageEvent damageEvent = new DamageEvent(attacker, target.Entity, modifiedDamage);
         InventoryComponent attackerInventory = attacker.GetComponent<InventoryComponent>();
-        if (attackerInventory != null){
-            foreach (DR_Entity item in attackerInventory.items){
-                EquippableComponent equippable = item.GetComponent<EquippableComponent>();
-                if (equippable == null || !equippable.isEquipped){
-                    continue;
-                }
-                foreach (DR_Modifier modifier in equippable.modifiers){
-                    damageEvent.OnAttack.AddListener(() => {modifier.OnAttack(gm, damageEvent);});
-                    damageEvent.OnKill.AddListener(() => {modifier.OnKill(gm, damageEvent);});
-                    modifier.ApplyAttackerDamageChanges(gm, damageEvent);
-                }
-            }
-        }
+        // if (attackerInventory != null){
+        //     foreach (DR_Entity item in attackerInventory.items){
+        //         EquippableComponent equippable = item.GetComponent<EquippableComponent>();
+        //         if (equippable == null || !equippable.isEquipped){
+        //             continue;
+        //         }
+        //         foreach (DR_Modifier modifier in equippable.modifiers){
+        //             damageEvent.OnAttack.AddListener(() => {modifier.OnAttack(gm, damageEvent);});
+        //             damageEvent.OnKill.AddListener(() => {modifier.OnKill(gm, damageEvent);});
+        //             modifier.ApplyAttackerDamageChanges(gm, damageEvent);
+        //         }
+        //     }
+        // }
 
-        InventoryComponent targetInventory = target.Entity.GetComponent<InventoryComponent>();
-        if (targetInventory != null){
-            foreach (DR_Entity item in targetInventory.items){
-                EquippableComponent equippable = item.GetComponent<EquippableComponent>();
-                if (equippable == null || !equippable.isEquipped){
-                    continue;
-                }
-                foreach (DR_Modifier modifier in equippable.modifiers){
-                    damageEvent.OnAttack.AddListener(() => {modifier.OnHit(gm, damageEvent);});
-                    damageEvent.OnKill.AddListener(() => {modifier.OnKilled(gm, damageEvent);});
-                    modifier.ApplyDefenderDamageChanges(gm, damageEvent);
-                }
-            }
-        }
+        // InventoryComponent targetInventory = target.Entity.GetComponent<InventoryComponent>();
+        // if (targetInventory != null){
+        //     foreach (DR_Entity item in targetInventory.items){
+        //         EquippableComponent equippable = item.GetComponent<EquippableComponent>();
+        //         if (equippable == null || !equippable.isEquipped){
+        //             continue;
+        //         }
+        //         foreach (DR_Modifier modifier in equippable.modifiers){
+        //             damageEvent.OnAttack.AddListener(() => {modifier.OnHit(gm, damageEvent);});
+        //             damageEvent.OnKill.AddListener(() => {modifier.OnKilled(gm, damageEvent);});
+        //             modifier.ApplyDefenderDamageChanges(gm, damageEvent);
+        //         }
+        //     }
+        // }
 
         if(target != null){
             //Debug testing
@@ -96,11 +96,9 @@ public class DamageSystem
 
             damageEvent.OnAttack?.Invoke();
 
-            float cameraShakeAmount = 0.5f;
 
             if(!target.IsAlive()){
                 damageEvent.killed = true;
-                cameraShakeAmount *= 2.0f;
 
                 LevelComponent targetLevel = target.Entity.GetComponent<LevelComponent>();
                 LevelComponent attackerLevel = attacker.GetComponent<LevelComponent>();
@@ -109,31 +107,18 @@ public class DamageSystem
                 }
 
                 damageEvent.OnKill?.Invoke();
-                FXSpawner.instance.SpawnDeathFX(target.Entity);
 
                 //Handle blood
                 DR_Cell cell = gm.CurrentMap.GetCell(target.Entity.Position);
                 cell.blood += Mathf.Max(Mathf.CeilToInt(target.maxHealth * 0.25f), 1);
                 cell.bloodStained = true;
-                DR_Renderer.instance.SetCellBloodState(target.Entity.Position, cell);
 
 
                 //TODO: make this better. have class to handle "garbage collecting" of entities
                 target.Entity.noLongerValid = true;
                 gm.CurrentMap.RemoveActor(target.Entity);
-                target.Entity.DestroyEntity();
             }
-
-            if (target.Entity.HasComponent<PlayerComponent>()){
-                cameraShakeAmount *= 1.5f;
-            }
-            
-            SoundSystem.instance.PlaySound(damageEvent.killed ? "death" : "attack");
-
-            CameraShake.ShakeCamera(cameraShakeAmount);
         }
-
-        LogSystem.instance.AddDamageLog(damageEvent);
 
         return damageEvent;
     }

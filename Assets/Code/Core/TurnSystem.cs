@@ -8,7 +8,6 @@ public class TurnSystem : MonoBehaviour
     List<TurnComponent> EligibleEntities;
     List<TurnComponent> CanAct;
 
-    DR_Action currentAction = null;
     DR_GameManager gm = null;
 
     public TurnSystem(){
@@ -75,30 +74,10 @@ public class TurnSystem : MonoBehaviour
         return turnComp;
     }
 
-    public bool IsPlayerTurn(){
-        if (!CanEntityAct()){
-            return false;
-        }
-
-        // TODO: have entities properly remove themselves
-        // Messy handling of entites which have been removed:
-        TurnComponent NextEntityTurn = GetNextEntity();
-        DR_Entity NextEntity = NextEntityTurn.Entity;
-
-        if (NextEntity == null){
-            CanAct.Remove(NextEntityTurn);
-            EligibleEntities.Remove(NextEntityTurn);
-            return IsPlayerTurn(); //recursively call to remove all null entities
-        }
-
-        return NextEntity.HasComponent<PlayerComponent>();
-    }
-
     public void HandleTurn(DR_GameManager gm, DR_Entity turnTaker){
         //Debug.Log("Handling turn for " + turnTaker.Name);
-        gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
-
         bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
+        gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
 
         if(isPlayer){
             StartCoroutine(WaitForPlayerInput(gm, turnTaker));
@@ -129,8 +108,6 @@ public class TurnSystem : MonoBehaviour
         }else{
             HandleTurnAction(gm, turnTaker, playerAction);
         }
-
-        
     }
 
     void HandleTurnAction(DR_GameManager gm, DR_Entity turnTaker, DR_Action action){
@@ -140,25 +117,9 @@ public class TurnSystem : MonoBehaviour
             Debug.LogAssertion("TurnSystem.HandleTurnAction | action is null!");
             return;
         }
-        if (currentAction != null){
-            Debug.LogAssertion("TurnSystem.HandleTurnAction | currentAction is NOT null!");
-            return;
-        }
-        currentAction = action;
-        currentAction.StartAction(gm);
-        StartCoroutine(CheckIfActionFinished(gm, turnTaker));
-    }
 
-    void Update(){
-        if (currentAction != null){ //TODO: change to flag/state
-            currentAction.ActionStep(gm, Time.deltaTime);
-        }
-    }
-
-    IEnumerator CheckIfActionFinished(DR_GameManager gm, DR_Entity turnTaker){
-        yield return new WaitUntil(() => currentAction.hasFinished);
-        //Debug.Log("action "+ currentAction.GetType() + " for " + turnTaker.Name + " succeeded: " + currentAction.wasSuccess);
-        TurnEnd(gm, turnTaker, currentAction.wasSuccess);
+        action.Perform(gm);
+        TurnEnd(gm, turnTaker, action.wasSuccess);
     }
 
     void TurnEnd(DR_GameManager gm, DR_Entity turnTaker, bool actionSucceeded){
@@ -182,10 +143,8 @@ public class TurnSystem : MonoBehaviour
             turnTaker.GetComponent<TurnComponent>().SpendTurn();
             if (turnTaker.HasComponent<PlayerComponent>()){
                 SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
-                DR_Renderer.instance.UpdateTiles();
             }
         }
-        currentAction = null;
         gm.OnTurnHandled();
     }
 
@@ -200,7 +159,10 @@ public class TurnSystem : MonoBehaviour
 
         for (int i = 0; i < DR_GameManager.KeyDirections.Length; i++)
         {
-            if (DR_InputHandler.GetKeyPressed(DR_GameManager.KeyDirections[i]))
+            //TODO: allow holding direction to move, but only if held for a minimum time?
+
+            if (DR_InputHandler.GetKeyPressed(DR_GameManager.KeyDirections[i])
+                || DR_InputHandler.GetKeyHeld(DR_GameManager.KeyDirections[i], 0.3f))
             {
                 Vector2Int interactPos = playerActor.Position + gm.Directions[i];
 

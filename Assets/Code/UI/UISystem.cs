@@ -69,7 +69,7 @@ public class UISystem : MonoBehaviour
         UpdateExpBar();
 
         if (!DR_InputHandler.instance.mouseIsInWorld){
-            DR_Renderer.instance.ResetSelectedCell();
+            GameRenderer.instance.ResetSelectedCell();
             return;
         }
 
@@ -78,7 +78,7 @@ public class UISystem : MonoBehaviour
 
             //TODO: should just have a single gameobject for the cursor?
             // may want to keep this when highlighting multiple cells though (spell target selection?)
-            DR_Renderer.instance.SetSelectedCell(MousePos);
+            GameRenderer.instance.SetSelectedCell(MousePos);
 
 
             LastMousePos = MousePos;

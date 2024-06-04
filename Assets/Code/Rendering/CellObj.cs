@@ -22,6 +22,11 @@ public class CellObj : MonoBehaviour
     }
 
     public void SetBlood(DR_Cell cell){
+        if (cell == null){
+            bloodOverlay.gameObject.SetActive(false);
+            bloodStainOverlay.gameObject.SetActive(false);
+            return;
+        }
         //TODO: later could use different sprites depending on amount
         bloodOverlay.gameObject.SetActive(cell.blood > 0);
         bloodStainOverlay.gameObject.SetActive(cell.bloodStained);

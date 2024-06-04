@@ -112,10 +112,6 @@ public class DR_Map
         return RemovedActor;
     }
 
-    public bool MoveActorRelative(DR_Entity Actor, Vector2Int posChange, bool animate = false){
-        return MoveActor(Actor, Actor.Position + posChange, animate);
-    }
-
     public bool CanMoveActor(DR_Entity Actor, Vector2Int pos){
         DR_Cell FromCell = Cells[Actor.Position.y, Actor.Position.x];
         DR_Cell ToCell = Cells[pos.y, pos.x];
@@ -125,20 +121,12 @@ public class DR_Map
         return true;
     }
 
-    public bool MoveActor(DR_Entity Actor, Vector2Int pos, bool animate = false){
+    public bool MoveActor(DR_Entity Actor, Vector2Int pos){
         DR_Cell FromCell = Cells[Actor.Position.y, Actor.Position.x];
         DR_Cell ToCell = Cells[pos.y, pos.x];
 
         if(ToCell.BlocksMovement() || ToCell.Actor != null){
             return false;
-        }
-        
-        //TODO: figure out better way to tell if actor has an entity to animate
-        if (animate && IsVisible[Actor.Position.y, Actor.Position.x]){
-            MoveAnimation moveAnim = new();
-            Actor.AddComponent<MoveAnimation>(moveAnim);
-            moveAnim.SetAnim(pos);
-            AnimationSystem.AddAnimation(moveAnim);
         }
 
         FromCell.Actor = null;

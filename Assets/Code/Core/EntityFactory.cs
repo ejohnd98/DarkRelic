@@ -60,57 +60,6 @@ public class EntityFactory : MonoBehaviour
         return NewProp;
     }
 
-    public static DR_Entity CreateEquipmentItem(Sprite Sprite, string Name){
-        DR_Entity NewItem = new DR_Entity();
-
-        NewItem.Name = Name;
-        NewItem.AddComponent<ItemComponent>(new ItemComponent());
-        NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
-        NewItem.AddComponent<EquippableComponent>(new EquippableComponent());
-        
-        return NewItem;
-    }
-
-    public static DR_Entity CreateHealingItem(Sprite Sprite, string Name, int healAmount){
-        DR_Entity NewItem = new DR_Entity();
-
-        NewItem.Name = Name;
-        NewItem.AddComponent<ItemComponent>(new ItemComponent());
-        NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
-        NewItem.AddComponent<HealingConsumableComponent>(new HealingConsumableComponent(healAmount));
-        
-        return NewItem;
-    }
-
-    public static DR_Entity CreateMagicItem(Sprite Sprite, string Name, int damageAmount){
-        DR_Entity NewItem = new DR_Entity();
-
-        NewItem.Name = Name;
-        NewItem.AddComponent<ItemComponent>(new ItemComponent());
-        NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
-        NewItem.AddComponent<MagicConsumableComponent>(new MagicConsumableComponent(damageAmount));
-        NewItem.GetComponent<MagicConsumableComponent>().targetClosest = true;
-        NewItem.GetComponent<MagicConsumableComponent>().color = new Color(1.0f, 1.0f, 0.529f);
-        NewItem.GetComponent<MagicConsumableComponent>().projectileSprite = DR_GameManager.instance.SparkProjectile;
-        
-        return NewItem;
-    }
-
-    public static DR_Entity CreateTargetedMagicItem(Sprite Sprite, string Name, int damageAmount){
-        DR_Entity NewItem = new DR_Entity();
-
-        NewItem.Name = Name;
-        NewItem.AddComponent<ItemComponent>(new ItemComponent());
-        NewItem.GetComponent<ItemComponent>().requireFurtherInputOnUse = true;
-        NewItem.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
-        NewItem.AddComponent<MagicConsumableComponent>(new MagicConsumableComponent(damageAmount));
-        NewItem.GetComponent<MagicConsumableComponent>().targetClosest = false;
-        NewItem.GetComponent<MagicConsumableComponent>().color = new Color(0.99f, 0.24f, 0.19f);
-        NewItem.GetComponent<MagicConsumableComponent>().projectileSprite = DR_GameManager.instance.FireProjectile;
-        
-        return NewItem;
-    }
-
     public static DR_Entity CreateDoor(Sprite OpenSprite, Sprite ClosedSprite){
         DR_Entity NewProp = CreateProp(ClosedSprite, "Door");
 
@@ -144,21 +93,21 @@ public class EntityFactory : MonoBehaviour
         NewActor.Name = Name;
         NewActor.Position = start;
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
-        MoveAnimation moveAnim = NewActor.AddComponent<MoveAnimation>(new());
-        moveAnim.AnimFinished += (DR_Animation moveAnim) => {
-                //Debug.Log("AnimFinished!");
-                DR_GameManager.instance.CurrentMap.RemoveEntity(NewActor);
-                NewActor.noLongerValid = true;
-                NewActor.DestroyEntity();
-                NewActor.isOnMap = false;
-                FXSpawner.instance.SpawnParticleFX(end, color);
-            };
+        // MoveAnimation moveAnim = NewActor.AddComponent<MoveAnimation>(new());
+        // moveAnim.AnimFinished += (DR_Animation moveAnim) => {
+        //         //Debug.Log("AnimFinished!");
+        //         DR_GameManager.instance.CurrentMap.RemoveEntity(NewActor);
+        //         NewActor.noLongerValid = true;
+        //         NewActor.DestroyEntity();
+        //         NewActor.isOnMap = false;
+        //         FXSpawner.instance.SpawnParticleFX(end, color);
+        //     };
 
         DR_GameManager.instance.CurrentMap.AddEntity(NewActor);
         NewActor.isOnMap = true;
 
-        moveAnim.SetAnim(end, 0.2f, EaseType.Linear);
-        AnimationSystem.AddAnimation(moveAnim);
+        //moveAnim.SetAnim(end, 0.2f, EaseType.Linear);
+        //AnimationSystem.AddAnimation(moveAnim, NewActor);
         return NewActor;
     }
 }

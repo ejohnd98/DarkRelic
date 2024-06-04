@@ -60,6 +60,7 @@ public class EntityDetailsUI : MonoBehaviour
         detailsEntries.Clear();
     }
 
+    //TODO: this could be optimized better
     private void UpdateUI(){
         ClearDetails();
         if (selectedRelic != null){

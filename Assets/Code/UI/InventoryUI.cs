@@ -68,22 +68,8 @@ public class InventoryUI : MonoBehaviour
     }
 
     public void OnItemClicked(DR_Entity item, DR_Entity user, DR_Entity target){
-        //messy drop/add action:
-        DR_Action action;
-
-        EquippableComponent equippable = item.GetComponent<EquippableComponent>();
+        // This was removed
         InventoryComponent inventory = user.GetComponent<InventoryComponent>();
-        if (equippable != null){
-            action = new ChangeEquipmentAction(item, user, !equippable.isEquipped);
-            UISystem.instance.SetUIAction(action);
-            return;
-        }
-
-        if (DR_InputHandler.GetKeyHeld(KeyCode.LeftControl)){
-            action = new DropAction(item, user);
-        }else{
-            action = new ItemAction(item, user, target);
-        }
-        UISystem.instance.SetUIAction(action);
+        UISystem.instance.SetUIAction(null);
     }
 }

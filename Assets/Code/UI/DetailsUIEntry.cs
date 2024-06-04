@@ -71,7 +71,7 @@ public class DetailsUIEntry : MonoBehaviour
             bloodstainedOverlay.gameObject.SetActive(true);
         }
 
-        spriteImage.sprite = cell.bBlocksMovement ? DR_Renderer.instance.WallTexture : DR_Renderer.instance.FloorTexture;
+        //spriteImage.sprite = cell.bBlocksMovement ? DR_Renderer.instance.WallTexture : DR_Renderer.instance.FloorTexture;
 
         nameText.text = entityName;
         detailsText.text = details;

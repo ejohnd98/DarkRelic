@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class DungeonGenerator : MonoBehaviour {
@@ -354,7 +353,7 @@ public class DungeonGenerator : MonoBehaviour {
 
             // Decrement room index, subtract exp cost
             experienceBudget -= enemy.GetComponent<LevelComponent>().stats.expGiven;
-            if (--roomIndex < 0) { 
+            if (--roomIndex < 1) { 
                 roomIndex = mapBlueprint.rooms.Count - 1;
             }
         }
@@ -378,6 +377,7 @@ public class DungeonGenerator : MonoBehaviour {
         DR_Map newMap = new DR_Map(mapBlueprint.mapSize);
         DR_GameManager gm = DR_GameManager.instance;
 
+
         for (int y = 0; y < newMap.MapSize.y; y++) {
             for (int x = 0; x < newMap.MapSize.x; x++) {
                 DR_Cell newCell = new DR_Cell();
@@ -385,6 +385,9 @@ public class DungeonGenerator : MonoBehaviour {
 
                 switch (mapBlueprint.cells[y, x].type) {
                     case MapGenCellType.NOT_SET:
+                        newCell.bBlocksMovement = true;
+                        newCell.neverRender = !mapBlueprint.RequiresRendering(x,y);
+                        break;
                     case MapGenCellType.WALL: {
                         newCell.bBlocksMovement = true;
                         break;
@@ -464,6 +467,34 @@ public class MapBlueprint {
                 cells[y,x].type = type;
             }
         }
+    }
+
+    public bool RequiresRendering(int x, int y)
+    {
+        // Check adjacent cells
+        for (int dx = -1; dx <= 1; dx++)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                // Skip self
+                if (dx == 0 && dy == 0){
+                    continue;
+                }
+
+                int cellX = x + dx;
+                int cellY = y + dy;
+
+                if (cellX >= 0 && cellX < mapSize.x && cellY >= 0 && cellY < mapSize.y)
+                {
+                    if (cells[cellY, cellX].type != MapGenCellType.NOT_SET)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }
 

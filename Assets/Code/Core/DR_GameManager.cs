@@ -38,10 +38,6 @@ public class DR_GameManager : MonoBehaviour
 
     public bool debug_disableFOV = false;
 
-    //Temp Camera 
-    public Camera MainCamera;
-    public Vector3 cameraOffset;
-
     //Temp Player
     DR_Entity PlayerActor;
     DR_Entity BossActor;
@@ -67,7 +63,6 @@ public class DR_GameManager : MonoBehaviour
     void Start()
     {
         // Create Dungeon
-        //CurrentDungeon = DR_MapGen.CreateDungeonTest(balanceTestMap);
         blackOverlay.SetShouldBeVisible(true);
         UISystem.instance.gameObject.SetActive(false);
         dungeonGenerator.GenerateDungeon(PostDungeonGenStep);
@@ -85,34 +80,6 @@ public class DR_GameManager : MonoBehaviour
 
         BossActor = EntityFactory.CreateActor(BossTexture, "Boss", Alignment.ENEMY, 20);
         BossActor.AddComponent<AIComponent>(new AIComponent());
-
-        //MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35), 1);
-
-        // pathfinding debug map
-        //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(DebugMap2));
-
-        // Add maps to Dungeon
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        // mapGenInfo.depth = 2;
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        // mapGenInfo.depth = 3;
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        //
-        // mapGenInfo.isLastFloor = true;
-        // mapGenInfo.depth = 4;
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-
-        //temp:
-        DR_Entity item1 = EntityFactory.CreateHealingItem(PotionTexture, "Health Potion", 10);
-        DR_Entity item2 = EntityFactory.CreateMagicItem(ShockTexture, "Shock Scroll", 5);
-        DR_Entity item3 = EntityFactory.CreateTargetedMagicItem(FireboltTexture, "Firebolt Scroll", 5);
-        DR_Entity testEquipment = EntityFactory.CreateEquipmentItem(AmuletTexture, "Amulet of Double Damage");
-        testEquipment.GetComponent<EquippableComponent>().modifiers.Add(new AttackMultiplierModifier(4.0f));
-
-        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item1);
-        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item2);
-        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item3);
-        // PlayerActor.GetComponent<InventoryComponent>().AddItem(testEquipment);
         
         MoveLevels(null, CurrentDungeon.maps[0], true, false);
 
@@ -128,19 +95,19 @@ public class DR_GameManager : MonoBehaviour
         UpdateCurrentMap();
 
         // Init Camera
-        UpdateCamera(true);
+        GameRenderer.instance.UpdateCamera(true);
 
         // Create Turn System
         turnSystem = gameObject.AddComponent<TurnSystem>();
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-        DR_Renderer.instance.CreateTiles();
 
         SetGameState(GameState.ADVANCE_GAME);
         UISystem.instance.RefreshDetailsUI();
         UISystem.instance.UpdateDepthUI();
 
         blackOverlay.SetShouldBeVisible(false);
+        GameRenderer.instance.FullyUpdateRenderer(true);
     }
 
     void Update()
@@ -148,48 +115,61 @@ public class DR_GameManager : MonoBehaviour
         if (CurrentState == GameState.INVALID){
             return;
         }
-        switch (CurrentState)
-        {
-            case GameState.ADVANCE_GAME:
-                {
-                    if (turnSystem.CanEntityAct())
+
+        bool finishedIterating = false;
+
+        while (!finishedIterating){
+            switch (CurrentState)
+            {
+                case GameState.ADVANCE_GAME:
                     {
-                        DR_Entity entity = turnSystem.GetNextEntity().Entity;
-                        turnSystem.HandleTurn(this, entity);
-                    }
-                    else
-                    {
-                        //reduce debts until an entity can act
-                        int limit = 50;
-                        while (!turnSystem.CanEntityAct() && limit-- > 0)
+                        if (turnSystem.CanEntityAct())
                         {
-                            turnSystem.RecoverDebts(1);
-                            turnSystem.UpdateEntityLists(CurrentMap);
+                            DR_Entity entity = turnSystem.GetNextEntity().Entity;
+                            if (entity.HasComponent<PlayerComponent>() && GameRenderer.instance.HasActionsQueued()){
+                                GameRenderer.instance.FullyUpdateRenderer();
+                                SetGameState(GameState.ANIMATING);
+                                break;
+                            }
+                            turnSystem.HandleTurn(this, entity);
                         }
+                        else
+                        {
+                            //reduce debts until an entity can act
+                            int limit = 50;
+                            while (!turnSystem.CanEntityAct() && limit-- > 0)
+                            {
+                                turnSystem.RecoverDebts(1);
+                                turnSystem.UpdateEntityLists(CurrentMap);
+                            }
+                        }
+                        break;
                     }
+                case GameState.ANIMATING:
+                {
+                    if (!GameRenderer.instance.currentlyUpdating){
+                        SetGameState(GameState.ADVANCE_GAME);
+                    }
+                    finishedIterating = true;
                     break;
                 }
-            case GameState.ANIMATING:
-            {
-                if (DR_Renderer.animsActive <= 0){
-                    SetGameState(GameState.ADVANCE_GAME);
+                case GameState.HANDLING_TURN:
+                {
+                    finishedIterating = true;
+                    break;
                 }
-                break;
-            }
-            case GameState.HANDLING_TURN:
-            {
-                break;
-            }
 
-            default:
-                break;
+                default:
+                    break;
+            }
         }
 
-        if (CurrentState != GameState.ANIMATING && CurrentState != GameState.ANIMATING && DR_Renderer.animsActive > 0){
-            SetGameState(GameState.ANIMATING);
-        }
+        // if (CurrentState != GameState.ANIMATING && AnimationSystem.IsAnimating()){
+        //     SetGameState(GameState.ANIMATING);
+        // }
 
-        if (CurrentState != GameState.GAME_OVER && !PlayerActor.GetComponent<HealthComponent>().IsAlive()){
+        if (CurrentState != GameState.GAME_OVER && CurrentState != GameState.ANIMATING &&!PlayerActor.GetComponent<HealthComponent>().IsAlive()){
+            //TODO: let this happen after animations are finished
             OnPlayerDied();
         }
     }
@@ -212,7 +192,7 @@ public class DR_GameManager : MonoBehaviour
         if (CurrentState == GameState.INVALID){
             return;
         }
-        UpdateCamera();
+        GameRenderer.instance.UpdateCamera();
     }
 
     public void SetGameState(GameState newState){
@@ -220,30 +200,6 @@ public class DR_GameManager : MonoBehaviour
             //Debug.Log("Changed states from " + CurrentState.ToString() + " to " + newState.ToString());
         }
         CurrentState = newState;
-    }
-
-    public void UpdateCamera(bool forcePos = false)
-    {
-        Vector3 DesiredPos = MainCamera.transform.position;
-        if (PlayerActor.HasComponent<MoveAnimation>()){
-            DesiredPos.x = PlayerActor.GetComponent<MoveAnimation>().GetAnimPosition().x;
-            DesiredPos.y = PlayerActor.GetComponent<MoveAnimation>().GetAnimPosition().y;
-        }else{
-            DesiredPos.x = PlayerActor.Position.x;
-            DesiredPos.y = PlayerActor.Position.y;
-        }
-
-        DesiredPos += cameraOffset;
-        
-
-        if (forcePos){
-            MainCamera.transform.position = DesiredPos;
-            return;
-        }
-        Vector3 Direction = DesiredPos - MainCamera.transform.position;
-        float LerpAmount = Time.deltaTime * 3.0f;
-
-        MainCamera.transform.position = Easings.QuadEaseOut(MainCamera.transform.position, DesiredPos, LerpAmount);
     }
 
     public void UpdateCurrentMap(){
@@ -272,8 +228,9 @@ public class DR_GameManager : MonoBehaviour
             blackOverlay.OnVisibleComplete -= OnFadeOut;
             LoadNextLevel(origin, destination, goingDeeper);
             blackOverlay.SetShouldBeVisible(false);
-            //turnSystem.UpdateEntityLists(CurrentMap);
-            //SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+            turnSystem.UpdateEntityLists(CurrentMap);
+            SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
+            GameRenderer.instance.FullyUpdateRenderer(true);
             //DR_Renderer.instance.CreateTiles();
             isFadeActive = false;
         };
@@ -300,9 +257,10 @@ public class DR_GameManager : MonoBehaviour
         destination.AddActor(PlayerActor, newPos);
         
         UpdateCurrentMap();
-        UpdateCamera(true);
-        DR_Renderer.instance.ClearAllObjects();
-        DR_Renderer.instance.CreateTiles();
+        GameRenderer.instance.UpdateCamera(true);
+        GameRenderer.instance.ClearAllObjects();
+        //DR_Renderer.instance.ClearAllObjects();
+        //DR_Renderer.instance.CreateTiles();
     }
     
     public DR_Entity GetPlayer(){
