@@ -131,9 +131,6 @@ public class DR_GameManager : MonoBehaviour
                                 SetGameState(GameState.ANIMATING);
                                 break;
                             }
-
-                            //TODO: game feels slower when there are more entities
-
                             turnSystem.HandleTurn(this, entity);
                         }
                         else
