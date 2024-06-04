@@ -76,7 +76,8 @@ public class MoveAnimation : ActionAnimation {
     {
         base.AnimStep(time);
         current = Easings.GetEasedValue(start, end, counter, easing);
-        rendererObj.position = current;
+        if (rendererObj != null)
+            rendererObj.position = current;
     }
 
     public override Vector3 GetAnimPosition(float depth = 0.0f){

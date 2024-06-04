@@ -56,34 +56,34 @@ public class DamageSystem
         
         DamageEvent damageEvent = new DamageEvent(attacker, target.Entity, modifiedDamage);
         InventoryComponent attackerInventory = attacker.GetComponent<InventoryComponent>();
-        if (attackerInventory != null){
-            foreach (DR_Entity item in attackerInventory.items){
-                EquippableComponent equippable = item.GetComponent<EquippableComponent>();
-                if (equippable == null || !equippable.isEquipped){
-                    continue;
-                }
-                foreach (DR_Modifier modifier in equippable.modifiers){
-                    damageEvent.OnAttack.AddListener(() => {modifier.OnAttack(gm, damageEvent);});
-                    damageEvent.OnKill.AddListener(() => {modifier.OnKill(gm, damageEvent);});
-                    modifier.ApplyAttackerDamageChanges(gm, damageEvent);
-                }
-            }
-        }
+        // if (attackerInventory != null){
+        //     foreach (DR_Entity item in attackerInventory.items){
+        //         EquippableComponent equippable = item.GetComponent<EquippableComponent>();
+        //         if (equippable == null || !equippable.isEquipped){
+        //             continue;
+        //         }
+        //         foreach (DR_Modifier modifier in equippable.modifiers){
+        //             damageEvent.OnAttack.AddListener(() => {modifier.OnAttack(gm, damageEvent);});
+        //             damageEvent.OnKill.AddListener(() => {modifier.OnKill(gm, damageEvent);});
+        //             modifier.ApplyAttackerDamageChanges(gm, damageEvent);
+        //         }
+        //     }
+        // }
 
-        InventoryComponent targetInventory = target.Entity.GetComponent<InventoryComponent>();
-        if (targetInventory != null){
-            foreach (DR_Entity item in targetInventory.items){
-                EquippableComponent equippable = item.GetComponent<EquippableComponent>();
-                if (equippable == null || !equippable.isEquipped){
-                    continue;
-                }
-                foreach (DR_Modifier modifier in equippable.modifiers){
-                    damageEvent.OnAttack.AddListener(() => {modifier.OnHit(gm, damageEvent);});
-                    damageEvent.OnKill.AddListener(() => {modifier.OnKilled(gm, damageEvent);});
-                    modifier.ApplyDefenderDamageChanges(gm, damageEvent);
-                }
-            }
-        }
+        // InventoryComponent targetInventory = target.Entity.GetComponent<InventoryComponent>();
+        // if (targetInventory != null){
+        //     foreach (DR_Entity item in targetInventory.items){
+        //         EquippableComponent equippable = item.GetComponent<EquippableComponent>();
+        //         if (equippable == null || !equippable.isEquipped){
+        //             continue;
+        //         }
+        //         foreach (DR_Modifier modifier in equippable.modifiers){
+        //             damageEvent.OnAttack.AddListener(() => {modifier.OnHit(gm, damageEvent);});
+        //             damageEvent.OnKill.AddListener(() => {modifier.OnKilled(gm, damageEvent);});
+        //             modifier.ApplyDefenderDamageChanges(gm, damageEvent);
+        //         }
+        //     }
+        // }
 
         if(target != null){
             //Debug testing

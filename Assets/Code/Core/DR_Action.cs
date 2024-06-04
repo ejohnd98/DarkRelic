@@ -39,9 +39,6 @@ public abstract class DR_Action {
     // Right now this is only used for additional inputs not given when
     // the action is created (ie. requires further input from player)
     public List<ActionInput> actionInputs = new List<ActionInput>();
-
-    public bool hasStarted = false;
-    public bool hasFinished = false;
     public bool wasSuccess = true;
 
     public bool RequiresInput(){
@@ -74,22 +71,10 @@ public abstract class DR_Action {
         return null;
     }
 
-    public virtual void StartAction(DR_GameManager gm){
-        hasStarted = true;
-    }
-
-    public virtual void ActionStep(DR_GameManager gm, float deltaTime){
-        if (!hasStarted || hasFinished){
-            return;
-        }
-        EndAction(gm);
-    }
-
-    public virtual void EndAction(DR_GameManager gm){
+    public virtual void Perform(DR_GameManager gm){
         if (wasSuccess){
             GameRenderer.instance.AddAction(this);
         }
-        hasFinished = true;
     }
 
     public virtual string GetLogText(){
@@ -115,32 +100,14 @@ public class MoveAction : DR_Action {
         this.pos = pos;
     }
 
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
-
+    public override void Perform(DR_GameManager gm){
         Vector2Int posA = owner.Position;
         if(!gm.CurrentMap.CanMoveActor(owner, pos)){
             wasSuccess = false;
-            EndAction(gm);
+            return;
         }
         
         gm.CurrentMap.MoveActor(owner, pos);
-        EndAction(gm);
-    }
-
-    public override void ActionStep(DR_GameManager gm, float deltaTime)
-    {
-        if (!hasStarted || hasFinished){
-            return;
-        }
-    }
-
-    public override void EndAction(DR_GameManager gm)
-    {
-        base.EndAction(gm);
-        if (!wasSuccess){
-            return;
-        }
 
         DR_Cell cell = gm.CurrentMap.GetCell(pos);
 
@@ -151,12 +118,10 @@ public class MoveAction : DR_Action {
                 inventory.AddBlood(cell.blood);
                 UISystem.instance.RefreshInventoryUI();
                 cell.blood = 0;
-                //DR_Renderer.instance.SetCellBloodState(pos, cell);
             }
         }
 
-
-        
+        base.Perform(gm);
     }
 }
 
@@ -181,50 +146,17 @@ public class AttackAction : DR_Action {
         return owner.Name + " attacked " + target.Entity.Name + "!";
     }
 
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
-
-        //attackAnim = owner.AddComponent<AttackAnimation>(new());
-        //attackAnim.SetAnim(target.Entity.Position);
-        //AnimationSystem.AddAnimation(attackAnim, owner);
-
-        //attackAnim.AnimHalfway += (DR_Animation moveAnim) => {
-            // int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
-
-            // DamageSystem.HandleAttack(gm, owner, target, baseDamage);
-
-            // //TODO: check if this is still needed here
-            // if (!target.IsAlive()){
-            //     gm.CurrentMap.RemoveActor(target.Entity);
-            //     target.Entity.DestroyEntity();
-            // }
-        //};
-
+    public override void Perform(DR_GameManager gm){
         int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
-
         damageEvent = DamageSystem.HandleAttack(gm, owner, target, baseDamage);
 
         //TODO: check if this is still needed here
         if (!target.IsAlive()){
             killed = true;
             gm.CurrentMap.RemoveActor(target.Entity);
-
-            // Animations may be referencing the entity so can't destroy yet
-            //target.Entity.DestroyEntity();
         }
 
-        EndAction(gm);
-
-        // attackAnim.AnimFinished += (DR_Animation moveAnim) => {
-        //     EndAction(gm);
-        // };
-    }
-
-    public override void ActionStep(DR_GameManager gm, float deltaTime)
-    {
-        if (!hasStarted || hasFinished){
-            return;
-        }
+        base.Perform(gm);
     }
 }
 
@@ -241,22 +173,14 @@ public class StairAction : DR_Action {
         return owner.Name + (stairs.goesDeeper ? " descended down a set of stairs." : " climbed up a set of stairs.");
     }
 
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
+    public override void Perform(DR_GameManager gm){
+
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
         gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper, true);
         SoundSystem.instance.PlaySound(stairs.goesDeeper ? "descend" : "ascend");
-        //return true;
-    }
 
-    public override void ActionStep(DR_GameManager gm, float deltaTime) {
-        if (!hasStarted || hasFinished){
-            return;
-        }
-
-        if (!DR_GameManager.instance.isFadeActive) {
-            EndAction(gm);
-        }
+        base.Perform(gm);
+        //TODO: create animation and wait for DR_GameManager.instance.isFadeActive
     }
 }
 
@@ -272,11 +196,10 @@ public class DoorAction : DR_Action {
         return new List<DR_Entity>(){owner, target.Entity};
     }
 
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
+    public override void Perform(DR_GameManager gm){
         target.ToggleOpen();
         SoundSystem.instance.PlaySound("door");
-        EndAction(gm);
+        base.Perform(gm);
     }
 }
 
@@ -289,11 +212,10 @@ public class GoalAction : DR_Action {
         loggable = true;
     }
 
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
+    public override void Perform(DR_GameManager gm){
         SoundSystem.instance.PlaySound("altar");
         gm.OnGameWon();
-        //return true;
+        base.Perform(gm);
     }
 
     public override string GetLogText(){
@@ -328,8 +250,7 @@ public class AltarAction : DR_Action {
         }
     }
 
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
+    public override void Perform(DR_GameManager gm){
         switch (altar.altarType){
             case AltarType.HEALTH:
             {
@@ -364,105 +285,7 @@ public class AltarAction : DR_Action {
         if (wasSuccess) {
             SoundSystem.instance.PlaySound("altar");
         }
-    }
-}
-
-public class ItemAction : DR_Action {
-    public DR_Entity target;
-    public DR_Entity item;
-
-    public MoveAnimation moveAnim;
-
-    public ItemAction (DR_Entity item, DR_Entity user, DR_Entity target){
-        this.item = item;
-        this.owner = user;
-        this.target = target;
-
-        ItemComponent itemComponent = item.GetComponent<ItemComponent>();
-        if (itemComponent != null){
-            if (itemComponent.requireFurtherInputOnUse){
-
-                actionInputs.Add(new(
-                    //Input validation:
-                    pos => {
-                        DR_Entity newTarget = DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos);
-                        return newTarget != null;
-                    },
-                    "Please select a target, or press ESC to cancel."
-                ));
-            }
-        }
-
-        loggable = true;
-    }
-
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
-
-        if (actionInputs.Count > 0){
-            target = DR_GameManager.instance.CurrentMap.GetActorAtPosition(actionInputs[0].inputValue);
-        }
-
-        MagicConsumableComponent magic = item.GetComponent<MagicConsumableComponent>();
-        if (magic != null){
-            Vector2Int targetPos;
-            if (magic.targetClosest){
-                targetPos = magic.GetTargetPosition(gm, owner, null);
-            }else{
-                targetPos = target.Position;
-            }
-            // moveAnim = EntityFactory.CreateProjectileEntityAtPosition(
-            //     magic.projectileSprite, "Projectile", owner.Position,targetPos, magic.color).GetComponent<MoveAnimation>();
-        }
-    }
-
-    public override void ActionStep(DR_GameManager gm, float deltaTime)
-    {
-        if (!hasStarted || hasFinished){
-            return;
-        }
-        if (moveAnim == null || !moveAnim.isAnimating){
-            EndAction(gm);
-        }
-    }
-
-    public override void EndAction(DR_GameManager gm)
-    {
-        ItemComponent itemComponent = item.GetComponent<ItemComponent>();
-        if (itemComponent != null){
-            itemComponent.UseItem(gm, owner, target);
-        }
-        base.EndAction(gm);
-    }
-
-    public override string GetLogText(){
-        //todo: get this from the item itself
-        return owner.Name + " used " + item.Name + ((owner == target)? "" : " on " + target.Name);
-    }
-}
-
-public class ChangeEquipmentAction : DR_Action {
-    public DR_Entity item;
-    public bool equip;
-
-    public ChangeEquipmentAction (DR_Entity item, DR_Entity user, bool equip){
-        this.item = item;
-        this.owner = user;
-        this.equip = equip;
-
-        loggable = true;
-    }
-
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
-        InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
-        if (inventory != null){
-            bool success = equip? inventory.EquipItem(item) : inventory.UnequipItem(item);
-        }
-    }
-
-    public override string GetLogText(){
-        return owner.Name + (equip ? " equipped " : " unequipped ") + item.Name;
+        base.Perform(gm);
     }
 }
 
@@ -479,52 +302,23 @@ public class PickupAction : DR_Action {
         return new List<DR_Entity>(){owner, item};
     }
 
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
+    public override void Perform(DR_GameManager gm){
         InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
         if (inventory != null){
             bool addedItem = inventory.AddItem(item);
             if (addedItem){
                 gm.CurrentMap.RemoveItem(item);
             }
+            base.Perform(gm);
             return;
         }else{
             Debug.LogError("Inventory is invalid!");
         }
-        return;
+        base.Perform(gm);
     }
 
     public override string GetLogText(){
         return owner.Name + " picked up " + item.Name;
-    }
-}
-
-public class DropAction : DR_Action {
-    public DR_Entity item;
-
-    public DropAction (DR_Entity item, DR_Entity user){
-        this.item = item;
-        this.owner = user;
-        loggable = true;
-    }
-
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
-        InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
-        if (inventory != null){
-            if (gm.CurrentMap.GetItemAtPosition(owner.Position) == null){
-                inventory.RemoveItem(item);
-                gm.CurrentMap.AddItem(item, owner.Position);
-            }
-            
-        }else{
-            Debug.LogError("Inventory is invalid!");
-        }
-        return;
-    }
-
-    public override string GetLogText(){
-        return owner.Name + " dropped " + item.Name;
     }
 }
 
@@ -536,11 +330,9 @@ public class WaitAction : DR_Action {
         loggable = logAction;
     }
 
-    public override void StartAction(DR_GameManager gm){
-        base.StartAction(gm);
+    public override void Perform(DR_GameManager gm){
         wasSuccess = true;
-        EndAction(gm);
-        return;
+        base.Perform(gm);
     }
 
     public override string GetLogText(){

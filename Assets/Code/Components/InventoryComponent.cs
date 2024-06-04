@@ -39,28 +39,6 @@ public class InventoryComponent : DR_Component
         UISystem.instance.RefreshInventoryUI();
     }
 
-    public bool EquipItem(DR_Entity item){
-        EquippableComponent equippable = item.GetComponent<EquippableComponent>();
-        if (equippable != null && equippedItems < maxEquips){
-            equippable.isEquipped = true;
-            equippedItems++;
-            UISystem.instance.RefreshInventoryUI();
-            return true;
-        }
-        return false;
-    }
-
-    public bool UnequipItem(DR_Entity item){
-        EquippableComponent equippable = item.GetComponent<EquippableComponent>();
-        if (equippable != null){
-            equippable.isEquipped = false;
-            equippedItems--;
-            UISystem.instance.RefreshInventoryUI();
-            return true;
-        }
-        return false;
-    }
-
     public void DropItem(DR_GameManager gm, DR_Entity item){
         items.Remove(item);
 

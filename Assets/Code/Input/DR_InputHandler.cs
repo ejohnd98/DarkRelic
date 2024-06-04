@@ -74,7 +74,7 @@ public class DR_InputHandler : MonoBehaviour
             KeyDictionary[keyCode] = inputState;
         }
 
-        cameraObj = DR_GameManager.instance.MainCamera;
+        cameraObj = GameRenderer.instance.MainCamera;
     }
 
     // Update is called once per frame

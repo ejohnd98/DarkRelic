@@ -38,10 +38,6 @@ public class DR_GameManager : MonoBehaviour
 
     public bool debug_disableFOV = false;
 
-    //Temp Camera 
-    public Camera MainCamera;
-    public Vector3 cameraOffset;
-
     //Temp Player
     DR_Entity PlayerActor;
     DR_Entity BossActor;
@@ -67,7 +63,6 @@ public class DR_GameManager : MonoBehaviour
     void Start()
     {
         // Create Dungeon
-        //CurrentDungeon = DR_MapGen.CreateDungeonTest(balanceTestMap);
         blackOverlay.SetShouldBeVisible(true);
         UISystem.instance.gameObject.SetActive(false);
         dungeonGenerator.GenerateDungeon(PostDungeonGenStep);
@@ -85,34 +80,6 @@ public class DR_GameManager : MonoBehaviour
 
         BossActor = EntityFactory.CreateActor(BossTexture, "Boss", Alignment.ENEMY, 20);
         BossActor.AddComponent<AIComponent>(new AIComponent());
-
-        //MapGenInfo mapGenInfo = new MapGenInfo(new Vector2Int(35,35), 1);
-
-        // pathfinding debug map
-        //CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromImage(DebugMap2));
-
-        // Add maps to Dungeon
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        // mapGenInfo.depth = 2;
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        // mapGenInfo.depth = 3;
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-        //
-        // mapGenInfo.isLastFloor = true;
-        // mapGenInfo.depth = 4;
-        // CurrentDungeon.maps.Add(DR_MapGen.CreateMapFromMapInfo(mapGenInfo));
-
-        //temp:
-        DR_Entity item1 = EntityFactory.CreateHealingItem(PotionTexture, "Health Potion", 10);
-        DR_Entity item2 = EntityFactory.CreateMagicItem(ShockTexture, "Shock Scroll", 5);
-        DR_Entity item3 = EntityFactory.CreateTargetedMagicItem(FireboltTexture, "Firebolt Scroll", 5);
-        DR_Entity testEquipment = EntityFactory.CreateEquipmentItem(AmuletTexture, "Amulet of Double Damage");
-        testEquipment.GetComponent<EquippableComponent>().modifiers.Add(new AttackMultiplierModifier(4.0f));
-
-        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item1);
-        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item2);
-        // PlayerActor.GetComponent<InventoryComponent>().AddItem(item3);
-        // PlayerActor.GetComponent<InventoryComponent>().AddItem(testEquipment);
         
         MoveLevels(null, CurrentDungeon.maps[0], true, false);
 
@@ -134,7 +101,6 @@ public class DR_GameManager : MonoBehaviour
         turnSystem = gameObject.AddComponent<TurnSystem>();
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-        //DR_Renderer.instance.CreateTiles();
 
         SetGameState(GameState.ADVANCE_GAME);
         UISystem.instance.RefreshDetailsUI();

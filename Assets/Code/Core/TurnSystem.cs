@@ -8,7 +8,6 @@ public class TurnSystem : MonoBehaviour
     List<TurnComponent> EligibleEntities;
     List<TurnComponent> CanAct;
 
-    DR_Action currentAction = null;
     DR_GameManager gm = null;
 
     public TurnSystem(){
@@ -109,8 +108,6 @@ public class TurnSystem : MonoBehaviour
         }else{
             HandleTurnAction(gm, turnTaker, playerAction);
         }
-
-        
     }
 
     void HandleTurnAction(DR_GameManager gm, DR_Entity turnTaker, DR_Action action){
@@ -120,27 +117,9 @@ public class TurnSystem : MonoBehaviour
             Debug.LogAssertion("TurnSystem.HandleTurnAction | action is null!");
             return;
         }
-        if (currentAction != null){
-            Debug.LogAssertion("TurnSystem.HandleTurnAction | currentAction is NOT null!");
-            return;
-        }
-        currentAction = action;
-        currentAction.StartAction(gm);
-        StartCoroutine(CheckIfActionFinished(gm, turnTaker));
-    }
 
-    void Update(){
-        if (currentAction != null){ //TODO: change to flag/state
-            currentAction.ActionStep(gm, Time.deltaTime);
-        }
-    }
-
-    IEnumerator CheckIfActionFinished(DR_GameManager gm, DR_Entity turnTaker){
-        // TODO: this is probably the source of slowness right now.
-        // TODO: now that animations are detached completely from actions, make all actions synchronous!
-        yield return new WaitUntil(() => currentAction.hasFinished);
-        //Debug.Log("action "+ currentAction.GetType() + " for " + turnTaker.Name + " succeeded: " + currentAction.wasSuccess);
-        TurnEnd(gm, turnTaker, currentAction.wasSuccess);
+        action.Perform(gm);
+        TurnEnd(gm, turnTaker, action.wasSuccess);
     }
 
     void TurnEnd(DR_GameManager gm, DR_Entity turnTaker, bool actionSucceeded){
@@ -166,7 +145,6 @@ public class TurnSystem : MonoBehaviour
                 SightSystem.CalculateVisibleCells(turnTaker, gm.CurrentMap);
             }
         }
-        currentAction = null;
         gm.OnTurnHandled();
     }
 
