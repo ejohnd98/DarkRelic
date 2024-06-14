@@ -29,6 +29,7 @@ public class UISystem : MonoBehaviour
     public Transform ExpBarPivot;
     public EntityDetailsUI detailsUI;
     public InventoryUI inventoryUI;
+    public AbilityToolbarUI abilityToolbarUI;
     public DepthGaugeUI depthUI;
     public GameObject gameOverUI, victoryUI;
 

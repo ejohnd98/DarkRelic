@@ -118,7 +118,8 @@ public class DR_GameManager : MonoBehaviour
 
         bool finishedIterating = false;
 
-        while (!finishedIterating){
+        int iterations = 0;
+        while (!finishedIterating && iterations++ < 100){
             switch (CurrentState)
             {
                 case GameState.ADVANCE_GAME:
