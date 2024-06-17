@@ -155,7 +155,7 @@ public class GameRenderer : MonoBehaviour
 
             // Create and start current group of animations
             if (actionsToBeRendered.Count > 0){
-                Debug.Log("Playing animations for: " + ActionListToString(actionsToBeRendered));
+                //Debug.Log("Playing animations for: " + ActionListToString(actionsToBeRendered));
             }
 
             for (int i = 0; i < actionsToBeRendered.Count; i++)
