@@ -69,6 +69,9 @@ public class UISystem : MonoBehaviour
         UpdateHealthBar();
         UpdateExpBar();
 
+        // Should not be doing this constantly
+        abilityToolbarUI.SetEntity(DR_GameManager.instance.GetPlayer());
+
         if (!DR_InputHandler.instance.mouseIsInWorld){
             GameRenderer.instance.ResetSelectedCell();
             return;

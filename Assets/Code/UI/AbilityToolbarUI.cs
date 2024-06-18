@@ -41,28 +41,35 @@ public class AbilityToolbarUI : MonoBehaviour
 
         // this should have a reference to some ability componment to pull state of each ability (and sprites, dscriptions, etc?)
 
-        // InventoryComponent inventory = entity.GetComponent<InventoryComponent>();
-        // if (inventory != null){
+        AbilityComponent abilityComponent = entity.GetComponent<AbilityComponent>();
+        if (abilityComponent == null){
+            AbilityUIParent.SetActive(false);
+            return;
+        }
 
-        //     foreach (var pair in inventory.RelicInventory){
-        //         GameObject itemButtonObj = Instantiate(AbilityButtonPrefab, Vector3.zero, Quaternion.identity, AbilityButtonsParent);
-        //         UIItemButton itemButton = itemButtonObj.GetComponent<UIItemButton>();
-        //         itemButton.SetEntity(pair.Value.relicEntity);
+            foreach (var ability in abilityComponent.abilities){
+                GameObject abilityButtonObj = Instantiate(AbilityButtonPrefab, Vector3.zero, Quaternion.identity, AbilityButtonsParent);
+                UIItemButton abilityButton = abilityButtonObj.GetComponent<UIItemButton>();
+                abilityButton.SetAbility(ability);
 
-        //         itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetRelic(pair.Value);});
-        //         itemButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
+                //abilityButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetRelic(pair.Value);});
+                //abilityButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
+                abilityButton.OnMouseDownEvents.AddListener(() => {
+                    OnAbilityClicked(entity, ability);
+                });
 
-        //         AbilityButtons.Add(itemButtonObj);
-        //     }
-        // }
+                AbilityButtons.Add(abilityButtonObj);
+            }
         
         AbilityUIParent.SetActive(true);
     }
 
-    //TODO: implement similar method again
-    public void OnItemClicked(DR_Entity item, DR_Entity user, DR_Entity target){
-        // This was removed
-        InventoryComponent inventory = user.GetComponent<InventoryComponent>();
-        UISystem.instance.SetUIAction(null);
+    public void OnAbilityClicked(DR_Entity owner, DR_Ability ability){
+
+        AbilityComponent abilityComponent = owner.GetComponent<AbilityComponent>();
+        abilityComponent.TriggerAbilityFromUI(ability);
+
+        //TODO: make into action
+        //UISystem.instance.SetUIAction(null);
     }
 }

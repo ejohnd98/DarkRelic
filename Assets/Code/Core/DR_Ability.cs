@@ -6,6 +6,9 @@ using UnityEngine;
 
 public abstract class DR_Ability
 {
+    public bool triggeredByPlayer = true;
+    public Sprite sprite;
+
     public virtual bool CanBePerformed(){
         return true;
     }
@@ -27,11 +30,20 @@ public abstract class DR_Ability
     
     // Possibly it does live on the DR_Entity, and then the components trigger them
     // Then things can subscribe to them and they can be triggered without worry.
+
+    // CURRENT TODO:
+    // Move ability to scriptable object (initially can be default type?)
+    // Create an ability action for those which are player triggered. Can be pretty barebones, but will have the "waiting for input" stage if needed
+
+    // Future:
+    // Have relic grant ability
+    // Add events for basic stuff on Entity and some way for abilities to subscribe (or just hardcode that)
 }
 
 public class TestAbility : DR_Ability
 {
     public TestAbility(){
         DR_EventSystem.TestEvent += OnTrigger;
+        sprite = GameRenderer.instance.FloorTexture;
     }
 }

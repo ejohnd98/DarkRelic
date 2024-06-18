@@ -474,7 +474,7 @@ MonoBehaviour:
   ExpBarPivot: {fileID: 1004378435}
   detailsUI: {fileID: 4179322141697608082}
   inventoryUI: {fileID: 66880691}
-  abilityToolbarUI: {fileID: 0}
+  abilityToolbarUI: {fileID: 1180160898}
   depthUI: {fileID: 66880692}
   gameOverUI: {fileID: 256652173}
   victoryUI: {fileID: 1704912405}
@@ -3234,7 +3234,7 @@ GameObject:
   - component: {fileID: 1180160897}
   - component: {fileID: 1180160898}
   m_Layer: 5
-  m_Name: AbilitiyToolbar
+  m_Name: AbilityToolbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

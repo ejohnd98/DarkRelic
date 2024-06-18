@@ -16,4 +16,8 @@ public class UIItemButton : UIButton {
     public void SetSprite(Sprite spr){
         ItemImage.sprite = spr;
     }
+
+    public void SetAbility(DR_Ability ability){
+        ItemImage.sprite = ability.sprite;
+    }
 }
