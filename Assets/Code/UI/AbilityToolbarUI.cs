@@ -31,6 +31,12 @@ public class AbilityToolbarUI : MonoBehaviour
             return;
         }
 
+        AbilityComponent abilityComponent = entity.GetComponent<AbilityComponent>();
+        if (!abilityComponent.dirtyFlag){
+            return; //Really temp
+        }
+        abilityComponent.dirtyFlag = false;
+
         foreach (GameObject obj in AbilityButtons){
             Destroy(obj);
         }
@@ -41,7 +47,7 @@ public class AbilityToolbarUI : MonoBehaviour
 
         // this should have a reference to some ability componment to pull state of each ability (and sprites, dscriptions, etc?)
 
-        AbilityComponent abilityComponent = entity.GetComponent<AbilityComponent>();
+        
         if (abilityComponent == null){
             AbilityUIParent.SetActive(false);
             return;

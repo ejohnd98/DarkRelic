@@ -7,6 +7,7 @@ using UnityEngine;
 public abstract class DR_Ability
 {
     public bool triggeredByPlayer = true;
+    public string abilityName = "";
     public Sprite sprite;
 
     public virtual bool CanBePerformed(){
@@ -15,7 +16,7 @@ public abstract class DR_Ability
 
     public virtual void OnTrigger(DR_Event e){
         TestEvent testEvent = e as TestEvent;
-        Debug.Log("OnTrigger: " + this.GetType().Name + " from: " + testEvent.GetType().Name + ", " + testEvent.test);
+        Debug.Log("OnTrigger: " + this.GetType().Name + " from: " + testEvent.GetType().Name + ", " + testEvent.test + ", ability name: " + abilityName);
     }
 
     //TODO: need to think about how this can be driven by scriptable objects as that's where the sprite, name, and description would be
@@ -43,7 +44,17 @@ public abstract class DR_Ability
 public class TestAbility : DR_Ability
 {
     public TestAbility(){
-        DR_EventSystem.TestEvent += OnTrigger;
-        sprite = GameRenderer.instance.FloorTexture;
+    }
+}
+
+public class TestAbility2 : DR_Ability
+{
+    public TestAbility2(){
+    }
+
+    public override void OnTrigger(DR_Event e){
+        base.OnTrigger(e);
+
+        Debug.Log("Extra override ability code!");
     }
 }

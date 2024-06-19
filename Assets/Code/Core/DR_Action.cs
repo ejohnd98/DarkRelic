@@ -156,11 +156,11 @@ public class AttackAction : DR_Action {
             gm.CurrentMap.RemoveActor(target.Entity);
         }
 
-        var test = new TestEvent
-        {
-            owner = owner
-        };
-        DR_EventSystem.TestEvent(test);
+        // var test = new TestEvent
+        // {
+        //     owner = owner
+        // };
+        //DR_EventSystem.TestEvent(test);
 
         base.Perform(gm);
     }
