@@ -78,6 +78,8 @@ public class TurnSystem : MonoBehaviour
         //Debug.Log("Handling turn for " + turnTaker.Name);
         bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
         gm.SetGameState(DR_GameManager.GameState.HANDLING_TURN);
+        TurnComponent turnComponent = turnTaker.GetComponent<TurnComponent>();
+        turnComponent.waitingForAction = true;
 
         if(isPlayer){
             StartCoroutine(WaitForPlayerInput(gm, turnTaker));
@@ -92,6 +94,9 @@ public class TurnSystem : MonoBehaviour
             playerAction = GetPlayerActionFromInput(gm, turnTaker);
             yield return null;
         }
+
+        TurnComponent turnComponent = turnTaker.GetComponent<TurnComponent>();
+        turnComponent.waitingForAction = false;
 
         while (playerAction.RequiresInput()){
             ActionInput actionInput = playerAction.GetNextNeededInput();
@@ -112,6 +117,12 @@ public class TurnSystem : MonoBehaviour
 
     void HandleTurnAction(DR_GameManager gm, DR_Entity turnTaker, DR_Action action){
         bool isPlayer = turnTaker.HasComponent<PlayerComponent>();
+
+        if(!isPlayer){
+            // Only gating this because this is already handled for player in WaitForPlayerInput
+            TurnComponent turnComponent = turnTaker.GetComponent<TurnComponent>();
+            turnComponent.waitingForAction = false;
+        }
 
         if (action == null){
             Debug.LogAssertion("TurnSystem.HandleTurnAction | action is null!");

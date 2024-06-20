@@ -32,19 +32,4 @@ public class AbilityComponent : DR_Component
             dirtyFlag = true;
         }
     }
-
-    public void TriggerAbilityFromUI(DR_Ability triggeredAbility){
-        TestEvent uiEvent = new();
-        foreach(var ability in abilities){
-            if (ability == triggeredAbility){
-
-                if (!ability.CanBePerformed()){
-                    continue;
-                }
-
-                ability.OnTrigger(uiEvent);
-                return;
-            }
-        }
-    }
 }

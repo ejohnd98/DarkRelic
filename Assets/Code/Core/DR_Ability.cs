@@ -15,8 +15,7 @@ public abstract class DR_Ability
     }
 
     public virtual void OnTrigger(DR_Event e){
-        TestEvent testEvent = e as TestEvent;
-        Debug.Log("OnTrigger: " + this.GetType().Name + " from: " + testEvent.GetType().Name + ", " + testEvent.test + ", ability name: " + abilityName);
+        Debug.LogFormat("OnTrigger: {0} ({1}) from event type: {2}", abilityName, this.GetType().Name, e.GetType().Name);
     }
 
     //TODO: need to think about how this can be driven by scriptable objects as that's where the sprite, name, and description would be

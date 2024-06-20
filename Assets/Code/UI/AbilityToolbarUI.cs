@@ -54,6 +54,9 @@ public class AbilityToolbarUI : MonoBehaviour
         }
 
             foreach (var ability in abilityComponent.abilities){
+                if (!ability.triggeredByPlayer){
+                    continue;
+                }
                 GameObject abilityButtonObj = Instantiate(AbilityButtonPrefab, Vector3.zero, Quaternion.identity, AbilityButtonsParent);
                 UIItemButton abilityButton = abilityButtonObj.GetComponent<UIItemButton>();
                 abilityButton.SetAbility(ability);
@@ -71,11 +74,11 @@ public class AbilityToolbarUI : MonoBehaviour
     }
 
     public void OnAbilityClicked(DR_Entity owner, DR_Ability ability){
+        TurnComponent turnComponent = owner.GetComponent<TurnComponent>();
+        if (!turnComponent.waitingForAction || !ability.CanBePerformed()){
+            return;
+        }
 
-        AbilityComponent abilityComponent = owner.GetComponent<AbilityComponent>();
-        abilityComponent.TriggerAbilityFromUI(ability);
-
-        //TODO: make into action
-        //UISystem.instance.SetUIAction(null);
+        UISystem.instance.SetUIAction(new AbilityAction(ability, owner));
     }
 }

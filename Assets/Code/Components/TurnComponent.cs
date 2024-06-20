@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TurnComponent : DR_Component
@@ -8,6 +9,9 @@ public class TurnComponent : DR_Component
     [Copy]
     public int ActionDebt = 1;
     float CurrentDebt = 0.0f;
+
+    [DoNotSerialize]
+    public bool waitingForAction = false;
 
     public bool CanTakeTurn(){
         return CurrentDebt >= 0;

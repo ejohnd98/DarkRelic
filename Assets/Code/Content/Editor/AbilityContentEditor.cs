@@ -8,6 +8,7 @@ using System.Collections.Generic;
 public class AbilityContentEditor : Editor
 {
     private Type[] derivedTypes;
+    private String[] typeNames;
     private int selectedTypeIndex = 0;
 
     private void OnEnable()
@@ -17,28 +18,28 @@ public class AbilityContentEditor : Editor
             .SelectMany(assembly => assembly.GetTypes())
             .Where(type => type.IsClass && !type.IsAbstract && type.IsSubclassOf(typeof(DR_Ability)))
             .ToArray();
+        
+        typeNames = GetTypeNameArray();
     }
 
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
-
-        AbilityContent contentObject = (AbilityContent)target;
-
         GUILayout.Space(10);
 
-        // Display the dropdown for selecting derived classes
-        selectedTypeIndex = EditorGUILayout.Popup("Ability Type: ", selectedTypeIndex, GetTypeNameArray());
-        
-        // Add a button to call the function with the selected type
-        if (GUILayout.Button("Assign Ability Type"))
+        AbilityContent contentObject = (AbilityContent)target;
+        selectedTypeIndex = Mathf.Max(Array.IndexOf(typeNames, contentObject.typeName), 0);
+
+        // Display dropdown for selecting derived classes
+        selectedTypeIndex = EditorGUILayout.Popup("Ability Type: ", selectedTypeIndex, typeNames);
+
+        string selectedTypeName = typeNames[selectedTypeIndex];
+        if (selectedTypeName != contentObject.typeName)
         {
-            if (selectedTypeIndex >= 0 && selectedTypeIndex < derivedTypes.Length)
-            {
-                Type selectedType = derivedTypes[selectedTypeIndex];
-                contentObject.abilityType = selectedType;
-                contentObject.typeName = selectedType.Name;
-            }
+            contentObject.typeName = selectedTypeName;
+
+            EditorUtility.SetDirty(contentObject);
+            AssetDatabase.SaveAssets();
         }
     }
 

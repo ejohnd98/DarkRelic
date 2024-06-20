@@ -166,6 +166,35 @@ public class AttackAction : DR_Action {
     }
 }
 
+public class AbilityAction : DR_Action {
+    public DR_Ability ability;
+
+    public AbilityAction (DR_Ability ability, DR_Entity owner){
+        this.ability = ability;
+        this.owner = owner;
+
+        //TODO: check if ability needs further input. if so, add here
+        //actionInputs.Add(new ActionInput((Vector2Int pos) => {return true;}));
+    }
+
+    public override List<DR_Entity> GetRelatedEntities(){
+        //TODO: implement this method on ability as well?
+        return new List<DR_Entity>(){owner};
+    }
+
+    public override void Perform(DR_GameManager gm){
+        if (ability.CanBePerformed()){
+            DR_Event abilityEvent = new();
+            abilityEvent.owner = owner;
+            ability.OnTrigger(abilityEvent);
+            wasSuccess = true;
+        }else{
+            wasSuccess = false;
+        }
+        base.Perform(gm);
+    }
+}
+
 public class StairAction : DR_Action {
     public StairComponent stairs;
 

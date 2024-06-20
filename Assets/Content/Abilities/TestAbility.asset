@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentName: Test Content Ability
   abilitySprite: {fileID: -1012467279, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  typeName: TestAbility

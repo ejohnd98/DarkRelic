@@ -9,7 +9,5 @@ public class AbilityContent : ScriptableObject
 {
     public string contentName;
     public Sprite abilitySprite;
-    public Type abilityType = null;
-
-    public string typeName = "";
+    public string typeName;
 }
