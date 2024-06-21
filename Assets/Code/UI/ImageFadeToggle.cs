@@ -24,6 +24,16 @@ public class ImageFadeToggle : MonoBehaviour {
         counter = image.color.a;
     }
 
+    [ContextMenu("SetVisible")]
+    public void SetVisible(){
+        SetShouldBeVisible(true);
+    }
+
+    [ContextMenu("SetInvisible")]
+    public void SetInvisible(){
+        SetShouldBeVisible(false);
+    }
+
     public void SetShouldBeVisible(bool isVisible) {
         shouldBeVisible = isVisible;
         isFading = true;

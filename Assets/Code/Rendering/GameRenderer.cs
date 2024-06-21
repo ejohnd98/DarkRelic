@@ -8,6 +8,10 @@ public class RenderedAction {
 
     public DR_Action originalAction;
 
+    public bool MustBeAnimatedAlone(){
+        return originalAction is StairAction;
+    }
+
     public RenderedAction(DR_Action action){
         originalAction = action;
     }
@@ -40,6 +44,8 @@ public class GameRenderer : MonoBehaviour
     public Vector3 cameraOffset;
     public Transform renderedPlayer;
 
+    public DR_Map currentRenderedMap = null;
+
     public Sprite WallTexture, FloorTexture, FogTexture;
     public GameObject CellObj;
 
@@ -53,6 +59,8 @@ public class GameRenderer : MonoBehaviour
 
     //Vector2Int selectedCellPos;
     public bool currentlyUpdating = false;
+
+    public bool lockCameraPos = false; //Messy
 
     public bool HasActionsQueued(){
         return actionQueue.Count > 0;
@@ -115,7 +123,6 @@ public class GameRenderer : MonoBehaviour
 
     private IEnumerator RenderActions(bool createTiles){
         DR_GameManager gm = DR_GameManager.instance;
-        DR_Map currentMap = gm.CurrentMap;
 
         List<RenderedAction> actionsToBeRendered = new();
 
@@ -131,7 +138,7 @@ public class GameRenderer : MonoBehaviour
                 bool canAddActionToList = true;//actionsToBeRendered.Count == 0;
 
                 foreach (var queuedAction in actionsToBeRendered){
-                    if (nextAction.OverlapsWith(queuedAction)){
+                    if (nextAction.OverlapsWith(queuedAction) || nextAction.MustBeAnimatedAlone()){
                         canAddActionToList = false;
                         break;
                     }
@@ -141,7 +148,9 @@ public class GameRenderer : MonoBehaviour
 
                     Vector2Int nextActionPos = nextAction.originalAction.owner.Position;
                     //Skip rendering action if entity not visible (could be made more robust as actions can affect multiple spaces)
-                    if (!currentMap.IsVisible[nextActionPos.y, nextActionPos.x] && !DR_GameManager.instance.debug_disableFOV){
+                    if (!currentRenderedMap.IsVisible[nextActionPos.y, nextActionPos.x] 
+                            && !DR_GameManager.instance.debug_disableFOV
+                            && !nextAction.originalAction.owner.HasComponent<PlayerComponent>()){
                         actionQueue.Dequeue();
                         continue;
                     }
@@ -165,6 +174,10 @@ public class GameRenderer : MonoBehaviour
                 if (anim != null){
                     activeAnimations.Add(anim);
                     anim.StartAnim();
+
+                    if (anim.action.originalAction is StairAction){
+                        createTiles = true;
+                    }
 
                     
                     if (anim.action.originalAction is AttackAction attack){
@@ -194,6 +207,7 @@ public class GameRenderer : MonoBehaviour
         // Bring map up to date (this may become redundant if the action animations make the same changes?)
         currentlyUpdating = false;
 
+        currentRenderedMap = DR_GameManager.instance.CurrentMap;
         if (createTiles){
             CreateTiles();
         }else{
@@ -204,6 +218,11 @@ public class GameRenderer : MonoBehaviour
 
     private ActionAnimation CreateActionAnimation(RenderedAction renderedAction){
 
+        var action = renderedAction.originalAction;
+        if (action is StairAction stairAction){
+            //TODO: messy
+            return new StairAnimation(renderedAction);
+        }
         // With any luck as long as the anims move everything to where they're supposed to be, this will be good enough for keeping map in sync
         // Stuff going out of or coming into visibility MIGHT need special care though
         GameObject entityObj;
@@ -211,11 +230,12 @@ public class GameRenderer : MonoBehaviour
         if (entityObj == null){
             return null;
         }
+        
 
         Transform entityTransform = entityObj.transform;
         Vector2Int startPos = new(Mathf.RoundToInt(entityTransform.position.x), Mathf.RoundToInt(entityTransform.position.y));
 
-        var action = renderedAction.originalAction;
+        
         if (action is MoveAction moveAction){
             Vector2Int endPos = moveAction.pos;
             return new MoveAnimation(renderedAction, entityTransform, startPos, endPos);
@@ -232,6 +252,10 @@ public class GameRenderer : MonoBehaviour
             Vector2Int endPos = new(Mathf.RoundToInt(targetEntityTransform.position.x), Mathf.RoundToInt(targetEntityTransform.position.y));
             return new AttackAnimation(renderedAction, entityTransform, targetEntityTransform, startPos, endPos);
         }
+        if (action is AbilityAction abilityAction){
+            //TODO: allow abilities to specify their own animation class to use
+            return new AbilityAnimation(renderedAction, entityTransform);
+        }
 
         return null;
     }
@@ -245,17 +269,15 @@ public class GameRenderer : MonoBehaviour
     }
 
     private void CreateTiles(){
-        DR_Map currentMap = DR_GameManager.instance.CurrentMap;
-
         foreach(GameObject obj in CellObjects.Values){
             Destroy(obj);
         }
         CellObjects.Clear();
 
         // Add new visuals
-        for(int y = 0; y < currentMap.MapSize.y; y++){
-            for(int x = 0; x < currentMap.MapSize.x; x++){
-                if (currentMap.GetCell(new Vector2Int(x,y)).neverRender){
+        for(int y = 0; y < currentRenderedMap.MapSize.y; y++){
+            for(int x = 0; x < currentRenderedMap.MapSize.x; x++){
+                if (currentRenderedMap.GetCell(new Vector2Int(x,y)).neverRender){
                     continue;
                 }
 
@@ -264,7 +286,7 @@ public class GameRenderer : MonoBehaviour
                 NewCellObj.name = "Cell (" + x + ", " + y + ")";
 
                 // Should this be in UpdateTiles instead?
-                NewCellObj.GetComponent<CellObj>().SetBlood(currentMap.GetCell(new Vector2Int(x,y)));
+                NewCellObj.GetComponent<CellObj>().SetBlood(currentRenderedMap.GetCell(new Vector2Int(x,y)));
             }
         }
 
@@ -272,18 +294,16 @@ public class GameRenderer : MonoBehaviour
     }
 
     private void UpdateTiles(){
-        DR_Map currentMap = DR_GameManager.instance.CurrentMap;
-
         foreach (var (pos, obj) in CellObjects){
             Sprite CellSprite = FogTexture;
-            if (currentMap.IsVisible[pos.y, pos.x] || DR_GameManager.instance.debug_disableFOV){
-                CellSprite = currentMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
+            if (currentRenderedMap.IsVisible[pos.y, pos.x] || DR_GameManager.instance.debug_disableFOV){
+                CellSprite = currentRenderedMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
                 obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 1.0f);
 
-                CellObjects[pos].GetComponent<CellObj>().SetBlood(currentMap.Cells[pos.y, pos.x]);
+                CellObjects[pos].GetComponent<CellObj>().SetBlood(currentRenderedMap.Cells[pos.y, pos.x]);
 
-            }else if (currentMap.IsKnown[pos.y, pos.x]){
-                CellSprite = currentMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
+            }else if (currentRenderedMap.IsKnown[pos.y, pos.x]){
+                CellSprite = currentRenderedMap.Cells[pos.y, pos.x].bBlocksMovement? WallTexture : FloorTexture;
                 obj.GetComponent<SpriteRenderer>().color = new Color(1.0f, 1.0f, 1.0f, 0.5f);
                 CellObjects[pos].GetComponent<CellObj>().SetBlood(null);
             }else{
@@ -306,10 +326,8 @@ public class GameRenderer : MonoBehaviour
     }
 
     private void UpdateEntities(){
-        DR_Map currentMap = DR_GameManager.instance.CurrentMap;
-
-        foreach(DR_Entity entity in currentMap.Entities){
-            bool isVisible = currentMap.IsVisible[entity.Position.y, entity.Position.x] || DR_GameManager.instance.debug_disableFOV;
+        foreach(DR_Entity entity in currentRenderedMap.Entities){
+            bool isVisible = currentRenderedMap.IsVisible[entity.Position.y, entity.Position.x] || DR_GameManager.instance.debug_disableFOV;
             if (isVisible && !EntityObjects.ContainsKey(entity)){
                 AddEntityObj(entity);
             }
@@ -317,7 +335,7 @@ public class GameRenderer : MonoBehaviour
 
         List<DR_Entity> entitiesToRemove = new List<DR_Entity>();
         foreach(DR_Entity entity in EntityObjects.Keys){
-            bool isVisible = currentMap.IsVisible[entity.Position.y, entity.Position.x] || DR_GameManager.instance.debug_disableFOV;
+            bool isVisible = currentRenderedMap.IsVisible[entity.Position.y, entity.Position.x] || DR_GameManager.instance.debug_disableFOV;
             if (entity.noLongerValid || !entity.isOnMap || !isVisible){
                 entitiesToRemove.Add(entity);
             }
@@ -328,8 +346,8 @@ public class GameRenderer : MonoBehaviour
         }
 
         foreach(DR_Entity Entity in EntityObjects.Keys){
-            bool isVisible = currentMap.IsVisible[Entity.Position.y, Entity.Position.x];
-            bool isKnown = currentMap.IsKnown[Entity.Position.y, Entity.Position.x];
+            bool isVisible = currentRenderedMap.IsVisible[Entity.Position.y, Entity.Position.x];
+            bool isKnown = currentRenderedMap.IsKnown[Entity.Position.y, Entity.Position.x];
             if (!isVisible && !isKnown && !DR_GameManager.instance.debug_disableFOV){
                 EntityObjects[Entity].SetActive(false);
                 continue;
@@ -408,12 +426,15 @@ public class GameRenderer : MonoBehaviour
     }
 
     public void SetBlood(Vector2Int pos){
-        CellObjects[pos].GetComponent<CellObj>().SetBlood(DR_GameManager.instance.CurrentMap.Cells[pos.y, pos.x]);
+        CellObjects[pos].GetComponent<CellObj>().SetBlood(currentRenderedMap.Cells[pos.y, pos.x]);
     }
 
     public void UpdateCamera(bool forcePos = false)
     {
         //TODO: do not move camera when player attacks
+        if (lockCameraPos){
+            return;
+        }
 
         Vector3 DesiredPos = MainCamera.transform.position;
         if (renderedPlayer != null){

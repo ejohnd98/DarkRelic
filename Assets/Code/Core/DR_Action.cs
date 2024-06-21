@@ -209,10 +209,15 @@ public class StairAction : DR_Action {
     }
 
     public override void Perform(DR_GameManager gm){
+        if (!stairs.goesDeeper && gm.CurrentDungeon.mapIndex == 0){
+            wasSuccess = false;
+            base.Perform(gm);
+            return;
+        }
 
+        //TODO: might be a bug here where you can quickly go up before the renderer has moved down, causing it to go up from what was originally on screen
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
         gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper, true);
-        SoundSystem.instance.PlaySound(stairs.goesDeeper ? "descend" : "ascend");
 
         base.Perform(gm);
         //TODO: create animation and wait for DR_GameManager.instance.isFadeActive

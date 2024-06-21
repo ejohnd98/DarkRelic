@@ -12,6 +12,7 @@ public abstract class ActionAnimation{
 
     public float length = 1.0f;
     public bool isAnimating = false;
+    public bool ignoreTimer = false;
 
     protected float counter = 0.0f;
     public float depth = 0.0f;
@@ -22,17 +23,27 @@ public abstract class ActionAnimation{
     public void StartAnim(){
         counter = 0.0f;
         isAnimating = true;
+        AnimStart();
         AnimStarted?.Invoke(this);
     }
 
     public void StopAnim(){
         isAnimating = false;
+        AnimEnd();
         AnimFinished?.Invoke(this);
+    }
+
+    public virtual void AnimStart(){
+
+    }
+
+    public virtual void AnimEnd(){
+        
     }
 
     // This should be overridden to define animation behaviour
     public virtual void AnimStep(float time){
-        if (!isAnimating){
+        if (!isAnimating || ignoreTimer){
             return;
         }
 
@@ -111,6 +122,20 @@ public class AttackAnimation : ActionAnimation {
         current = start;
     }
 
+    public override void AnimStart()
+    {
+        if (entity.HasComponent<PlayerComponent>()){
+            GameRenderer.instance.lockCameraPos = true;
+        }
+    }
+
+    public override void AnimEnd()
+    {
+        if (entity.HasComponent<PlayerComponent>()){
+            GameRenderer.instance.lockCameraPos = false;
+        }
+    }
+
     public override void AnimStep(float time){
         base.AnimStep(time);
 
@@ -152,5 +177,64 @@ public class AttackAnimation : ActionAnimation {
 
     public override Vector3 GetAnimPosition(float depth = 0.0f){
         return current;
+    }
+}
+
+public class AbilityAnimation : ActionAnimation {
+
+    public AbilityAnimation(RenderedAction action, Transform rendererObj, float time = 0.25f){
+        this.rendererObj = rendererObj;
+        this.action = action;
+        this.entity = action.originalAction.owner;
+        this.length = time;
+
+        AnimStarted += (anim)=>{
+            SoundSystem.instance.PlaySound("abilityPlaceholder");
+        };
+    }
+
+    public override void AnimStart()
+    {
+        FXSpawner.instance.SpawnParticleFX(entity.Position, new Color(0.9f, 0.9f, 1.0f));
+    }
+}
+
+public class StairAnimation : ActionAnimation {
+
+    public StairAnimation(RenderedAction action){
+        this.action = action;
+        this.entity = action.originalAction.owner;
+        ignoreTimer = true;
+    }
+
+    public override void AnimStart()
+    {
+        StairAction stairAction = action.originalAction as StairAction;
+        SoundSystem.instance.PlaySound(stairAction.stairs.goesDeeper ? "descend" : "ascend");
+
+        ImageFadeToggle blackOverlay = DR_GameManager.instance.blackOverlay;
+
+        Action OnFadeOut = null;
+        OnFadeOut = () => {
+            blackOverlay.OnVisibleComplete -= OnFadeOut;
+            StopAnim();
+            //GameRenderer.instance.FullyUpdateRenderer();
+            blackOverlay.SetShouldBeVisible(false);
+            GameRenderer.instance.lockCameraPos = false;
+            
+            //TODO: figure out way to force camera pos here
+        };
+
+        Action OnFadeIn = null;
+        OnFadeIn = () => {
+            blackOverlay.OnVisibleComplete -= OnFadeIn;
+            //StopAnim();
+        };
+        
+        blackOverlay.OnVisibleComplete += OnFadeOut;
+        blackOverlay.OnInvisibleComplete += OnFadeIn;
+
+        blackOverlay.SetShouldBeVisible(true);
+        GameRenderer.instance.lockCameraPos = true;
     }
 }

@@ -4357,6 +4357,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: a368deba881e15e43b2a7c8a250ef685, type: 3}
   - {fileID: 8300000, guid: eb626992661a16541847e7772271a2f1, type: 3}
   - {fileID: 8300000, guid: b83f370a1acf2c54da7ee1494d4f8170, type: 3}
+  - {fileID: 8300000, guid: 652441dca4fe6764eba7dbba90f88806, type: 3}
   variantSfxList: []
 --- !u!4 &1759956583
 Transform:
