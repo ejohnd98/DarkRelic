@@ -24,12 +24,16 @@ public class AbilityComponent : DR_Component
         }
 
         foreach(var startingAbility in startingAbilities){
-            Type abilityType = Type.GetType(startingAbility.typeName);
-            DR_Ability ability = System.Activator.CreateInstance(abilityType) as DR_Ability;
-            ability.sprite = startingAbility.abilitySprite;
-            ability.abilityName = startingAbility.contentName;
-            abilities.Add(ability);
-            dirtyFlag = true;
+            AddAbilityFromContent(startingAbility);
         }
+    }
+
+    public void AddAbilityFromContent(AbilityContent content){
+        Type abilityType = Type.GetType(content.typeName);
+        DR_Ability ability = System.Activator.CreateInstance(abilityType) as DR_Ability;
+        ability.sprite = content.abilitySprite;
+        ability.abilityName = content.contentName;
+        abilities.Add(ability);
+        dirtyFlag = true;
     }
 }

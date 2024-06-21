@@ -38,3 +38,5 @@ MonoBehaviour:
       data:
         key: RelicComponent
         relicType: 2
+        grantedAbilities:
+        - {fileID: 11400000, guid: b400c29260cc8a34da4e3b33be9b3765, type: 2}

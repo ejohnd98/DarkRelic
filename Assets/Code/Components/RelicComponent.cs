@@ -16,6 +16,9 @@ public class RelicComponent : DR_Component
     [Copy]
     public RelicType relicType;
 
+    [Copy]
+    public AbilityContent[] grantedAbilities;
+
     public override string GetDetailsDescription()
     {
         switch (relicType){

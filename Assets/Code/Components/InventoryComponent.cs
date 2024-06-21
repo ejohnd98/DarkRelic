@@ -81,6 +81,14 @@ public class InventoryComponent : DR_Component
                     count = 1
                 };
             }
+
+            // TODO: handle unequip too
+            if (Entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){
+                foreach(var ability in relicComponent.grantedAbilities){
+                    abilityComponent.AddAbilityFromContent(ability);
+                }
+            }
+
             Entity.GetComponent<LevelComponent>().UpdateStats();
             UISystem.instance.RefreshInventoryUI();
             return true;
