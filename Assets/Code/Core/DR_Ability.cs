@@ -9,6 +9,7 @@ public abstract class DR_Ability
     public bool triggeredByPlayer = true;
     public string abilityName = "";
     public Sprite sprite;
+    public List<ActionInput> actionInputs;
 
     public virtual bool CanBePerformed(){
         return true;
@@ -16,6 +17,15 @@ public abstract class DR_Ability
 
     public virtual void OnTrigger(DR_Event e){
         Debug.LogFormat("OnTrigger: {0} ({1}) from event type: {2}", abilityName, this.GetType().Name, e.GetType().Name);
+    }
+
+    public void ResetInputs(){
+        actionInputs = new();
+        SetupInputs();
+    }
+
+    protected virtual void SetupInputs(){
+
     }
 
     //TODO: need to think about how this can be driven by scriptable objects as that's where the sprite, name, and description would be
@@ -55,5 +65,21 @@ public class TestAbility2 : DR_Ability
         base.OnTrigger(e);
 
         Debug.Log("Extra override ability code!");
+    }
+}
+
+// TODO: generalize to projectile (or further to targeted?) ability
+public class BloodBoltAbility : DR_Ability
+{
+    public BloodBoltAbility(){
+    }
+
+    protected override void SetupInputs(){
+        //TODO: cap range? Eventually will want to precompute targets so they can shown through UI
+        actionInputs.Add(new ActionInput((Vector2Int pos) => {return true;}));
+    }
+
+    public override void OnTrigger(DR_Event e){
+        Debug.Log("BloodBoltAbility Triggered with input: " + actionInputs[0].inputValue);
     }
 }

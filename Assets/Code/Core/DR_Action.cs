@@ -172,14 +172,20 @@ public class AbilityAction : DR_Action {
     public AbilityAction (DR_Ability ability, DR_Entity owner){
         this.ability = ability;
         this.owner = owner;
-
-        //TODO: check if ability needs further input. if so, add here
-        //actionInputs.Add(new ActionInput((Vector2Int pos) => {return true;}));
+        loggable = true;
+        
+        // Tell action if we need any further input
+        ability.ResetInputs();
+        actionInputs = ability.actionInputs;
     }
 
     public override List<DR_Entity> GetRelatedEntities(){
         //TODO: implement this method on ability as well?
         return new List<DR_Entity>(){owner};
+    }
+
+    public override string GetLogText(){
+        return owner.Name + " activated " + ability.abilityName;
     }
 
     public override void Perform(DR_GameManager gm){

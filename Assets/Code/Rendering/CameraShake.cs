@@ -23,6 +23,8 @@ public class CameraShake : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
+    //TODO: directional screen shake
+
     void Update()
     {
         if(currentShake > 0){

@@ -827,8 +827,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -4, y: 0}
-  m_SizeDelta: {x: 132, y: 96}
+  m_AnchoredPosition: {x: -4, y: 4}
+  m_SizeDelta: {x: 132, y: 92}
   m_Pivot: {x: 1, y: 0}
 --- !u!222 &174035608
 CanvasRenderer:
@@ -875,6 +875,7 @@ MonoBehaviour:
   FogTexture: {fileID: 951428456, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   CellObj: {fileID: 2981893753497814314, guid: a111716a7249b3a45a002a8bff83ed16, type: 3}
   currentlyUpdating: 0
+  lockCameraPos: 0
 --- !u!4 &190818967
 Transform:
   m_ObjectHideFlags: 0
@@ -3855,8 +3856,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 4
-    m_Right: 4
+    m_Left: 2
+    m_Right: 2
     m_Top: 4
     m_Bottom: 4
   m_ChildAlignment: 6
@@ -3913,7 +3914,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bad6cdaed5f5c84fb780b942b7436fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isFadeActive: 0
   entitesCreated: 0
   CurrentState: 4
   dungeonGenerator: {fileID: 2139329888}
@@ -4718,7 +4718,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -4, y: -4}
-  m_SizeDelta: {x: 132, y: 258}
+  m_SizeDelta: {x: 132, y: 256}
   m_Pivot: {x: 1, y: 1}
 --- !u!1 &4179322141697608081
 GameObject:
