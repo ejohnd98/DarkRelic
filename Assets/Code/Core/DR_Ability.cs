@@ -71,15 +71,30 @@ public class TestAbility2 : DR_Ability
 // TODO: generalize to projectile (or further to targeted?) ability
 public class BloodBoltAbility : DR_Ability
 {
+    public bool killed = false;
+    public DR_Entity target;
     public BloodBoltAbility(){
+    }
+
+    public override bool CanBePerformed(){
+        //TODO: blood cost
+        return true;
     }
 
     protected override void SetupInputs(){
         //TODO: cap range? Eventually will want to precompute targets so they can shown through UI
-        actionInputs.Add(new ActionInput((Vector2Int pos) => {return true;}));
+        actionInputs.Add(new ActionInput((Vector2Int pos) => {return DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos) != null;}));
     }
 
     public override void OnTrigger(DR_Event e){
         Debug.Log("BloodBoltAbility Triggered with input: " + actionInputs[0].inputValue);
+
+        DR_Entity owner = e.owner;
+        target = DR_GameManager.instance.CurrentMap.GetActorAtPosition(actionInputs[0].inputValue);
+
+        int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+        var damageEvent = DamageSystem.HandleAttack(DR_GameManager.instance, owner, target, baseDamage);
+
+        killed = damageEvent.killed;
     }
 }

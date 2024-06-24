@@ -20,7 +20,7 @@ public class AISystem
             if (entity.DistanceTo(target.Position) == 1){
                 HealthComponent targetHealth = target.GetComponent<HealthComponent>();
                 if (targetHealth.IsAlive()){
-                    return new AttackAction(targetHealth, entity);
+                    return new AttackAction(target, entity);
                 }
             }
 

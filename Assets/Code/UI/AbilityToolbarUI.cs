@@ -61,8 +61,8 @@ public class AbilityToolbarUI : MonoBehaviour
                 UIItemButton abilityButton = abilityButtonObj.GetComponent<UIItemButton>();
                 abilityButton.SetAbility(ability);
 
-                //abilityButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetRelic(pair.Value);});
-                //abilityButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
+                abilityButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetAbility(ability);});
+                abilityButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
                 abilityButton.OnMouseDownEvents.AddListener(() => {
                     OnAbilityClicked(entity, ability);
                 });

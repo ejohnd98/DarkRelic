@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: TestAbility 2
   m_EditorClassIdentifier: 
   contentName: Test Content Ability 2
-  abilitySprite: {fileID: 231037434, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  abilitySprite: {fileID: -816387132, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   typeName: TestAbility2

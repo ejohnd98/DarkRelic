@@ -243,7 +243,7 @@ public class GameRenderer : MonoBehaviour
         if (action is AttackAction attackAction){
 
             GameObject targetEntityObj;
-            EntityObjects.TryGetValue(attackAction.target.Entity, out targetEntityObj);
+            EntityObjects.TryGetValue(attackAction.target, out targetEntityObj);
             if (targetEntityObj == null){
                 Debug.LogError("CreateActionAnimation: Could not get targeted entity obj for attack anim");
                 return null;
@@ -253,7 +253,12 @@ public class GameRenderer : MonoBehaviour
             return new AttackAnimation(renderedAction, entityTransform, targetEntityTransform, startPos, endPos);
         }
         if (action is AbilityAction abilityAction){
-            //TODO: allow abilities to specify their own animation class to use
+
+            //TODO: more properly determine what animation to use for an ability (specify on ability itself?)
+            if (abilityAction.ability is BloodBoltAbility bloodBoltAbility){
+                return new ProjectileAnimation(renderedAction, entityTransform, EntityObjects[bloodBoltAbility.target].transform);
+            }
+
             return new AbilityAnimation(renderedAction, entityTransform);
         }
 

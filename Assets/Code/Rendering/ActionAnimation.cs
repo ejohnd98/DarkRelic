@@ -154,13 +154,13 @@ public class AttackAnimation : ActionAnimation {
                         Vector2Int bloodPos = new(Mathf.RoundToInt(targetRendererObj.position.x), Mathf.RoundToInt(targetRendererObj.position.y));
                         GameRenderer.instance.SetBlood(bloodPos);
 
-                        FXSpawner.instance.SpawnDeathFX(attack.target.Entity, targetRendererObj.position);
-                        GameRenderer.instance.RemoveEntityObj(attack.target.Entity);
+                        FXSpawner.instance.SpawnDeathFX(attack.target, targetRendererObj.position);
+                        GameRenderer.instance.RemoveEntityObj(attack.target);
 
                         cameraShakeAmount *= 2.0f;
                     }
 
-                    if (attack.target.Entity.HasComponent<PlayerComponent>()){
+                    if (attack.target.HasComponent<PlayerComponent>()){
                         cameraShakeAmount *= 1.5f;
                     }
 
@@ -196,6 +196,58 @@ public class AbilityAnimation : ActionAnimation {
     public override void AnimStart()
     {
         FXSpawner.instance.SpawnParticleFX(entity.Position, new Color(0.9f, 0.9f, 1.0f));
+    }
+}
+
+public class ProjectileAnimation : ActionAnimation {
+
+    public Transform targetRendererObj;
+
+    public ProjectileAnimation(RenderedAction action, Transform rendererObj, Transform targetRenderObj, float time = 0.25f){
+        this.rendererObj = rendererObj;
+        this.action = action;
+        this.entity = action.originalAction.owner;
+        this.length = time;
+        this.targetRendererObj = targetRenderObj;
+
+        AnimStarted += (anim)=>{
+            SoundSystem.instance.PlaySound("abilityPlaceholder");
+        };
+    }
+
+    public override void AnimStart()
+    {
+        //Super messy. Should be getting the renderer obj corresponding to the target entity
+        Vector2Int targetPos = action.originalAction.actionInputs[0].inputValue;
+
+        FXSpawner.instance.SpawnParticleFX(targetPos, new Color(0.722f, 0.145f, 0.247f));
+
+        //TODO: this is a lot of duplicate code from the attack animation. Should have common ground of some sort
+
+        float cameraShakeAmount = 0.5f;
+
+        if (action.originalAction is AbilityAction abilityAction && abilityAction.ability is BloodBoltAbility bloodBoltAbility){
+            DR_Entity targetEntity = bloodBoltAbility.target;
+
+            if (bloodBoltAbility.killed){
+                //TODO: more proper way of setting blood (this pulls the latest data which may not be accurate to the current visuals)
+                Vector2Int bloodPos = new(Mathf.RoundToInt(targetRendererObj.position.x), Mathf.RoundToInt(targetRendererObj.position.y));
+                GameRenderer.instance.SetBlood(bloodPos);
+
+                FXSpawner.instance.SpawnDeathFX(targetEntity, targetRendererObj.position);
+                GameRenderer.instance.RemoveEntityObj(targetEntity);
+
+                cameraShakeAmount *= 2.0f;
+            }
+
+            if (targetEntity.HasComponent<PlayerComponent>()){
+                cameraShakeAmount *= 1.5f;
+            }
+
+            SoundSystem.instance.PlaySound(bloodBoltAbility.killed ? "death" : "attack");
+
+            CameraShake.ShakeCamera(cameraShakeAmount);
+        }
     }
 }
 

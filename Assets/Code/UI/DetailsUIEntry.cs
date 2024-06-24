@@ -86,4 +86,13 @@ public class DetailsUIEntry : MonoBehaviour
         nameText.text = entityName;
         detailsText.text = details;
     }
+
+    public void Init(DR_Ability ability){
+        string entityName = ability.abilityName;
+        string details = "";//relic.relicEntity.GetComponent<RelicComponent>().GetDetailsDescription();
+
+        spriteImage.sprite = ability.sprite;
+        nameText.text = entityName;
+        detailsText.text = details;
+    }
 }

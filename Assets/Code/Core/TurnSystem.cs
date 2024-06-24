@@ -182,7 +182,7 @@ public class TurnSystem : MonoBehaviour
                 if (targetCell.Actor != null){
                     HealthComponent target = targetCell.Actor.GetComponent<HealthComponent>();
                     if (target != null){
-                        actionList.Add(new AttackAction(target, playerActor));
+                        actionList.Add(new AttackAction(targetCell.Actor, playerActor));
                     }
                 }
 

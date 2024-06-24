@@ -126,24 +126,24 @@ public class MoveAction : DR_Action {
 }
 
 public class AttackAction : DR_Action {
-    public HealthComponent target;
+    public DR_Entity target;
     public AttackAnimation attackAnim;
 
     public bool killed = false;
     public DamageEvent damageEvent;
 
-    public AttackAction (HealthComponent target, DR_Entity attacker = null){
+    public AttackAction (DR_Entity target, DR_Entity attacker = null){
         this.target = target;
         this.owner = attacker;
         loggable = false; //handle this separately for attacks
     }
 
     public override List<DR_Entity> GetRelatedEntities(){
-        return new List<DR_Entity>(){owner, target.Entity};
+        return new List<DR_Entity>(){owner, target};
     }
 
     public override string GetLogText(){
-        return owner.Name + " attacked " + target.Entity.Name + "!";
+        return owner.Name + " attacked " + target.Name + "!";
     }
 
     public override void Perform(DR_GameManager gm){
@@ -151,9 +151,9 @@ public class AttackAction : DR_Action {
         damageEvent = DamageSystem.HandleAttack(gm, owner, target, baseDamage);
 
         //TODO: check if this is still needed here
-        if (!target.IsAlive()){
+        if (!target.GetComponent<HealthComponent>().IsAlive()){
             killed = true;
-            gm.CurrentMap.RemoveActor(target.Entity);
+            gm.CurrentMap.RemoveActor(target);
         }
 
         // var test = new TestEvent
