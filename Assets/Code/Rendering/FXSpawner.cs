@@ -10,6 +10,7 @@ public class FXSpawner : MonoBehaviour
     public static float fadeTime = 0.3f;
 
     public GameObject FXObj;
+    public GameObject spriteObj;
     public Material whiteMat;
 
     void Awake()
@@ -21,9 +22,19 @@ public class FXSpawner : MonoBehaviour
     }
 
     public void SpawnParticleFX(Vector2Int pos, Color color){
-        GameObject FXObject = Instantiate(FXObj,new Vector3(pos.x, pos.y, FXDepth), Quaternion.identity, transform);
+        GameObject FXObject = Instantiate(FXObj, new Vector3(pos.x, pos.y, FXDepth), Quaternion.identity, transform);
         var main = FXObject.GetComponent<ParticleSystem>().main;
         main.startColor = color;
+    }
+
+    public Transform SpawnSprite(Vector2Int pos, Sprite spr, Color color){
+        GameObject FXObject = Instantiate(spriteObj, new Vector3(pos.x, pos.y, FXDepth), Quaternion.identity, transform);
+        if (spr != null){
+            FXObject.GetComponent<SpriteRenderer>().sprite = spr;
+        }
+        FXObject.GetComponent<SpriteRenderer>().color = color;
+
+        return FXObject.transform;
     }
 
     public void SpawnDeathFX(DR_Entity killedEntity, Vector3 pos){

@@ -181,7 +181,7 @@ public class AbilityAction : DR_Action {
 
     public override List<DR_Entity> GetRelatedEntities(){
         //TODO: implement this method on ability as well?
-        return new List<DR_Entity>(){owner};
+        return ability.GetRelatedEntities();
     }
 
     public override string GetLogText(){

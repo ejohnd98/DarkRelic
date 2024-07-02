@@ -49,8 +49,8 @@ public class GameRenderer : MonoBehaviour
     public Sprite WallTexture, FloorTexture, FogTexture;
     public GameObject CellObj;
 
-    Dictionary<DR_Entity, GameObject> EntityObjects;
-    Dictionary<Vector2Int, GameObject> CellObjects;
+    public Dictionary<DR_Entity, GameObject> EntityObjects;
+    public Dictionary<Vector2Int, GameObject> CellObjects;
 
     Vector2Int selectedCellPos;
 

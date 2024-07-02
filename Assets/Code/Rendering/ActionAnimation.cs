@@ -203,7 +203,12 @@ public class ProjectileAnimation : ActionAnimation {
 
     public Transform targetRendererObj;
 
-    public ProjectileAnimation(RenderedAction action, Transform rendererObj, Transform targetRenderObj, float time = 0.25f){
+    //TODO: What if there's multiple projectiles?
+    Transform projectileObj;
+    Vector3 a, b;
+    Vector2Int targetPos;
+
+    public ProjectileAnimation(RenderedAction action, Transform rendererObj, Transform targetRenderObj, float time = 0.2f){
         this.rendererObj = rendererObj;
         this.action = action;
         this.entity = action.originalAction.owner;
@@ -218,11 +223,27 @@ public class ProjectileAnimation : ActionAnimation {
     public override void AnimStart()
     {
         //Super messy. Should be getting the renderer obj corresponding to the target entity
-        Vector2Int targetPos = action.originalAction.actionInputs[0].inputValue;
+        targetPos = action.originalAction.actionInputs[0].inputValue;
+        a = GameRenderer.instance.EntityObjects[action.originalAction.owner].transform.position;
+        b = new Vector3(targetPos.x, targetPos.y, -1);
 
+        projectileObj = FXSpawner.instance.SpawnSprite(new Vector2Int(Mathf.RoundToInt(a.x), Mathf.RoundToInt(a.y)), null, new Color(0.722f, 0.145f, 0.247f));
+    }
+
+    public override void AnimStep(float time){
+        base.AnimStep(time);
+
+        Vector3 pos = Easings.GetEasedValue(a,b,counter, EaseType.EaseInQuad);
+        pos.z = projectileObj.position.z;
+        projectileObj.position = pos;
+    }
+
+    public override void AnimEnd()
+    {
+        GameObject.Destroy(projectileObj.gameObject);
+        
         FXSpawner.instance.SpawnParticleFX(targetPos, new Color(0.722f, 0.145f, 0.247f));
-
-        //TODO: this is a lot of duplicate code from the attack animation. Should have common ground of some sort
+                //TODO: this is a lot of duplicate code from the attack animation. Should have common ground of some sort
 
         float cameraShakeAmount = 0.5f;
 

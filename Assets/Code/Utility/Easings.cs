@@ -6,6 +6,7 @@ using UnityEngine;
 
 public enum EaseType{
     QuadEaseOut,
+    EaseInQuad,
     Linear
 }
 
@@ -19,13 +20,13 @@ public class Easings
         return Vector3.Lerp(a,b,x);
     }
 
-    public static Vector3 QuadEaseOut(Vector3 a, Vector3 b, float x) {
-        float val = 1 - (1 - x) * (1 - x);
+    public static Vector3 EaseInQuad(Vector3 a, Vector3 b, float x) {
+        float val = Mathf.Clamp01(x * x * x);
         val = 1.0f - val;
         return (a * val) + (b * (1.0f - val));
     }
 
-    public static float QuadEaseOut(float a, float b, float x) {
+    public static Vector3 QuadEaseOut(Vector3 a, Vector3 b, float x) {
         float val = 1 - (1 - x) * (1 - x);
         val = 1.0f - val;
         return (a * val) + (b * (1.0f - val));
@@ -48,6 +49,8 @@ public class Easings
         switch(type){
             case EaseType.QuadEaseOut:
                 return QuadEaseOut(a,b, Mathf.Clamp01(time));
+            case EaseType.EaseInQuad:
+                return EaseInQuad(a,b, Mathf.Clamp01(time));
             default:
             case EaseType.Linear:
                 return Linear(a,b, Mathf.Clamp01(time));

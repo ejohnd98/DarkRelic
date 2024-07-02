@@ -3997,6 +3997,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FXObj: {fileID: 330791543554764459, guid: aaa4ac33f49b4524d8fa44b75257ea06, type: 3}
+  spriteObj: {fileID: 2981893753497814314, guid: f2eae98a33e1bc040a09e695739684f2, type: 3}
   whiteMat: {fileID: 2100000, guid: 0df34838ebd30b646b1c88fe4e146a39, type: 2}
 --- !u!1 &1495742247
 GameObject:

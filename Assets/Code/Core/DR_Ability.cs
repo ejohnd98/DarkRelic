@@ -10,6 +10,7 @@ public abstract class DR_Ability
     public string abilityName = "";
     public Sprite sprite;
     public List<ActionInput> actionInputs;
+    public List<DR_Entity> relatedEntities = new();
 
     public virtual bool CanBePerformed(){
         return true;
@@ -21,7 +22,12 @@ public abstract class DR_Ability
 
     public void ResetInputs(){
         actionInputs = new();
+        relatedEntities = new();
         SetupInputs();
+    }
+
+    public virtual List<DR_Entity> GetRelatedEntities(){
+        return relatedEntities;
     }
 
     protected virtual void SetupInputs(){
@@ -83,6 +89,7 @@ public class BloodBoltAbility : DR_Ability
 
     protected override void SetupInputs(){
         //TODO: cap range? Eventually will want to precompute targets so they can shown through UI
+        //TODO BUG: require visibility too!
         actionInputs.Add(new ActionInput((Vector2Int pos) => {return DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos) != null;}));
     }
 
@@ -91,6 +98,9 @@ public class BloodBoltAbility : DR_Ability
 
         DR_Entity owner = e.owner;
         target = DR_GameManager.instance.CurrentMap.GetActorAtPosition(actionInputs[0].inputValue);
+
+        relatedEntities.Add(target);
+        relatedEntities.Add(owner);
 
         int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
         var damageEvent = DamageSystem.HandleAttack(DR_GameManager.instance, owner, target, baseDamage);
