@@ -32,4 +32,21 @@ public class DR_Cell
 
         return bBlocksMovement;
     }
+
+    public void AddBlood(int blood){
+        this.blood += blood;
+        bloodStained = true;
+    }
+
+    public void CollectBlood(DR_Entity collector){
+        if (blood > 0){
+            if (collector.GetComponent<InventoryComponent>() is InventoryComponent inventory && inventory.canCollectBlood){
+                //TODO: later have a handler for this as relics will affect stuff here when getting blood
+
+                inventory.AddBlood(blood);
+                UISystem.instance.RefreshInventoryUI();
+                blood = 0;
+            }
+        }
+    }
 }

@@ -9,5 +9,7 @@ public class AbilityContent : ScriptableObject
 {
     public string contentName;
     public Sprite abilitySprite;
+
+    [HideInInspector]
     public string typeName;
 }

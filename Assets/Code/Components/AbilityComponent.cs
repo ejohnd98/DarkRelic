@@ -11,9 +11,7 @@ public class AbilityComponent : DR_Component
 
     public List<DR_Ability> abilities = new();
 
-    public AbilityComponent(){
-
-    }
+    public AbilityComponent(){}
 
     public bool dirtyFlag = true; //Temp for UI
 
@@ -31,9 +29,11 @@ public class AbilityComponent : DR_Component
     public void AddAbilityFromContent(AbilityContent content){
         Type abilityType = Type.GetType(content.typeName);
         DR_Ability ability = System.Activator.CreateInstance(abilityType) as DR_Ability;
+        ability.owner = Entity;
         ability.sprite = content.abilitySprite;
         ability.abilityName = content.contentName;
         abilities.Add(ability);
+        ability.OnAdded();
         dirtyFlag = true;
     }
 }

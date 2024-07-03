@@ -5,6 +5,10 @@ using UnityEngine;
 
 public class DR_Entity
 {
+    // Putting these here isn't great
+    public Action<DR_Event> OnAttackOther;
+    public Action<DR_Event> OnAttacked;
+
     public string Name = "Untitled Entity";
     public Vector2Int Position;
     public int id = -1;

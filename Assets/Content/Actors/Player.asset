@@ -81,4 +81,6 @@ MonoBehaviour:
         startingAbilities:
         - {fileID: 11400000, guid: 9815f83c1a3ed01429f98bd57885a9cb, type: 2}
         - {fileID: 11400000, guid: 19611e4d403ad0646807eb08dcc95924, type: 2}
+        - {fileID: 11400000, guid: 3b6d77afd3689c745ace1fc30df6e787, type: 2}
+        - {fileID: 11400000, guid: 09703b602289e09419cccf4dd5134976, type: 2}
         dirtyFlag: 1

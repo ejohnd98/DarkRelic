@@ -82,14 +82,19 @@ public class DamageSystem
 
                 //Handle blood
                 DR_Cell cell = gm.CurrentMap.GetCell(target.Position);
-                cell.blood += Mathf.Max(Mathf.CeilToInt(targetHealthComp.maxHealth * 0.25f), 1);
-                cell.bloodStained = true;
+                cell.AddBlood(Mathf.Max(Mathf.CeilToInt(targetHealthComp.maxHealth * 0.25f), 1));
 
-
-                //TODO: make this better. have class to handle "garbage collecting" of entities
+                //TODO: Is this still needed?
                 target.noLongerValid = true;
                 gm.CurrentMap.RemoveActor(target);
             }
+
+            AttackEvent attackEvent = new AttackEvent {
+                owner = attacker,
+                target = target,
+                damageDealt = damageEvent.GetResultingDamage()
+            };
+            attacker.OnAttackOther?.Invoke(attackEvent);
         }
 
         return damageEvent;

@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentName: Test Content Ability 2
   abilitySprite: {fileID: -816387132, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  triggeredByPlayer: 1
   typeName: TestAbility2

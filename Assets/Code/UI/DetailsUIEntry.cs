@@ -89,7 +89,13 @@ public class DetailsUIEntry : MonoBehaviour
 
     public void Init(DR_Ability ability){
         string entityName = ability.abilityName;
-        string details = "";//relic.relicEntity.GetComponent<RelicComponent>().GetDetailsDescription();
+        string details = "";
+
+        details += ability.triggeredByPlayer? "Player-activated" : "Passive";
+
+        if(ability.bloodCost > 0){
+            details += "\nCost: " + ability.bloodCost;
+        }
 
         spriteImage.sprite = ability.sprite;
         nameText.text = entityName;

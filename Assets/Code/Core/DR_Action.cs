@@ -101,7 +101,6 @@ public class MoveAction : DR_Action {
     }
 
     public override void Perform(DR_GameManager gm){
-        Vector2Int posA = owner.Position;
         if(!gm.CurrentMap.CanMoveActor(owner, pos)){
             wasSuccess = false;
             return;
@@ -110,16 +109,7 @@ public class MoveAction : DR_Action {
         gm.CurrentMap.MoveActor(owner, pos);
 
         DR_Cell cell = gm.CurrentMap.GetCell(pos);
-
-        if (cell.blood > 0){
-            if (owner.GetComponent<InventoryComponent>() is InventoryComponent inventory && inventory.canCollectBlood){
-                //TODO: later have a handler for this as relics will affect stuff here when getting blood
-
-                inventory.AddBlood(cell.blood);
-                UISystem.instance.RefreshInventoryUI();
-                cell.blood = 0;
-            }
-        }
+        cell.CollectBlood(owner);
 
         base.Perform(gm);
     }
@@ -192,7 +182,7 @@ public class AbilityAction : DR_Action {
         if (ability.CanBePerformed()){
             DR_Event abilityEvent = new();
             abilityEvent.owner = owner;
-            ability.OnTrigger(abilityEvent);
+            ability.Trigger(abilityEvent);
             wasSuccess = true;
         }else{
             wasSuccess = false;

@@ -54,20 +54,19 @@ public class AbilityToolbarUI : MonoBehaviour
         }
 
             foreach (var ability in abilityComponent.abilities){
-                if (!ability.triggeredByPlayer){
-                    continue;
-                }
                 GameObject abilityButtonObj = Instantiate(AbilityButtonPrefab, Vector3.zero, Quaternion.identity, AbilityButtonsParent);
                 UIItemButton abilityButton = abilityButtonObj.GetComponent<UIItemButton>();
                 abilityButton.SetAbility(ability);
 
                 abilityButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetAbility(ability);});
                 abilityButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
+                AbilityButtons.Add(abilityButtonObj);
+                if (!ability.triggeredByPlayer){
+                    continue;
+                }
                 abilityButton.OnMouseDownEvents.AddListener(() => {
                     OnAbilityClicked(entity, ability);
                 });
-
-                AbilityButtons.Add(abilityButtonObj);
             }
         
         AbilityUIParent.SetActive(true);
