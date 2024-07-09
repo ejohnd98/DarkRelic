@@ -3285,8 +3285,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AbilityUIParent: {fileID: 1180160895}
   AbilityButtonsParent: {fileID: 778728787}
-  AbilityButtonPrefab: {fileID: 5749562450120609317, guid: fcd564aa9b554114eb86b65abe832f81, type: 3}
-  placeholderRelicSprite: {fileID: -816387132, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  AbilityButtonPrefab: {fileID: 4579564185213674772, guid: 035a7b8b7be70b84082c74630846361b, type: 3}
+  passiveAbilityFrame: {fileID: 21300000, guid: d0098049ea9a53646ac196d7d22ae6fb, type: 3}
 --- !u!1 &1248985450
 GameObject:
   m_ObjectHideFlags: 0

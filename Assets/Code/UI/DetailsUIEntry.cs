@@ -71,7 +71,7 @@ public class DetailsUIEntry : MonoBehaviour
             bloodstainedOverlay.gameObject.SetActive(true);
         }
 
-        //spriteImage.sprite = cell.bBlocksMovement ? DR_Renderer.instance.WallTexture : DR_Renderer.instance.FloorTexture;
+        spriteImage.sprite = cell.bBlocksMovement ? GameRenderer.instance.WallTexture : GameRenderer.instance.FloorTexture;
 
         nameText.text = entityName;
         detailsText.text = details;
@@ -89,9 +89,9 @@ public class DetailsUIEntry : MonoBehaviour
 
     public void Init(DR_Ability ability){
         string entityName = ability.abilityName;
-        string details = "";
+        string details = ability.abilityDescription;
 
-        details += ability.triggeredByPlayer? "Player-activated" : "Passive";
+        details += "\n" + (ability.triggeredByPlayer? "Player-activated" : "Passive");
 
         if(ability.bloodCost > 0){
             details += "\nCost: " + ability.bloodCost;

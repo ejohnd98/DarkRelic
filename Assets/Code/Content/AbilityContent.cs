@@ -8,6 +8,7 @@ using UnityEngine;
 public class AbilityContent : ScriptableObject
 {
     public string contentName;
+    public string abilityDescription; //Temp
     public Sprite abilitySprite;
 
     [HideInInspector]

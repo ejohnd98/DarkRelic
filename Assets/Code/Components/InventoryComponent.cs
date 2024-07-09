@@ -12,14 +12,17 @@ public class HeldRelic
 
 public class InventoryComponent : DR_Component
 {
+    public Action<DR_Event> OnPickedUpBlood;
+    public Action<DR_Event> OnSpentBlood;
+    
     [Copy]
-    public int capacity = 0;
+    public int capacity;
     [Copy]
-    public int maxEquips = 0;
+    public int maxEquips;
     [Copy]
-    public bool canCollectBlood = false;
+    public bool canCollectBlood;
     [Copy]
-    public int blood = 0;
+    public int blood;
     
     public int equippedItems = 0;
     public List<DR_Entity> items = new List<DR_Entity>();
@@ -107,14 +110,28 @@ public class InventoryComponent : DR_Component
 
     public void AddBlood(int amount)
     {
+        BloodChangeEvent bloodEvent = new();
+        bloodEvent.oldBlood = blood;
+
         blood += amount;
         SoundSystem.instance.PlaySound("addBlood");
         UISystem.instance.RefreshInventoryUI();
+
+        bloodEvent.newBlood = blood;
+        bloodEvent.bloodDelta = amount;
+        OnPickedUpBlood?.Invoke(bloodEvent);
     }
 
     public void SpendBlood(int amount)
     {
+        BloodChangeEvent bloodEvent = new();
+        bloodEvent.oldBlood = blood;
+
         blood -= amount;
         UISystem.instance.RefreshInventoryUI();
+
+        bloodEvent.newBlood = blood;
+        bloodEvent.bloodDelta = amount;
+        OnSpentBlood?.Invoke(bloodEvent);
     }
 }

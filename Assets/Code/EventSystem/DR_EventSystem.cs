@@ -23,3 +23,16 @@ public class AttackEvent : DR_Event
     public DR_Entity target;
     public int damageDealt = 0;
 }
+
+public class BloodChangeEvent : DR_Event
+{
+    public DR_Entity target;
+    public int bloodDelta;
+    public int oldBlood;
+    public int newBlood;
+}
+
+public class ActionEvent : DR_Event
+{
+    public DR_Action action;
+}

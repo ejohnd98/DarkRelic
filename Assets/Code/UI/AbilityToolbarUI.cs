@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class AbilityToolbarUI : MonoBehaviour
@@ -13,8 +14,7 @@ public class AbilityToolbarUI : MonoBehaviour
     public GameObject AbilityButtonPrefab;
     List<GameObject> AbilityButtons;
 
-    //very temp:
-    public Sprite placeholderRelicSprite;
+    public Sprite passiveAbilityFrame;
 
     private void Awake() {
         AbilityButtons = new List<GameObject>();
@@ -42,12 +42,6 @@ public class AbilityToolbarUI : MonoBehaviour
         }
         AbilityButtons.Clear();
 
-        //TODO: show "abilities" once that system exists
-        // have a function to register to which is called when the button is clicked
-
-        // this should have a reference to some ability componment to pull state of each ability (and sprites, dscriptions, etc?)
-
-        
         if (abilityComponent == null){
             AbilityUIParent.SetActive(false);
             return;
@@ -62,6 +56,7 @@ public class AbilityToolbarUI : MonoBehaviour
                 abilityButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
                 AbilityButtons.Add(abilityButtonObj);
                 if (!ability.triggeredByPlayer){
+                    abilityButton.GetComponent<Image>().sprite = passiveAbilityFrame;
                     continue;
                 }
                 abilityButton.OnMouseDownEvents.AddListener(() => {

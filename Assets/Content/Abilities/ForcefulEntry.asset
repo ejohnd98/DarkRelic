@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3345d0cb511916c488b6346dd25f4a71, type: 3}
-  m_Name: BloodBolt
+  m_Name: ForcefulEntry
   m_EditorClassIdentifier: 
-  contentName: Blood Bolt
-  abilityDescription: Cast a targeted projectile
-  abilitySprite: {fileID: -1480307124, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-  typeName: BloodBoltAbility
+  contentName: Forceful Entry
+  abilityDescription: Damage enemies adjacent to doors when opening
+  abilitySprite: {fileID: -1968637622, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+  typeName: ForecefulEntryAbility

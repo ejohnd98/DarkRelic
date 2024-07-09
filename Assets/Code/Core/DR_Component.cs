@@ -52,7 +52,7 @@ public abstract class DR_Component
         {
             // Check if this should be copied
             if (!Attribute.IsDefined(sourceField, typeof(CopyAttribute))){
-                return;
+                continue;
             }
 
             FieldInfo destinationField = destinationType.GetField(sourceField.Name);

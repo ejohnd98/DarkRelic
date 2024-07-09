@@ -234,4 +234,15 @@ public class DR_Map
 
         return Cells[pos.y, pos.x].Actor;
     }
+
+    public List<DR_Cell> GetAdjacentCells(Vector2Int pos){
+        List<DR_Cell> cells = new();
+        foreach (Vector2Int dir in DR_GameManager.instance.Directions){
+            var newPos = pos + dir;
+            if (ValidPosition(newPos)){
+                cells.Add(GetCell(newPos));
+            }
+        }
+        return cells;
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -5,6 +6,9 @@ using UnityEngine;
 
 public class TurnComponent : DR_Component
 {
+    public Action<DR_Event> OnActionStart;
+    public Action<DR_Event> OnActionEnd;
+
     //TODO: move this to be based off a speed stat?
     [Copy]
     public int ActionDebt = 1;

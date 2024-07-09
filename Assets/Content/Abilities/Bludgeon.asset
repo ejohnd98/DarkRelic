@@ -13,5 +13,6 @@ MonoBehaviour:
   m_Name: Bludgeon
   m_EditorClassIdentifier: 
   contentName: Bludgeon
+  abilityDescription: Bloody the tiles around enemies after combat
   abilitySprite: {fileID: -1286188592, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   typeName: BludgeonAbility

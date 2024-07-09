@@ -32,6 +32,7 @@ public class AbilityComponent : DR_Component
         ability.owner = Entity;
         ability.sprite = content.abilitySprite;
         ability.abilityName = content.contentName;
+        ability.abilityDescription = content.abilityDescription;
         abilities.Add(ability);
         ability.OnAdded();
         dirtyFlag = true;

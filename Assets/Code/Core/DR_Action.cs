@@ -71,10 +71,22 @@ public abstract class DR_Action {
         return null;
     }
 
-    public virtual void Perform(DR_GameManager gm){
+    public void PerformAction(DR_GameManager gm){
+        ActionEvent actionEvent= new ActionEvent();
+        actionEvent.owner = owner;
+        actionEvent.action = this;
+        owner.GetComponent<TurnComponent>().OnActionStart?.Invoke(actionEvent);
+
+        Perform(gm);
+
         if (wasSuccess){
             GameRenderer.instance.AddAction(this);
         }
+
+        owner.GetComponent<TurnComponent>().OnActionEnd?.Invoke(actionEvent);
+    }
+
+    protected virtual void Perform(DR_GameManager gm){
     }
 
     public virtual string GetLogText(){
@@ -100,7 +112,7 @@ public class MoveAction : DR_Action {
         this.pos = pos;
     }
 
-    public override void Perform(DR_GameManager gm){
+    protected override void Perform(DR_GameManager gm){
         if(!gm.CurrentMap.CanMoveActor(owner, pos)){
             wasSuccess = false;
             return;
@@ -110,8 +122,6 @@ public class MoveAction : DR_Action {
 
         DR_Cell cell = gm.CurrentMap.GetCell(pos);
         cell.CollectBlood(owner);
-
-        base.Perform(gm);
     }
 }
 
@@ -136,7 +146,7 @@ public class AttackAction : DR_Action {
         return owner.Name + " attacked " + target.Name + "!";
     }
 
-    public override void Perform(DR_GameManager gm){
+   protected override void Perform(DR_GameManager gm){
         int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
         damageEvent = DamageSystem.HandleAttack(gm, owner, target, baseDamage);
 
@@ -152,7 +162,7 @@ public class AttackAction : DR_Action {
         // };
         //DR_EventSystem.TestEvent(test);
 
-        base.Perform(gm);
+        
     }
 }
 
@@ -178,7 +188,7 @@ public class AbilityAction : DR_Action {
         return owner.Name + " activated " + ability.abilityName;
     }
 
-    public override void Perform(DR_GameManager gm){
+   protected override void Perform(DR_GameManager gm){
         if (ability.CanBePerformed()){
             DR_Event abilityEvent = new();
             abilityEvent.owner = owner;
@@ -187,7 +197,7 @@ public class AbilityAction : DR_Action {
         }else{
             wasSuccess = false;
         }
-        base.Perform(gm);
+        
     }
 }
 
@@ -204,10 +214,10 @@ public class StairAction : DR_Action {
         return owner.Name + (stairs.goesDeeper ? " descended down a set of stairs." : " climbed up a set of stairs.");
     }
 
-    public override void Perform(DR_GameManager gm){
+   protected override void Perform(DR_GameManager gm){
         if (!stairs.goesDeeper && gm.CurrentDungeon.mapIndex == 0){
             wasSuccess = false;
-            base.Perform(gm);
+            
             return;
         }
 
@@ -215,7 +225,7 @@ public class StairAction : DR_Action {
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
         gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper, true);
 
-        base.Perform(gm);
+        
         //TODO: create animation and wait for DR_GameManager.instance.isFadeActive
     }
 }
@@ -232,10 +242,10 @@ public class DoorAction : DR_Action {
         return new List<DR_Entity>(){owner, target.Entity};
     }
 
-    public override void Perform(DR_GameManager gm){
+   protected override void Perform(DR_GameManager gm){
         target.ToggleOpen();
         SoundSystem.instance.PlaySound("door");
-        base.Perform(gm);
+        
     }
 }
 
@@ -248,10 +258,10 @@ public class GoalAction : DR_Action {
         loggable = true;
     }
 
-    public override void Perform(DR_GameManager gm){
+   protected override void Perform(DR_GameManager gm){
         SoundSystem.instance.PlaySound("altar");
         gm.OnGameWon();
-        base.Perform(gm);
+        
     }
 
     public override string GetLogText(){
@@ -286,7 +296,7 @@ public class AltarAction : DR_Action {
         }
     }
 
-    public override void Perform(DR_GameManager gm){
+   protected override void Perform(DR_GameManager gm){
         switch (altar.altarType){
             case AltarType.HEALTH:
             {
@@ -321,7 +331,7 @@ public class AltarAction : DR_Action {
         if (wasSuccess) {
             SoundSystem.instance.PlaySound("altar");
         }
-        base.Perform(gm);
+        
     }
 }
 
@@ -338,19 +348,19 @@ public class PickupAction : DR_Action {
         return new List<DR_Entity>(){owner, item};
     }
 
-    public override void Perform(DR_GameManager gm){
+   protected override void Perform(DR_GameManager gm){
         InventoryComponent inventory = owner.GetComponent<InventoryComponent>();
         if (inventory != null){
             bool addedItem = inventory.AddItem(item);
             if (addedItem){
                 gm.CurrentMap.RemoveItem(item);
             }
-            base.Perform(gm);
+            
             return;
         }else{
             Debug.LogError("Inventory is invalid!");
         }
-        base.Perform(gm);
+        
     }
 
     public override string GetLogText(){
@@ -366,9 +376,9 @@ public class WaitAction : DR_Action {
         loggable = logAction;
     }
 
-    public override void Perform(DR_GameManager gm){
+   protected override void Perform(DR_GameManager gm){
         wasSuccess = true;
-        base.Perform(gm);
+        
     }
 
     public override string GetLogText(){

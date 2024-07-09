@@ -129,7 +129,7 @@ public class TurnSystem : MonoBehaviour
             return;
         }
 
-        action.Perform(gm);
+        action.PerformAction(gm);
         TurnEnd(gm, turnTaker, action.wasSuccess);
     }
 
@@ -170,8 +170,6 @@ public class TurnSystem : MonoBehaviour
 
         for (int i = 0; i < DR_GameManager.KeyDirections.Length; i++)
         {
-            //TODO: allow holding direction to move, but only if held for a minimum time?
-
             if (DR_InputHandler.GetKeyPressed(DR_GameManager.KeyDirections[i])
                 || DR_InputHandler.GetKeyHeld(DR_GameManager.KeyDirections[i], 0.3f))
             {
@@ -183,6 +181,14 @@ public class TurnSystem : MonoBehaviour
                     HealthComponent target = targetCell.Actor.GetComponent<HealthComponent>();
                     if (target != null){
                         actionList.Add(new AttackAction(targetCell.Actor, playerActor));
+                    }
+                }
+
+                //TEMP
+                if (targetCell.Prop != null && Input.GetKey(KeyCode.LeftAlt)) {
+                    DoorComponent door = targetCell.Prop.GetComponent<DoorComponent>();
+                    if (door != null){
+                        actionList.Add(new DoorAction(door, playerActor));
                     }
                 }
 

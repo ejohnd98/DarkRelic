@@ -8,6 +8,7 @@ public abstract class DR_Ability
 {
     public bool triggeredByPlayer = true;
     public string abilityName = "";
+    public string abilityDescription = ""; //Temp
     public Sprite sprite;
     public List<ActionInput> actionInputs;
     public List<DR_Entity> relatedEntities = new();
@@ -22,14 +23,22 @@ public abstract class DR_Ability
 
     public virtual bool CanBePerformed(){
         if (bloodCost > 0){
-            return owner.GetComponent<InventoryComponent>().blood >= bloodCost;
+            return owner.GetComponent<InventoryComponent>().blood + owner.GetComponent<HealthComponent>().currentHealth >= bloodCost;
         }
         return true;
     }
 
     public void Trigger(DR_Event e){
         if (bloodCost > 0){
-            owner.GetComponent<InventoryComponent>().SpendBlood(bloodCost);
+            var inventory = owner.GetComponent<InventoryComponent>();
+            int bloodToUse = Mathf.Min(inventory.blood, bloodCost);
+            inventory.SpendBlood(bloodToUse);
+            if (bloodCost - bloodToUse > 0){
+                owner.GetComponent<HealthComponent>().TakeDamage(bloodCost - bloodToUse);
+                if (owner.GetComponent<HealthComponent>().currentHealth <= 0){
+                    Debug.Log("Player tried to use too much blood!");
+                }
+            }
         }
         OnTrigger(e);
     }
@@ -203,6 +212,61 @@ public class BludgeonAbility : DR_Ability
                 continue;
             }
             gm.CurrentMap.GetCell(cellPos).AddBlood(bloodAmountPerTile);
+        }
+    }
+}
+
+public class CrystalChaliceAbility : DR_Ability
+{
+    public CrystalChaliceAbility(){
+        triggeredByPlayer = false;
+    }
+
+    public override void OnAdded()
+    {
+        owner.GetComponent<InventoryComponent>().OnPickedUpBlood += OnTrigger;
+    }
+
+    protected override void OnTrigger(DR_Event e){
+
+        var bloodEvent = e as BloodChangeEvent;
+
+        HealthComponent healthComp = owner.GetComponent<HealthComponent>();
+        int healAmount = Mathf.Max(1, Mathf.FloorToInt(bloodEvent.bloodDelta * 0.25f));
+        healthComp.Heal(healAmount);
+    }
+}
+
+public class ForecefulEntryAbility : DR_Ability
+{
+    public ForecefulEntryAbility(){
+        triggeredByPlayer = false;
+    }
+
+    public override void OnAdded()
+    {
+        owner.GetComponent<TurnComponent>().OnActionEnd += OnTrigger;
+    }
+
+    protected override void OnTrigger(DR_Event e){
+
+        var actionEvent = e as ActionEvent;
+
+        //TODO: have a way for abilities to tack on needed animations to actions?
+
+        if (actionEvent.action is DoorAction doorAction){
+            if (!doorAction.target.IsOpen()){
+                // Only trigger when opening door
+                return;
+            }
+            var gm = DR_GameManager.instance;
+            int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+            foreach(var cell in gm.CurrentMap.GetAdjacentCells(doorAction.target.Entity.Position)){
+                if (cell.Actor != null && cell.Actor != owner){
+                    DamageSystem.HandleAttack(gm, owner, cell.Actor, Mathf.FloorToInt(baseDamage * 0.5f));
+                    cell.AddBlood(1); //Temp just to show SOMETHING 
+                }
+            }
         }
     }
 }

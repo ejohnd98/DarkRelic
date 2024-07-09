@@ -45,6 +45,8 @@ public class DamageSystem
 {
     public static DamageEvent HandleAttack(DR_GameManager gm, DR_Entity attacker, DR_Entity target, int damage)
     {
+        // add a flag to allow blood splatter on any attack? Bludgeon ability would just always set this to true
+
 
         var targetHealthComp = target.GetComponent<HealthComponent>();
         int modifiedDamage = damage;
