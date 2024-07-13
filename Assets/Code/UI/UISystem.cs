@@ -43,7 +43,7 @@ public class UISystem : MonoBehaviour
     void Awake()
     {
         instance = this;
-        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
+        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.ForceSoftware);
     }
 
     public void RefreshDetailsUI(){
@@ -129,7 +129,7 @@ public class UISystem : MonoBehaviour
         currentActionInput = actionInput;
         currentState = UIState.SELECTING_TARGET;
 
-        Cursor.SetCursor(targetingCursorTexture, Vector2.zero, CursorMode.Auto);
+        Cursor.SetCursor(targetingCursorTexture, Vector2.zero, CursorMode.ForceSoftware);
     }
 
     public void BackOutOfTargetSelection(){
@@ -137,7 +137,7 @@ public class UISystem : MonoBehaviour
         currentActionInput = null;
         currentState = UIState.NORMAL;
 
-        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
+        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.ForceSoftware);
     }
 
 
@@ -156,7 +156,7 @@ public class UISystem : MonoBehaviour
                     if (currentActionInput.GiveInput(MousePos)){
                         currentState = UIState.NORMAL;
                         currentActionInput = null;
-                        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.Auto);
+                        Cursor.SetCursor(cursorTexture, Vector2.zero, CursorMode.ForceSoftware);
                     }
                     //TODO: allow selecting other items in inventory?
                 }
