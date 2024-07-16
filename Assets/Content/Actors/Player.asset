@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Player
   m_EditorClassIdentifier: 
   contentName: Player
+  guid: 0cb0ddc2-929e-43f4-9dbb-6977cf2d80dc
   components:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
@@ -29,8 +30,6 @@ MonoBehaviour:
       type: {class: InventoryComponent, ns: , asm: Assembly-CSharp}
       data:
         key: InventoryComponent
-        capacity: 25
-        maxEquips: 10
         canCollectBlood: 1
         blood: 0
         equippedItems: 0

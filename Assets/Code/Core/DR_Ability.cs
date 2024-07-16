@@ -13,12 +13,16 @@ public abstract class DR_Ability
     public List<ActionInput> actionInputs;
     public List<DR_Entity> relatedEntities = new();
 
+    public int count = 1;
+
     public DR_Entity owner;
+    public string contentGuid = "";
 
     public int bloodCost = 0;
 
     public virtual void OnAdded(){
-        //owner is guaranteed to be set here
+        // Owner is guaranteed to be set here
+        // Should only be for init stuff and not every time this ability is picked up
     }
 
     public virtual bool CanBePerformed(){
@@ -80,24 +84,6 @@ public abstract class DR_Ability
     // Future:
     // Have relic grant ability
     // Add events for basic stuff on Entity and some way for abilities to subscribe (or just hardcode that)
-}
-
-public class TestAbility : DR_Ability
-{
-    public TestAbility(){
-    }
-}
-
-public class TestAbility2 : DR_Ability
-{
-    public TestAbility2(){
-    }
-
-    protected override void OnTrigger(DR_Event e){
-        base.OnTrigger(e);
-
-        Debug.Log("Extra override ability code!");
-    }
 }
 
 // TODO: generalize to projectile (or further to targeted?) ability
@@ -183,7 +169,9 @@ public class BludgeonAbility : DR_Ability
         var gm = DR_GameManager.instance;
 
         // TODO: only bloody tiles if enough damage is done, and only partially on tiles if not enough to cover all
-        int bloodAmountPerTile = Mathf.Max(Mathf.CeilToInt(attackEvent.damageDealt * 0.25f), 1);
+        int bloodAmountPerTile = Mathf.CeilToInt(
+                0.25f * Mathf.Clamp(attackEvent.damageDealt, 4, attackEvent.target.GetComponent<HealthComponent>().maxHealth)
+            );
 
         // Kind of messy way of getting the "splatter area"
         List<Vector2Int> positions = new()

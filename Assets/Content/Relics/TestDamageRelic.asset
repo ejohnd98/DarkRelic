@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TestDamageRelic
   m_EditorClassIdentifier: 
   contentName: Damage Relic
+  guid: 88acacc2-94c4-402c-b7c7-753186953d50
   components:
   - rid: 2467970878754521088
   - rid: 2467970878754521089
@@ -33,8 +34,10 @@ MonoBehaviour:
       data:
         key: ItemComponent
         requireFurtherInputOnUse: 0
+        count: 1
     - rid: 2467970878754521090
       type: {class: RelicComponent, ns: , asm: Assembly-CSharp}
       data:
         key: RelicComponent
         relicType: 0
+        grantedAbilities: []

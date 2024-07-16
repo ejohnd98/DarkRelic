@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: HealthAltar
   m_EditorClassIdentifier: 
   contentName: Altar
+  guid: ab09ad93-d175-4366-94fb-45eb6db363e8
   components:
   - rid: 3012876423545487360
   - rid: 3012876423545487361
@@ -38,3 +39,5 @@ MonoBehaviour:
       type: {class: AltarComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AltarComponent
+        altarType: 0
+        itemAltarContent: {fileID: 0}

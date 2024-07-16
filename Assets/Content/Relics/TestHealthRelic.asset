@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TestHealthRelic
   m_EditorClassIdentifier: 
   contentName: Health Relic
+  guid: f618ba00-0901-4cbc-b129-56bceba1c45b
   components:
   - rid: 2467970878754521088
   - rid: 2467970878754521089
@@ -33,6 +34,7 @@ MonoBehaviour:
       data:
         key: ItemComponent
         requireFurtherInputOnUse: 0
+        count: 1
     - rid: 2467970878754521090
       type: {class: RelicComponent, ns: , asm: Assembly-CSharp}
       data:

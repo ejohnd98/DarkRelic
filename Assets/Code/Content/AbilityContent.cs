@@ -5,9 +5,8 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "NewAbilityContent", menuName = "DR Ability Content")]
 [System.Serializable]
-public class AbilityContent : ScriptableObject
+public class AbilityContent : ContentBase
 {
-    public string contentName;
     public string abilityDescription; //Temp
     public Sprite abilitySprite;
 

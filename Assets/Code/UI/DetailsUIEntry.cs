@@ -48,6 +48,12 @@ public class DetailsUIEntry : MonoBehaviour
             firstLine = false;
         }
 
+        if (entity.GetComponent<ItemComponent>() is ItemComponent itemComponent){
+            if (!firstLine) { details += '\n'; }
+            details += itemComponent.GetDetailsDescription();
+            firstLine = false;
+        }
+
         if (entity.GetComponent<SpriteComponent>() is SpriteComponent spriteComponent){
             spriteImage.sprite = spriteComponent.GetCurrentSprite();
             spriteImage.gameObject.SetActive(true);
@@ -88,7 +94,7 @@ public class DetailsUIEntry : MonoBehaviour
     }
 
     public void Init(DR_Ability ability){
-        string entityName = ability.abilityName;
+        string entityName = ability.abilityName + ((ability.count > 1) ? (" (" + ability.count + ")") : "");
         string details = ability.abilityDescription;
 
         details += "\n" + (ability.triggeredByPlayer? "Player-activated" : "Passive");

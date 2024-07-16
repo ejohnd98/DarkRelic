@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Rat
   m_EditorClassIdentifier: 
   contentName: Rat
+  guid: 28f80459-25fa-42e6-8620-37d278f7fdbc
   components:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
@@ -47,6 +48,7 @@ MonoBehaviour:
       data:
         key: TurnComponent
         ActionDebt: 4
+        waitingForAction: 0
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
       data:

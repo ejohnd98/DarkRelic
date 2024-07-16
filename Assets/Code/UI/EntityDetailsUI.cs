@@ -17,6 +17,8 @@ public class EntityDetailsUI : MonoBehaviour
     //TEMP, should be an entity or content
     private HeldRelic selectedRelic = null;
 
+    private DR_Entity selectedItem = null;
+
     private DR_Ability selectedAbility = null;
 
     private List<DetailsUIEntry> detailsEntries = new List<DetailsUIEntry>();
@@ -31,6 +33,11 @@ public class EntityDetailsUI : MonoBehaviour
         UpdateUI();
     }
 
+    public void SetItem(DR_Entity item){
+        selectedItem = item;
+        UpdateUI();
+    }
+
     public void SetAbility(DR_Ability ability)
     {
         selectedAbility = ability;
@@ -40,6 +47,7 @@ public class EntityDetailsUI : MonoBehaviour
     public void ClearItem(){
         selectedRelic = null;
         selectedAbility = null;
+        selectedItem = null;
         selectedCell = DR_GameManager.instance.TryGetPlayerCell();
         UpdateUI();
     }
@@ -81,6 +89,12 @@ public class EntityDetailsUI : MonoBehaviour
         ClearDetails();
         if (selectedRelic != null){
             AddDetailsEntry(selectedRelic);
+            DetailsUIParent.SetActive(true);
+            return;
+        }
+
+        if (selectedItem != null){
+            AddDetailsEntry(selectedItem);
             DetailsUIParent.SetActive(true);
             return;
         }

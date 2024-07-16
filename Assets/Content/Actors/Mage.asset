@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Mage
   m_EditorClassIdentifier: 
   contentName: Mage
+  guid: dbd1f898-2e21-4323-9f50-04c4f283fe41
   components:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
@@ -49,12 +50,14 @@ MonoBehaviour:
       data:
         key: TurnComponent
         ActionDebt: 6
+        waitingForAction: 0
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
       data:
         key: LevelComponent
         level: 1
         expScale: 0.5
+        currentExp: 0
         healthScale: 0.5
         strengthScale: 0.5
     - rid: 5068184619078123527

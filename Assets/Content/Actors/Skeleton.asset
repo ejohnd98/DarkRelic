@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Skeleton
   m_EditorClassIdentifier: 
   contentName: Skeleton
+  guid: 5868e099-3003-4df1-bb3a-f0cfb8f581bf
   components:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
@@ -49,6 +50,7 @@ MonoBehaviour:
       data:
         key: TurnComponent
         ActionDebt: 8
+        waitingForAction: 0
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
       data:

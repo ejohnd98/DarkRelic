@@ -50,14 +50,14 @@ public class InventoryUI : MonoBehaviour
 
             bloodText.text = inventory.blood.ToString();
             bloodShadowText.text = inventory.blood.ToString();
-            
 
-            foreach (var pair in inventory.RelicInventory){
+            foreach(var item in inventory.items){
                 GameObject itemButtonObj = Instantiate(ItemButtonPrefab, Vector3.zero, Quaternion.identity, ItemButtonsParent);
                 UIItemButton itemButton = itemButtonObj.GetComponent<UIItemButton>();
-                itemButton.SetEntity(pair.Value.relicEntity);
+                itemButton.SetEntity(item);
+                itemButton.SetAmount(item.GetComponent<ItemComponent>().count);
 
-                itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetRelic(pair.Value);});
+                itemButton.OnMouseEnterEvents.AddListener(() => {UISystem.instance.detailsUI.SetItem(item);});
                 itemButton.OnMouseExitEvents.AddListener(() => {UISystem.instance.detailsUI.ClearItem();});
 
                 ItemButtons.Add(itemButtonObj);

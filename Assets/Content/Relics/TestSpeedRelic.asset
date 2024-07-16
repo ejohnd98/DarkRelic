@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TestSpeedRelic
   m_EditorClassIdentifier: 
   contentName: Speed Relic
+  guid: 78d7d19f-0cd8-4133-9718-7025556b93d5
   components:
   - rid: 2467970878754521088
   - rid: 2467970878754521089
@@ -33,8 +34,10 @@ MonoBehaviour:
       data:
         key: ItemComponent
         requireFurtherInputOnUse: 0
+        count: 1
     - rid: 2467970878754521090
       type: {class: RelicComponent, ns: , asm: Assembly-CSharp}
       data:
         key: RelicComponent
         relicType: 1
+        grantedAbilities: []

@@ -7,6 +7,7 @@ using TMPro;
 
 public class UIItemButton : UIButton {
     public Image ItemImage;
+    public TextMeshProUGUI amountText;
 
     public void SetEntity(DR_Entity entity){
         SpriteComponent spriteComp = entity.GetComponent<SpriteComponent>();
@@ -19,5 +20,9 @@ public class UIItemButton : UIButton {
 
     public void SetAbility(DR_Ability ability){
         ItemImage.sprite = ability.sprite;
+    }
+
+    public void SetAmount(int amount){
+        amountText.text = (amount > 1) ? amount.ToString() : "";
     }
 }

@@ -27,8 +27,19 @@ public class AbilityComponent : DR_Component
     }
 
     public void AddAbilityFromContent(AbilityContent content){
+        
+        //Check if ability already exists on component:
+        foreach(var existingAbility in abilities){
+            if (existingAbility.contentGuid.Equals(content.guid)){
+                existingAbility.count++;
+                dirtyFlag = true;
+                return;
+            }
+        }
+
         Type abilityType = Type.GetType(content.typeName);
         DR_Ability ability = System.Activator.CreateInstance(abilityType) as DR_Ability;
+        ability.contentGuid = content.guid;
         ability.owner = Entity;
         ability.sprite = content.abilitySprite;
         ability.abilityName = content.contentName;

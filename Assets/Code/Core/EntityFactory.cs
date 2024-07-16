@@ -31,6 +31,7 @@ public class EntityFactory : MonoBehaviour
         }
 
         newEntity.Name = content.contentName;
+        newEntity.contentGuid = content.guid;
 
         return newEntity;
     }
@@ -41,9 +42,8 @@ public class EntityFactory : MonoBehaviour
         NewActor.Name = Name;
         NewActor.AddComponent<SpriteComponent>(new SpriteComponent(Sprite));
         NewActor.AddComponent<HealthComponent>(new HealthComponent(1)); //TODO: no longer should be providing maxhealth directly
-        NewActor.AddComponent<InventoryComponent>(new InventoryComponent(25));
+        NewActor.AddComponent<InventoryComponent>(new InventoryComponent());
         NewActor.AddComponent<TurnComponent>(new TurnComponent());
-        //NewActor.AddComponent<MoveAnimComponent>(new MoveAnimComponent());
         NewActor.AddComponent<AlignmentComponent>(new AlignmentComponent(alignment));
         NewActor.AddComponent<LevelComponent>(new LevelComponent(level));
         

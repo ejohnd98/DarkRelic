@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Phantom
   m_EditorClassIdentifier: 
   contentName: Phantom
+  guid: 22471fad-b031-4aeb-ac46-560836ca1440
   components:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
@@ -49,12 +50,14 @@ MonoBehaviour:
       data:
         key: TurnComponent
         ActionDebt: 6
+        waitingForAction: 0
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
       data:
         key: LevelComponent
         level: 1
         expScale: 0.5
+        currentExp: 0
         healthScale: 0.5
         strengthScale: 0.5
     - rid: 5068184619078123527

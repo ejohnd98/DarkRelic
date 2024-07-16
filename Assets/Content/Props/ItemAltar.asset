@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ItemAltar
   m_EditorClassIdentifier: 
   contentName: Altar
+  guid: ac85d3b7-3589-49c8-8bad-ef5885708a55
   components:
   - rid: 3012876423545487360
   - rid: 3012876423545487361

@@ -16,10 +16,6 @@ public class InventoryComponent : DR_Component
     public Action<DR_Event> OnSpentBlood;
     
     [Copy]
-    public int capacity;
-    [Copy]
-    public int maxEquips;
-    [Copy]
     public bool canCollectBlood;
     [Copy]
     public int blood;
@@ -30,11 +26,6 @@ public class InventoryComponent : DR_Component
     public Dictionary<RelicType, HeldRelic> RelicInventory = new ();
 
     public InventoryComponent(){}
-
-    public InventoryComponent(int capacity, int maxEquips = 10){
-        this.capacity = 999;//capacity;
-        this.maxEquips = maxEquips;
-    }
 
     public void RemoveItem(DR_Entity item){
         items.Remove(item);
@@ -73,6 +64,8 @@ public class InventoryComponent : DR_Component
         {
             SoundSystem.instance.PlaySound("relic");
             RelicType relicType = relicComponent.relicType;
+
+            // TODO: make these relics into passive abilities instead and remove this
             if (RelicInventory.ContainsKey(relicType))
             {
                 RelicInventory[relicType].count += 1;
@@ -93,19 +86,23 @@ public class InventoryComponent : DR_Component
             }
 
             Entity.GetComponent<LevelComponent>().UpdateStats();
-            UISystem.instance.RefreshInventoryUI();
-            return true;
         }
         
-        if (items.Count + 1 < capacity){
-            items.Add(item);
-
-            //TODO: only do this when the displayed UI matches this one
-            UISystem.instance.RefreshInventoryUI();
-            
-            return true;
+        bool addedItem = false;
+        foreach (var existingItem in items){
+            if (existingItem.contentGuid == item.contentGuid){
+                existingItem.GetComponent<ItemComponent>().count++;
+                addedItem = true;
+            }
         }
-        return false;
+
+        if (!addedItem){
+            items.Add(item);
+        }
+
+        //TODO: only do this when the displayed UI matches this one?
+        UISystem.instance.RefreshInventoryUI();
+        return true;
     }
 
     public void AddBlood(int amount)

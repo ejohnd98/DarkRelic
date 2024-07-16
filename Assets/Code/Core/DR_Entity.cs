@@ -12,6 +12,7 @@ public class DR_Entity
     public string Name = "Untitled Entity";
     public Vector2Int Position;
     public int id = -1;
+    public string contentGuid = "";
 
     public bool noLongerValid = false;
     public bool isOnMap = false;

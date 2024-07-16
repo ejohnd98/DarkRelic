@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ForcefulEntry
   m_EditorClassIdentifier: 
   contentName: Forceful Entry
+  guid: 3f1bea9c-9db1-4c3b-a830-7828e0ebd27a
   abilityDescription: Damage enemies adjacent to doors when opening
   abilitySprite: {fileID: -1968637622, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   typeName: ForecefulEntryAbility
