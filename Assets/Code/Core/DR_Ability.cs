@@ -47,6 +47,9 @@ public abstract class DR_Ability
         OnTrigger(e);
     }
 
+    public virtual void ApplyStatModifiers(StatsModifier statsModifier){
+    }
+
     protected virtual void OnTrigger(DR_Event e){
     }
 
@@ -256,5 +259,56 @@ public class ForecefulEntryAbility : DR_Ability
                 }
             }
         }
+    }
+}
+
+public class HealthBoostAbility : DR_Ability
+{
+    public HealthBoostAbility(){
+        triggeredByPlayer = false;
+    }
+
+    public override void OnAdded()
+    {
+        owner.GetComponent<LevelComponent>().UpdateStats();
+    }
+
+    public override void ApplyStatModifiers(StatsModifier statsModifier)
+    {
+        statsModifier.maxHealth.addedValue += 10.0f * count;
+    }
+}
+
+public class StrengthBoostAbility : DR_Ability
+{
+    public StrengthBoostAbility(){
+        triggeredByPlayer = false;
+    }
+
+    public override void OnAdded()
+    {
+        owner.GetComponent<LevelComponent>().UpdateStats();
+    }
+
+    public override void ApplyStatModifiers(StatsModifier statsModifier)
+    {
+        statsModifier.strength.multiplier *= (1.0f + (count * 0.05f));
+    }
+}
+
+public class TurnSpeedBoostAbility : DR_Ability
+{
+    public TurnSpeedBoostAbility(){
+        triggeredByPlayer = false;
+    }
+
+    public override void OnAdded()
+    {
+        owner.GetComponent<LevelComponent>().UpdateStats();
+    }
+
+    public override void ApplyStatModifiers(StatsModifier statsModifier)
+    {
+        statsModifier.turnLength.multiplier *= Mathf.Pow(0.9f, count);
     }
 }

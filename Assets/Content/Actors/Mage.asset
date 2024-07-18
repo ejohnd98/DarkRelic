@@ -60,6 +60,7 @@ MonoBehaviour:
         currentExp: 0
         healthScale: 0.5
         strengthScale: 0.5
+        turnLengthScale: 3
     - rid: 5068184619078123527
       type: {class: AIComponent, ns: , asm: Assembly-CSharp}
       data:

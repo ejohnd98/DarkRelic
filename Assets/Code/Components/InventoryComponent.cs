@@ -22,8 +22,6 @@ public class InventoryComponent : DR_Component
     
     public int equippedItems = 0;
     public List<DR_Entity> items = new List<DR_Entity>();
-    
-    public Dictionary<RelicType, HeldRelic> RelicInventory = new ();
 
     public InventoryComponent(){}
 
@@ -63,20 +61,6 @@ public class InventoryComponent : DR_Component
         if (item.GetComponent<RelicComponent>() is RelicComponent relicComponent)
         {
             SoundSystem.instance.PlaySound("relic");
-            RelicType relicType = relicComponent.relicType;
-
-            // TODO: make these relics into passive abilities instead and remove this
-            if (RelicInventory.ContainsKey(relicType))
-            {
-                RelicInventory[relicType].count += 1;
-            }
-            else
-            {
-                RelicInventory[relicType] = new HeldRelic(){
-                    relicEntity = item,
-                    count = 1
-                };
-            }
 
             // TODO: handle unequip too
             if (Entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){

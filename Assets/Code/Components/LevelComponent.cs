@@ -8,6 +8,28 @@ public class Stats{
     public int strength = 1;
     public int maxHealth = 1;
     public int expGiven = 1;
+    public float turnLength = 1.0f;
+}
+
+public class StatModifier{
+    public float multiplier = 1.0f;
+    public float addedValue = 0.0f;
+}
+
+public class StatsModifier{
+    public StatModifier strength = new();
+    public StatModifier maxHealth = new();
+    public StatModifier expGiven = new();
+    public StatModifier turnLength = new();
+
+    public Stats GetResultingStats(Stats stats){
+        return new Stats(){
+            strength = Mathf.CeilToInt((stats.strength + strength.addedValue) * strength.multiplier),
+            maxHealth = Mathf.CeilToInt((stats.maxHealth + maxHealth.addedValue) * maxHealth.multiplier),
+            expGiven = Mathf.CeilToInt((stats.expGiven + expGiven.addedValue) * expGiven.multiplier),
+            turnLength = (stats.turnLength + turnLength.addedValue) * turnLength.multiplier
+        };
+    }
 }
 
 public class LevelComponent : DR_Component
@@ -21,11 +43,12 @@ public class LevelComponent : DR_Component
     [Copy]
     public int currentExp = 0;
 
-    //TODO: expand on this concept and have different enemies just have a scale applied to some generic set of stats
     [Copy]
     public float healthScale = 1.0f;
     [Copy]
     public float strengthScale = 1.0f;
+    [Copy]
+    public float turnLengthScale = 1.0f;
 
     // This should not be copied as it will be created in OnComponentAdded
     public Stats stats;
@@ -74,10 +97,9 @@ public class LevelComponent : DR_Component
 
         stats = GetLevelStats(level, this);
 
-        if (Entity.GetComponent<InventoryComponent>() is InventoryComponent inventory
-            && inventory.RelicInventory.ContainsKey(RelicType.HEALTH_RELIC))
-        {
-            stats.maxHealth = Mathf.CeilToInt(stats.maxHealth * (1.0f + (inventory.RelicInventory[RelicType.HEALTH_RELIC].count * 0.05f)));
+        if (Entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){
+            StatsModifier modifier = abilityComponent.GetStatsModifier();
+            stats = modifier.GetResultingStats(stats);
         }
         
         HealthComponent healthComponent = Entity.GetComponent<HealthComponent>();
@@ -85,22 +107,27 @@ public class LevelComponent : DR_Component
     }
 
     public static Stats GetLevelStats(int level, LevelComponent comp) {
-        Stats level1Stats = new Stats();
-        level1Stats.strength = 1;
-        level1Stats.maxHealth = 5;
-        level1Stats.expGiven = 200;
+        Stats level1Stats = new()
+        {
+            strength = 1,
+            maxHealth = 5,
+            expGiven = 200
+        };
 
-        Stats level50Stats = new Stats();
-        level50Stats.strength = 80;
-        level50Stats.maxHealth = 400;
-        level50Stats.expGiven = 2000;
-        
+        Stats level50Stats = new()
+        {
+            strength = 80,
+            maxHealth = 400,
+            expGiven = 2000
+        };
+
         float levelFraction = (level-1) / 100.0f;
 
         return new Stats {
             strength = Mathf.CeilToInt(comp.strengthScale * Mathf.Lerp(level1Stats.strength, level50Stats.strength, levelFraction)),
             maxHealth = Mathf.CeilToInt(comp.healthScale * Mathf.Lerp(level1Stats.maxHealth, level50Stats.maxHealth, levelFraction)),
-            expGiven = Mathf.CeilToInt(comp.expScale * Mathf.Lerp(level1Stats.expGiven, level50Stats.expGiven, levelFraction))
+            expGiven = Mathf.CeilToInt(comp.expScale * Mathf.Lerp(level1Stats.expGiven, level50Stats.expGiven, levelFraction)),
+            turnLength = comp.turnLengthScale * Mathf.Lerp(level1Stats.turnLength, level50Stats.turnLength, levelFraction)
         };
     }
 

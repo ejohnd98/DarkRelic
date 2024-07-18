@@ -48,4 +48,14 @@ public class AbilityComponent : DR_Component
         ability.OnAdded();
         dirtyFlag = true;
     }
+
+    public StatsModifier GetStatsModifier(){
+        StatsModifier statsModifier = new();
+
+        foreach(var ability in abilities){
+            ability.ApplyStatModifiers(statsModifier);
+        }
+
+        return statsModifier;
+    }
 }

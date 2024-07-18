@@ -69,6 +69,7 @@ MonoBehaviour:
         currentExp: 0
         healthScale: 2
         strengthScale: 1.5
+        turnLengthScale: 2
     - rid: 5068184619078123526
       type: {class: PlayerComponent, ns: , asm: Assembly-CSharp}
       data:

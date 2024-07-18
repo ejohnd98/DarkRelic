@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
-  m_Name: TestDamageRelic
+  m_Name: TurnSpeedRelic
   m_EditorClassIdentifier: 
-  contentName: Damage Relic
-  guid: 88acacc2-94c4-402c-b7c7-753186953d50
+  contentName: Speed Relic
+  guid: 78d7d19f-0cd8-4133-9718-7025556b93d5
   components:
   - rid: 2467970878754521088
   - rid: 2467970878754521089
@@ -25,7 +25,7 @@ MonoBehaviour:
       type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
       data:
         key: SpriteComponent
-        Sprite: {fileID: 2067603762, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        Sprite: {fileID: 56429528, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
         hasAnimation: 0
         animFrames: []
         animLength: 1
@@ -39,5 +39,5 @@ MonoBehaviour:
       type: {class: RelicComponent, ns: , asm: Assembly-CSharp}
       data:
         key: RelicComponent
-        relicType: 0
-        grantedAbilities: []
+        grantedAbilities:
+        - {fileID: 11400000, guid: 99887da2b604b12449b44465f38e1c6c, type: 2}

@@ -6,7 +6,6 @@ public class ContentBase : ScriptableObject
 {
     public string contentName;
 
-    [HideInInspector]
     public string guid;
 
     void OnValidate()

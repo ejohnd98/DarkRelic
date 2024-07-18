@@ -9,26 +9,22 @@ public class TurnComponent : DR_Component
     public Action<DR_Event> OnActionStart;
     public Action<DR_Event> OnActionEnd;
 
-    //TODO: move this to be based off a speed stat?
-    [Copy]
-    public int ActionDebt = 1;
     float CurrentDebt = 0.0f;
 
-    [DoNotSerialize]
+    [DoNotSerialize][HideInInspector]
     public bool waitingForAction = false;
+
+    private LevelComponent levelComponent;
 
     public bool CanTakeTurn(){
         return CurrentDebt >= 0;
     }
 
     public float GetTurnLength(){
-        float debt = ActionDebt;
-        if (Entity.GetComponent<InventoryComponent>() is InventoryComponent inventory
-            && inventory.RelicInventory.ContainsKey(RelicType.SPEED_RELIC))
-        {
-            debt *= Mathf.Clamp(1.0f - (inventory.RelicInventory[RelicType.SPEED_RELIC].count * 0.05f), 0.1f, 1.0f);
+        if (levelComponent == null){
+            levelComponent = Entity.GetComponent<LevelComponent>();
         }
-        return debt;
+        return levelComponent.stats.turnLength;
     }
 
     public void SpendTurn()
