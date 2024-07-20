@@ -135,7 +135,7 @@ public class BloodBoltAbility : DR_Ability
 
     public override string GetFormattedDescription(){
         float percent = GetStrengthModifier();
-        return string.Format("Fires a bloody projectile that deals {0:P0} of a regular attack's damage.", percent);
+        return string.Format("Fires a bloody projectile that deals {0:0%} of a regular attack's damage.", percent);
     }
 }
 
@@ -237,7 +237,7 @@ public class BludgeonAbility : DR_Ability
 
     public override string GetFormattedDescription(){
         float percent = GetBloodPercent();
-        return string.Format("Splatters {0:P0} of dealt damage as blood around the target. (minimum 1 per tile)", percent);
+        return string.Format("Splatters {0:0%} of dealt damage as blood around the target. (minimum 1 per tile)", percent);
     }
 }
 
@@ -267,7 +267,7 @@ public class CrystalChaliceAbility : DR_Ability
 
     public override string GetFormattedDescription(){
         float percent = GetHealPercent();
-        return string.Format("Recover {0:P0} of picked up blood as health.", percent);
+        return string.Format("Recover {0:0%} of picked up blood as health.", percent);
     }
 }
 
@@ -349,7 +349,7 @@ public class StrengthBoostAbility : DR_Ability
     }
 
     public override string GetFormattedDescription(){
-        return string.Format("Increases strength by {0:P0}.", (count * 0.05f));
+        return string.Format("Increases strength by {0:0%}.", (count * 0.05f));
     }
 }
 
@@ -370,6 +370,6 @@ public class TurnSpeedBoostAbility : DR_Ability
     }
 
     public override string GetFormattedDescription(){
-        return string.Format("Reduces turn length by {0:P0}.", (1.0f - (Mathf.Pow(0.9f, count))));
+        return string.Format("Reduces turn length by {0:0%}.", (1.0f - (Mathf.Pow(0.9f, count))));
     }
 }
