@@ -14,11 +14,10 @@ public abstract class DR_Ability
     public List<DR_Entity> relatedEntities = new();
 
     public int count = 1;
+    public int baseBloodCost = 0;
 
     public DR_Entity owner;
     public string contentGuid = "";
-
-    public int bloodCost = 0;
 
     public virtual void OnAdded(){
         // Owner is guaranteed to be set here
@@ -26,6 +25,7 @@ public abstract class DR_Ability
     }
 
     public virtual bool CanBePerformed(){
+        int bloodCost = GetBloodCost();
         if (bloodCost > 0){
             return owner.GetComponent<InventoryComponent>().blood + owner.GetComponent<HealthComponent>().currentHealth >= bloodCost;
         }
@@ -33,6 +33,7 @@ public abstract class DR_Ability
     }
 
     public void Trigger(DR_Event e){
+        int bloodCost = GetBloodCost();
         if (bloodCost > 0){
             var inventory = owner.GetComponent<InventoryComponent>();
             int bloodToUse = Mathf.Min(inventory.blood, bloodCost);
@@ -64,7 +65,15 @@ public abstract class DR_Ability
     }
 
     protected virtual void SetupInputs(){
+    }
 
+    public virtual int GetBloodCost(){
+        return baseBloodCost;
+    }
+
+    public virtual string GetFormattedDescription(){
+        //TODO: get a list of things to insert?
+        return abilityDescription;
     }
 
     //TODO: need to think about how this can be driven by scriptable objects as that's where the sprite, name, and description would be
@@ -95,9 +104,10 @@ public class BloodBoltAbility : DR_Ability
     public bool killed = false;
     public DR_Entity target;
     public BloodBoltAbility(){
-        bloodCost = 1;
+        baseBloodCost = 1;
     }
 
+    //TODO: allow targeting ground
     protected override void SetupInputs(){
         //TODO: cap range? Eventually will want to precompute targets so they can shown through UI
         //TODO BUG: require visibility too!
@@ -113,17 +123,32 @@ public class BloodBoltAbility : DR_Ability
         relatedEntities.Add(target);
         relatedEntities.Add(owner);
 
-        int baseDamage = owner.GetComponent<LevelComponent>().stats.strength * 2;
+        int baseDamage = Mathf.FloorToInt(owner.GetComponent<LevelComponent>().stats.strength * GetStrengthModifier());
         var damageEvent = DamageSystem.HandleAttack(DR_GameManager.instance, owner, target, baseDamage);
 
         killed = damageEvent.killed;
+    }
+
+    private float GetStrengthModifier(){
+        return 0.5f * Mathf.Log(count + 1, 2) - 0.25f;
+    }
+
+    public override string GetFormattedDescription(){
+        float percent = GetStrengthModifier();
+        return string.Format("Fires a bloody projectile that deals {0:P0} of a regular attack's damage.", percent);
     }
 }
 
 public class BloodWalkAbility : DR_Ability
 {
     public BloodWalkAbility(){
-        bloodCost = 5;
+        baseBloodCost = 5;
+    }
+
+    public override int GetBloodCost()
+    {
+        //TODO: maybe scale with distance?
+        return  Mathf.CeilToInt(baseBloodCost * Mathf.Pow(0.5f, count-1));
     }
 
     protected override void SetupInputs(){
@@ -173,7 +198,7 @@ public class BludgeonAbility : DR_Ability
 
         // TODO: only bloody tiles if enough damage is done, and only partially on tiles if not enough to cover all
         int bloodAmountPerTile = Mathf.CeilToInt(
-                0.25f * Mathf.Clamp(attackEvent.damageDealt, 4, attackEvent.target.GetComponent<HealthComponent>().maxHealth)
+                Mathf.Clamp(GetBloodPercent() * attackEvent.damageDealt / 4.0f, 1, attackEvent.target.GetComponent<HealthComponent>().maxHealth)
             );
 
         // Kind of messy way of getting the "splatter area"
@@ -205,6 +230,15 @@ public class BludgeonAbility : DR_Ability
             gm.CurrentMap.GetCell(cellPos).AddBlood(bloodAmountPerTile);
         }
     }
+
+    private float GetBloodPercent(){
+        return 0.1f + (0.25f * Mathf.Log(count, 2));
+    }
+
+    public override string GetFormattedDescription(){
+        float percent = GetBloodPercent();
+        return string.Format("Splatters {0:P0} of dealt damage as blood around the target. (minimum 1 per tile)", percent);
+    }
 }
 
 public class CrystalChaliceAbility : DR_Ability
@@ -223,11 +257,22 @@ public class CrystalChaliceAbility : DR_Ability
         var bloodEvent = e as BloodChangeEvent;
 
         HealthComponent healthComp = owner.GetComponent<HealthComponent>();
-        int healAmount = Mathf.Max(1, Mathf.FloorToInt(bloodEvent.bloodDelta * 0.25f));
+        int healAmount = Mathf.Max(1, Mathf.FloorToInt(bloodEvent.bloodDelta * GetHealPercent()));
         healthComp.Heal(healAmount);
+    }
+
+    private float GetHealPercent(){
+        return 0.1f + (0.3f * Mathf.Log(count, 2));
+    }
+
+    public override string GetFormattedDescription(){
+        float percent = GetHealPercent();
+        return string.Format("Recover {0:P0} of picked up blood as health.", percent);
     }
 }
 
+//TODO: typo
+//TODO: figure out how this stacks and a better way for it to actually hit things
 public class ForecefulEntryAbility : DR_Ability
 {
     public ForecefulEntryAbility(){
@@ -260,6 +305,10 @@ public class ForecefulEntryAbility : DR_Ability
             }
         }
     }
+
+    public override string GetFormattedDescription(){
+        return string.Format("To-Do: This ability currently sucks!");
+    }
 }
 
 public class HealthBoostAbility : DR_Ability
@@ -276,6 +325,10 @@ public class HealthBoostAbility : DR_Ability
     public override void ApplyStatModifiers(StatsModifier statsModifier)
     {
         statsModifier.maxHealth.addedValue += 10.0f * count;
+    }
+
+    public override string GetFormattedDescription(){
+        return string.Format("Increases health by {0}.", (int)(count * 10.0f));
     }
 }
 
@@ -294,6 +347,10 @@ public class StrengthBoostAbility : DR_Ability
     {
         statsModifier.strength.multiplier *= (1.0f + (count * 0.05f));
     }
+
+    public override string GetFormattedDescription(){
+        return string.Format("Increases strength by {0:P0}.", (count * 0.05f));
+    }
 }
 
 public class TurnSpeedBoostAbility : DR_Ability
@@ -310,5 +367,9 @@ public class TurnSpeedBoostAbility : DR_Ability
     public override void ApplyStatModifiers(StatsModifier statsModifier)
     {
         statsModifier.turnLength.multiplier *= Mathf.Pow(0.9f, count);
+    }
+
+    public override string GetFormattedDescription(){
+        return string.Format("Reduces turn length by {0:P0}.", (1.0f - (Mathf.Pow(0.9f, count))));
     }
 }

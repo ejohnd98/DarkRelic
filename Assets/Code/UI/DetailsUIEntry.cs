@@ -48,9 +48,9 @@ public class DetailsUIEntry : MonoBehaviour
             firstLine = false;
         }
 
-        if (entity.GetComponent<ItemComponent>() is ItemComponent itemComponent){
+        if (entity.GetComponent<RelicComponent>() is RelicComponent relicComponent){
             if (!firstLine) { details += '\n'; }
-            details += itemComponent.GetDetailsDescription();
+            details += relicComponent.GetDetailsDescription();
             firstLine = false;
         }
 
@@ -95,12 +95,12 @@ public class DetailsUIEntry : MonoBehaviour
 
     public void Init(DR_Ability ability){
         string entityName = ability.abilityName + ((ability.count > 1) ? (" (" + ability.count + ")") : "");
-        string details = ability.abilityDescription;
+        string details = ability.GetFormattedDescription();
 
         details += "\n" + (ability.triggeredByPlayer? "Player-activated" : "Passive");
 
-        if(ability.bloodCost > 0){
-            details += "\nCost: " + ability.bloodCost;
+        if(ability.GetBloodCost() > 0){
+            details += "\nCost: " + ability.GetBloodCost();
         }
 
         spriteImage.sprite = ability.sprite;

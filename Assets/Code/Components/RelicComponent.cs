@@ -10,7 +10,12 @@ public class RelicComponent : DR_Component
 
     public override string GetDetailsDescription()
     {
-        //TODO: list granted abilities
-        return "[To be implemented]";
+        string description = "Grants:";
+
+        for (int i = 0; i < grantedAbilities.Length; i++){
+            description += '\n' + grantedAbilities[i].name;
+        }
+
+        return description;
     }
 }
