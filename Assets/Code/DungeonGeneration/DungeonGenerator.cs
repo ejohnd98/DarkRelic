@@ -14,6 +14,8 @@ public class DungeonGenerator : MonoBehaviour {
     private MapLayout visualizationLayoutTarget = null; 
     private List<GameObject> visualizationObjects = new();
 
+    public GraphGenerator graphGenerator;
+
     public Transform visualizationParent;
     public SpriteRenderer visualizationPrefab;
     public Sprite roomSpr;
@@ -138,9 +140,12 @@ public class DungeonGenerator : MonoBehaviour {
         DR_GameManager gm = DR_GameManager.instance;
 
         // TODO: separate steps out into their own coroutines?
+        graphGenerator.GenerateGraph(visualizeGeneration);
+        yield return new WaitWhile(() => graphGenerator.isGeneratingGraph);
+
 
         // Create map layout here
-        MapLayout mapLayout = new MapLayout(mapSize);
+        MapLayout mapLayout = graphGenerator.GetGraphAsMapLayout(mapSize, new Vector2Int(7,7));//new MapLayout(mapSize);
         MapBlueprint mapBlueprint = new MapBlueprint(mapSize);
         Coroutine visualizer = null;
         if (visualizeGeneration){
@@ -148,37 +153,38 @@ public class DungeonGenerator : MonoBehaviour {
             visualizer = StartCoroutine(VisualizationCoroutine());
         }
 
-        // Hardcoded layout
-        for (int i = 0; i < 4; i++) {
-            Vector2Int roomPos = new Vector2Int(8 + i*2, (i * 9));
-            Vector2Int roomSize = new Vector2Int(7, 7);
+        // // Hardcoded layout
+        // for (int i = 0; i < 4; i++) {
+        //     Vector2Int roomPos = new Vector2Int(8 + i*2, (i * 9));
+        //     Vector2Int roomSize = new Vector2Int(7, 7);
 
-            if (i == 0){
-                roomPos = new Vector2Int(2, (2 * 9));
-            }
+        //     if (i == 0){
+        //         roomPos = new Vector2Int(2, (2 * 9));
+        //     }
 
-            if (i == 3){
-                roomPos = new Vector2Int(9 + i*2 + 9, ((i-1) * 9));
-            }
+        //     if (i == 3){
+        //         roomPos = new Vector2Int(9 + i*2 + 9, ((i-1) * 9));
+        //     }
             
             
-            var node = new MapLayoutNode();
-            node.position = roomPos;
-            node.size = roomSize;
-            if (i > 0){
-                mapLayout.connections.Add(new (mapLayout.nodes[^1], node));
-            }
-            mapLayout.nodes.Add(node);
+        //     var node = new MapLayoutNode();
+        //     node.position = roomPos;
+        //     node.size = roomSize;
+        //     if (i > 0){
+        //         mapLayout.connections.Add(new (mapLayout.nodes[^1], node));
+        //     }
+        //     mapLayout.nodes.Add(node);
 
-            yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
-        }
+        //     yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
+        // }
 
-        mapLayout.connections.Add(new (mapLayout.nodes[0], mapLayout.nodes[2]));
+        //mapLayout.connections.Add(new (mapLayout.nodes[0], mapLayout.nodes[2]));
 
-        mapLayout.nodes[0].roomTag = RoomTag.START;
-        mapLayout.nodes[^1].roomTag = RoomTag.END;
+        //mapLayout.nodes[0].roomTag = RoomTag.START;
+        //mapLayout.nodes[^1].roomTag = RoomTag.END;
 
-        yield return new WaitForSeconds(0.5f * visualizationSpeedMod);
+        if (visualizeGeneration)
+            yield return new WaitForSeconds(2.0f * visualizationSpeedMod);
 
 
         if (visualizeGeneration){
@@ -194,7 +200,13 @@ public class DungeonGenerator : MonoBehaviour {
             MapGenRoom room = new(roomPos, roomSize, mapBlueprint);
             node.resultingRoom = room;
             room.roomTag = node.roomTag;
+            room.roomLabel = node.label;
             mapBlueprint.rooms.Add(room);
+
+            if (!room.IsValid()){
+                Debug.LogError("Room is outside map bounds!");
+            }
+
             mapBlueprint.AssignRoomToCells(room);
 
             mapBlueprint.PlaceCellType(
@@ -221,8 +233,8 @@ public class DungeonGenerator : MonoBehaviour {
                 break;
             }
             
-
-            yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
+            if (visualizeGeneration)
+                yield return new WaitForEndOfFrame();
         }
 
         // Mark door tiles and carve out hallways:
@@ -239,7 +251,9 @@ public class DungeonGenerator : MonoBehaviour {
             Vector2Int doorPosB = roomB.GetEdgePositionAtDir(-posDiff);
 
             Vector2Int currentPos = doorPosA;
-            while(currentPos != doorPosB){
+            int iterations = 100;
+            while(currentPos != doorPosB && iterations > 0){
+                iterations--;
                 Vector2Int diff = doorPosB - currentPos;
                 if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y) && diff.x != 0){
                     currentPos.x +=  MathF.Sign(diff.x);
@@ -248,10 +262,12 @@ public class DungeonGenerator : MonoBehaviour {
                 }
 
                 mapBlueprint.GetCell(currentPos).type = MapGenCellType.FLOOR;
-                yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
+                if (visualizeGeneration)
+                    yield return new WaitForEndOfFrame();
             }
 
-            yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
+            if (visualizeGeneration)
+                yield return new WaitForEndOfFrame();
 
             mapBlueprint.GetCell(doorPosA).type = MapGenCellType.DOOR;
             mapBlueprint.GetCell(doorPosB).type = MapGenCellType.DOOR;
@@ -297,7 +313,8 @@ public class DungeonGenerator : MonoBehaviour {
 
                 if (newEntity != null) {
                     mapBlueprint.entitiesToPlace.Add(new Vector2Int(x, y), newEntity);
-                    yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
+                    if (visualizeGeneration)
+                        yield return new WaitForEndOfFrame();
                 }
             }
         }
@@ -348,7 +365,8 @@ public class DungeonGenerator : MonoBehaviour {
                 failedAttempts++;
                 continue;
             }
-            yield return new WaitForSeconds(0.1f * visualizationSpeedMod);
+            if (visualizeGeneration)
+                yield return new WaitForEndOfFrame();
             mapBlueprint.entitiesToPlace.Add(enemyPos, enemy);
 
             // Decrement room index, subtract exp cost
@@ -360,7 +378,8 @@ public class DungeonGenerator : MonoBehaviour {
         
         Debug.Log("Floor " + (depth + 1) + ": leftover budget " + experienceBudget + "/" + dungeonGenInfo.getExpectedExperience(depth+1) + ". lowest exp enemy is " + lowestExpEnemy);
         
-        yield return new WaitForSeconds(0.5f * visualizationSpeedMod);
+        if (visualizeGeneration)
+            yield return new WaitForSeconds(0.5f * visualizationSpeedMod);
 
         if (visualizeGeneration){
             StopCoroutine(visualizer);
@@ -382,6 +401,8 @@ public class DungeonGenerator : MonoBehaviour {
             for (int x = 0; x < newMap.MapSize.x; x++) {
                 DR_Cell newCell = new DR_Cell();
                 newMap.Cells[y, x] = newCell;
+
+                newCell.associatedRoom = mapBlueprint.cells[y, x].associatedRoom;
 
                 switch (mapBlueprint.cells[y, x].type) {
                     case MapGenCellType.NOT_SET:
@@ -505,6 +526,8 @@ public class MapLayout {
 
     public List<MapLayoutNode> nodes = new();
     public List<Tuple<MapLayoutNode, MapLayoutNode>> connections = new();
+
+    public Dictionary<EpForceDirectedGraph.cs.Node, MapLayoutNode> NodeDict = new();
 
     public MapLayout(Vector2Int size){
         mapSize = size;

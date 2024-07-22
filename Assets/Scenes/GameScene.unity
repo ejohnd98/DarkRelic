@@ -4527,6 +4527,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1779602167}
   m_CullTransparentMesh: 1
+--- !u!1 &1815001597
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1815001598}
+  m_Layer: 5
+  m_Name: GameObject_01
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1815001598
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1815001597}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -5, y: 2.75, z: -9}
+  m_LocalScale: {x: 0.03, y: 0.03, z: 0.03}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2139329889}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1825417452
 GameObject:
   m_ObjectHideFlags: 0
@@ -4649,6 +4680,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2139329889}
   - component: {fileID: 2139329888}
+  - component: {fileID: 2139329890}
   m_Layer: 0
   m_Name: DungeonGen
   m_TagString: Untagged
@@ -4668,7 +4700,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f435638a63c5474395755738dbd8fc72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  visualizeGeneration: 0
+  visualizeGeneration: 1
+  graphGenerator: {fileID: 2139329890}
   visualizationParent: {fileID: 1825417453}
   visualizationPrefab: {fileID: 2227962700054437479, guid: d6192717655c4254fb44f0ce4c70c817, type: 3}
   roomSpr: {fileID: -1211660134, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
@@ -4688,9 +4721,24 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1825417453}
+  - {fileID: 1815001598}
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2139329890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2139329887}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba5c203bdad755147b9a3b9225e94554, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forceDirectedGraphVisParent: {fileID: 1815001598}
+  isGeneratingGraph: 0
 --- !u!222 &1261612131203790736
 CanvasRenderer:
   m_ObjectHideFlags: 0

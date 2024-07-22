@@ -77,6 +77,10 @@ public class DetailsUIEntry : MonoBehaviour
             bloodstainedOverlay.gameObject.SetActive(true);
         }
 
+        if (cell.associatedRoom != null){
+            details += "\nLabel: " + cell.associatedRoom.roomLabel;
+        }
+
         spriteImage.sprite = cell.bBlocksMovement ? GameRenderer.instance.WallTexture : GameRenderer.instance.FloorTexture;
 
         nameText.text = entityName;

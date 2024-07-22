@@ -11,6 +11,9 @@ public class DR_Cell
     public int blood = 0;
     public bool bloodStained = false;
 
+    //map gen debugging
+    public MapGenRoom associatedRoom = null;
+
     public bool neverRender = false;
 
     public bool BlocksMovement(bool ignoreActor = false){

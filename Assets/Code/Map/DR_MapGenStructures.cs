@@ -52,7 +52,7 @@ public class DungeonGenInfo
     public Vector2Int getFloorSize(int floor)
     {
         // temp hardcoded value
-        return new Vector2Int(35, 35);
+        return new Vector2Int(60, 60);
     }
 }
 
@@ -105,6 +105,7 @@ public class MapGenRoom{
 
     public Vector2Int pos, size;
     public MapBlueprint mapBlueprint;
+    public string roomLabel = "";
     public RoomTag roomTag = RoomTag.NONE;
 
     public MapGenRoom(Vector2Int pos, Vector2Int size, MapBlueprint mapBlueprint){
@@ -172,12 +173,24 @@ public class MapGenRoom{
 
         return result;
     }
+
+    public bool IsValid(){
+        bool isValid = pos.x > 0 && pos.x + size.x < mapBlueprint.mapSize.x
+            && pos.y > 0 && pos.y + size.y < mapBlueprint.mapSize.y;
+        
+        if (!isValid){
+            Debug.LogError("Room is outside map bounds!");
+        }
+        
+        return isValid;
+    }
 }
 
 public class MapLayoutNode{
     public Vector2Int position;
     public Vector2Int size = Vector2Int.one;
     public RoomTag roomTag = RoomTag.NONE;
+    public string label = "Node";
 
     public MapGenRoom resultingRoom = null;
 }
