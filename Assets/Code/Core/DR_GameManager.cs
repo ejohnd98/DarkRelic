@@ -223,28 +223,8 @@ public class DR_GameManager : MonoBehaviour
         }
 
         LoadNextLevel(origin, destination, goingDeeper);
-        //blackOverlay.SetShouldBeVisible(false);
         turnSystem.UpdateEntityLists(CurrentMap);
         SightSystem.CalculateVisibleCells(PlayerActor, CurrentMap);
-        
-        // // TODO: decouple the fading here
-        // Action OnFadeOut = null;
-        // OnFadeOut = () => {
-        //     blackOverlay.OnVisibleComplete -= OnFadeOut;
-            
-        //     //DR_Renderer.instance.CreateTiles();
-        //     isFadeActive = false;
-        // };
-        // Action OnFadeIn = null;
-        // OnFadeIn = () => {
-        //     blackOverlay.OnVisibleComplete -= OnFadeIn;
-        // };
-        
-        // blackOverlay.OnVisibleComplete += OnFadeOut;
-        // blackOverlay.OnInvisibleComplete += OnFadeIn;
-        
-        // isFadeActive = true;
-        // blackOverlay.SetShouldBeVisible(true);
     }
 
     private void LoadNextLevel(DR_Map origin, DR_Map destination, bool goingDeeper) {
@@ -258,10 +238,6 @@ public class DR_GameManager : MonoBehaviour
         destination.AddActor(PlayerActor, newPos);
         
         UpdateCurrentMap();
-        //GameRenderer.instance.UpdateCamera(true);
-        //GameRenderer.instance.ClearAllObjects();
-        //DR_Renderer.instance.ClearAllObjects();
-        //DR_Renderer.instance.CreateTiles();
     }
     
     public DR_Entity GetPlayer(){

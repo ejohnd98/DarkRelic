@@ -62,7 +62,7 @@ public class DungeonGenerator : MonoBehaviour {
 
                     switch (visualizationTarget.cells[y, x].type) {
                         case MapGenCellType.NOT_SET:{
-                            CreateSpriteAt(new Vector2Int(x,y), notSetSpr, 0.0f);
+                            //CreateSpriteAt(new Vector2Int(x,y), notSetSpr, 0.0f);
                             break;
                         }
                         case MapGenCellType.WALL: {
@@ -153,36 +153,6 @@ public class DungeonGenerator : MonoBehaviour {
             visualizer = StartCoroutine(VisualizationCoroutine());
         }
 
-        // // Hardcoded layout
-        // for (int i = 0; i < 4; i++) {
-        //     Vector2Int roomPos = new Vector2Int(8 + i*2, (i * 9));
-        //     Vector2Int roomSize = new Vector2Int(7, 7);
-
-        //     if (i == 0){
-        //         roomPos = new Vector2Int(2, (2 * 9));
-        //     }
-
-        //     if (i == 3){
-        //         roomPos = new Vector2Int(9 + i*2 + 9, ((i-1) * 9));
-        //     }
-            
-            
-        //     var node = new MapLayoutNode();
-        //     node.position = roomPos;
-        //     node.size = roomSize;
-        //     if (i > 0){
-        //         mapLayout.connections.Add(new (mapLayout.nodes[^1], node));
-        //     }
-        //     mapLayout.nodes.Add(node);
-
-        //     yield return new WaitForSeconds(0.2f * visualizationSpeedMod);
-        // }
-
-        //mapLayout.connections.Add(new (mapLayout.nodes[0], mapLayout.nodes[2]));
-
-        //mapLayout.nodes[0].roomTag = RoomTag.START;
-        //mapLayout.nodes[^1].roomTag = RoomTag.END;
-
         if (visualizeGeneration)
             yield return new WaitForSeconds(2.0f * visualizationSpeedMod);
 
@@ -191,7 +161,6 @@ public class DungeonGenerator : MonoBehaviour {
             visualizationLayoutTarget = null;
             visualizationTarget = mapBlueprint;
         }
-
 
         // Create rooms based on nodes and carve out
         foreach(var node in mapLayout.nodes){
@@ -250,24 +219,55 @@ public class DungeonGenerator : MonoBehaviour {
             Vector2Int doorPosA = roomA.GetEdgePositionAtDir(posDiff);
             Vector2Int doorPosB = roomB.GetEdgePositionAtDir(-posDiff);
 
+            Vector2Int currentTarget = doorPosB;
+            if (!roomB.IsPositionInsideRoom(doorPosB - (Vector2Int.right * dir.x))){
+                currentTarget.x -= dir.x;
+            }else{
+                currentTarget.y -= dir.y;
+            }
+
             Vector2Int currentPos = doorPosA;
-            int iterations = 100;
-            while(currentPos != doorPosB && iterations > 0){
-                iterations--;
-                Vector2Int diff = doorPosB - currentPos;
-                if (Mathf.Abs(diff.x) > Mathf.Abs(diff.y) && diff.x != 0){
+
+            for(int i = 0; currentPos != doorPosB && i < 100; i++){
+
+                Vector2Int diff = currentTarget - currentPos;
+
+                bool ShouldMoveHorizontal(){
+                    // Get away from room for first few iterations
+                    if (i < 3){
+                        return !roomA.IsPositionInsideRoom(currentPos + Vector2Int.right * MathF.Sign(diff.x));
+                    }
+                    // Prefer not overlapping room until needed
+                    if (diff.x != 0 && diff.y != 0){
+                        return !roomB.IsPositionInsideRoom(currentPos + Vector2Int.right * MathF.Sign(diff.x));
+                    }
+                    // Prefer moving in direction of larger difference
+                    return Mathf.Abs(diff.x) > Mathf.Abs(diff.y);
+                }
+
+                if (ShouldMoveHorizontal()){
                     currentPos.x +=  MathF.Sign(diff.x);
-                }else if(diff.y != 0){
+                }else{
                     currentPos.y += MathF.Sign(diff.y);
                 }
 
+                if (currentPos == currentTarget){
+                    currentTarget = doorPosB;
+                }
+
                 mapBlueprint.GetCell(currentPos).type = MapGenCellType.FLOOR;
-                if (visualizeGeneration)
+                if (visualizeGeneration){
                     yield return new WaitForEndOfFrame();
+                    yield return new WaitForEndOfFrame();
+                    
+                }
             }
 
-            if (visualizeGeneration)
+            if (visualizeGeneration){
                 yield return new WaitForEndOfFrame();
+                yield return new WaitForEndOfFrame();
+            }
+                
 
             mapBlueprint.GetCell(doorPosA).type = MapGenCellType.DOOR;
             mapBlueprint.GetCell(doorPosB).type = MapGenCellType.DOOR;
@@ -379,7 +379,7 @@ public class DungeonGenerator : MonoBehaviour {
         Debug.Log("Floor " + (depth + 1) + ": leftover budget " + experienceBudget + "/" + dungeonGenInfo.getExpectedExperience(depth+1) + ". lowest exp enemy is " + lowestExpEnemy);
         
         if (visualizeGeneration)
-            yield return new WaitForSeconds(0.5f * visualizationSpeedMod);
+            yield return new WaitForSeconds(2f * visualizationSpeedMod);
 
         if (visualizeGeneration){
             StopCoroutine(visualizer);

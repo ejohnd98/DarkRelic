@@ -52,7 +52,7 @@ public class DungeonGenInfo
     public Vector2Int getFloorSize(int floor)
     {
         // temp hardcoded value
-        return new Vector2Int(60, 60);
+        return new Vector2Int(90, 90);
     }
 }
 

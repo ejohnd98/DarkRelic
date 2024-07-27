@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EpForceDirectedGraph.cs;
 using UnityEngine;
@@ -6,6 +7,7 @@ using UnityEngine.UIElements;
 class ForceDirectedGraphRenderer: AbstractRenderer
 {
    public Transform parentTransform;
+   private Color visColor = Color.white;
 
    public List<GameObject> nodeObjs = new();
    public List<GameObject> edgeObjs = new();
@@ -46,6 +48,8 @@ class ForceDirectedGraphRenderer: AbstractRenderer
       edgeObj.transform.rotation = Quaternion.LookRotation (position2 - position1);
       edgeObj.name = iEdge.Data.label;
       edgeObjs.Add(edgeObj);
+
+      edgeObj.GetComponent<MeshRenderer>().material.color = visColor;
    }
 
    protected override void drawNode(Node iNode, AbstractVector iPosition)
@@ -58,5 +62,12 @@ class ForceDirectedGraphRenderer: AbstractRenderer
       nodeObj.transform.localScale = new Vector3(10.0f, 10.0f, 1.0f);
       nodeObj.name = iNode.Data.label;
       nodeObjs.Add(nodeObj);
+
+      nodeObj.GetComponent<MeshRenderer>().material.color = visColor;
+   }
+
+   public void SetColor(Color color)
+   {
+      visColor = color;
    }
 };

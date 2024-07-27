@@ -147,17 +147,23 @@ public class GraphGenerator : MonoBehaviour {
         SnapPointsToGrid();
         m_fdgRenderer.Draw(0.1f, false);
 
-        if (visualizeGeneration)
-            yield return new WaitForSeconds(1.0f);
-        m_fdgRenderer.Clear();
-
         if (DoAnyEdgesCross()){
+            m_fdgRenderer.SetColor(Color.red);
+            m_fdgRenderer.Draw(0.1f, false);
+            if (visualizeGeneration)
+                yield return new WaitForSeconds(1.0f);
+
             Debug.Log("Restarting due to edge crosses!");
+
+            m_fdgRenderer.Clear();
             GenerateGraph(visualizeGeneration);
             yield break;
         }
+        
+        if (visualizeGeneration)
+            yield return new WaitForSeconds(1.0f);
 
-
+        m_fdgRenderer.Clear();
         isGeneratingGraph = false;
         yield return null;
 
@@ -281,7 +287,50 @@ public class GraphGenerator : MonoBehaviour {
             return m_fdgGraph.CreateEdge(a, b, data);
         }
 
+        Node start = CreateNode("start");
+        start.Data.roomTag = RoomTag.START;
+        Node exit = CreateNode("exit");
+        exit.Data.roomTag = RoomTag.END;
         
+        Node normal1 = CreateNode("normal1");
+        Node normal2 = CreateNode("normal2");
+        Node normal3 = CreateNode("normal3");
+        Node normal4 = CreateNode("normal4");
+        Node normal5 = CreateNode("normal5");
+        Node normal6 = CreateNode("normal6");
+        Node normal7 = CreateNode("normal7");
+
+        Node hub1 = CreateNode("hub1");
+        Node hub2 = CreateNode("hub2");
+
+        Node reward1 = CreateNode("reward1");
+        Node reward2 = CreateNode("reward2");
+
+        Node bossFoyer = CreateNode("bossFoyer");
+        Node boss = CreateNode("boss");
+
+        Node shop = CreateNode("shop");
+
+        ConnectNodes(start, normal1);
+        ConnectNodes(normal1, normal2);
+        ConnectNodes(normal2, hub1);
+        ConnectNodes(hub1, normal3);
+        ConnectNodes(normal3, reward1);
+        ConnectNodes(reward1, normal1);
+        ConnectNodes(hub1, normal4);
+        ConnectNodes(normal4, hub2);
+        ConnectNodes(normal4, bossFoyer);
+        ConnectNodes(bossFoyer, boss);
+        ConnectNodes(boss, exit);
+        ConnectNodes(hub2, normal5);
+        ConnectNodes(hub2, normal6);
+        ConnectNodes(normal6, shop);
+        ConnectNodes(normal5, normal7);
+        ConnectNodes(normal7, reward2);
+        ConnectNodes(reward2, hub2);
+
+
+        /* ---- BASIC MAP ----
         Node startNode = CreateNode("Start", 5.0f);
         startNode.Data.roomTag = RoomTag.START;
         Node endNode = CreateNode("End", 5.0f);
@@ -315,6 +364,7 @@ public class GraphGenerator : MonoBehaviour {
 
         ConnectNodes(L2, C1);
         ConnectNodes(R2, C1);
+         ---- BASIC MAP ---- */
 
         return m_fdgGraph;
     }
