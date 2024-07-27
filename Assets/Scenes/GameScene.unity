@@ -782,7 +782,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 2
+  m_Spacing: 1
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -3940,9 +3940,14 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 04e475988e63fc84e889cba4e4f0776e, type: 2}
   - {fileID: 11400000, guid: 601c95c9b77b71f44b8020e88aca5b7b, type: 2}
   relicPickupContentArray:
+  - {fileID: 11400000, guid: c71c5d1efbe3ad54ebbd81b6c23dc2cc, type: 2}
+  - {fileID: 11400000, guid: 4b6970b498eeb8549ac37aa84e1805e1, type: 2}
+  - {fileID: 11400000, guid: fcd1b59bf2ba6e64a9eafc624f24a52f, type: 2}
+  - {fileID: 11400000, guid: bc761f88b62abfb42a7ec50142d4d2a7, type: 2}
+  - {fileID: 11400000, guid: bb2a2f07bcd43c8488aace038285b8eb, type: 2}
+  - {fileID: 11400000, guid: e6202f6bd355102419dc9aec1c275c66, type: 2}
   - {fileID: 11400000, guid: adddb8fb11ad25b4f9849f82c804bb16, type: 2}
   - {fileID: 11400000, guid: 6431098bfc789704698a9e52856a17a2, type: 2}
-  - {fileID: 11400000, guid: e6202f6bd355102419dc9aec1c275c66, type: 2}
   healthAltarContent: {fileID: 11400000, guid: 64c5dbd6b1226a147ba747fb89846ad1, type: 2}
   itemAltarContent: {fileID: 11400000, guid: 25fe5b1a7fc3cb947939c6bcd6e8a210, type: 2}
   debug_disableFOV: 0
