@@ -346,8 +346,7 @@ public class GameRenderer : MonoBehaviour
             }
         }
         foreach(DR_Entity entity in entitiesToRemove){
-            Destroy(EntityObjects[entity]);
-            EntityObjects.Remove(entity);
+            RemoveEntityObj(entity);
         }
 
         foreach(DR_Entity Entity in EntityObjects.Keys){
