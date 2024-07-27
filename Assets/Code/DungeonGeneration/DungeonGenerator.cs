@@ -194,9 +194,15 @@ public class DungeonGenerator : MonoBehaviour {
                 case RoomTag.END:
                     mapBlueprint.GetCell(room.GetCenterPosition()).type = (depth == dungeonGenInfo.floors-1) ? MapGenCellType.GOAL : MapGenCellType.STAIRS_DOWN;
                     mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.up).type = MapGenCellType.HEALTH_ALTAR;
-                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.up * 3).type = MapGenCellType.ITEM_ALTAR;
-                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.right * 3).type = MapGenCellType.ITEM_ALTAR;
-                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.down * 3).type = MapGenCellType.ITEM_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.up + Vector2Int.right).type = MapGenCellType.ITEM_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.up + Vector2Int.left).type = MapGenCellType.ITEM_ALTAR;
+                    break;
+                case RoomTag.RELIC:
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.right).type = MapGenCellType.ITEM_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.left).type = MapGenCellType.ITEM_ALTAR;
+                    break;
+                case RoomTag.HEALTH:
+                    mapBlueprint.GetCell(room.GetCenterPosition()).type = MapGenCellType.HEALTH_ALTAR;
                     break;
                 default:
                 break;

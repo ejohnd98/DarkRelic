@@ -403,6 +403,10 @@ public class GameRenderer : MonoBehaviour
         if (entity.HasComponent<PlayerComponent>()){
             renderedPlayer = NewEntityObj.transform;
         }
+
+        if (entity.GetComponent<AltarComponent>() is AltarComponent altar){
+            NewEntityObj.GetComponent<CellObj>().SetAltarItem(altar);
+        }
     }
 
     public void RemoveEntityObj(DR_Entity entity)

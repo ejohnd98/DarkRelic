@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
+  m_Name: BloodWalkRelic
+  m_EditorClassIdentifier: 
+  contentName: Blood-Walking Boots
+  guid: 3e4f8afa-1107-4dbf-9d18-b68ac4360348
+  components:
+  - rid: 2467970878754521088
+  - rid: 2467970878754521089
+  - rid: 2467970878754521090
+  references:
+    version: 2
+    RefIds:
+    - rid: 2467970878754521088
+      type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: SpriteComponent
+        Sprite: {fileID: -1878333176, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        hasAnimation: 0
+        animFrames: []
+        animLength: 1
+    - rid: 2467970878754521089
+      type: {class: ItemComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: ItemComponent
+        requireFurtherInputOnUse: 0
+        count: 1
+    - rid: 2467970878754521090
+      type: {class: RelicComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: RelicComponent
+        grantedAbilities:
+        - {fileID: 11400000, guid: 3b6d77afd3689c745ace1fc30df6e787, type: 2}

@@ -301,15 +301,20 @@ public class GraphGenerator : MonoBehaviour {
         Node normal7 = CreateNode("normal7");
 
         Node hub1 = CreateNode("hub1");
+        hub1.Data.roomTag = RoomTag.HEALTH;
         Node hub2 = CreateNode("hub2");
+        hub2.Data.roomTag = RoomTag.HEALTH;
 
         Node reward1 = CreateNode("reward1");
+        reward1.Data.roomTag = RoomTag.RELIC;
         Node reward2 = CreateNode("reward2");
+        reward2.Data.roomTag = RoomTag.RELIC;
 
         Node bossFoyer = CreateNode("bossFoyer");
         Node boss = CreateNode("boss");
 
         Node shop = CreateNode("shop");
+        shop.Data.roomTag = RoomTag.RELIC;
 
         ConnectNodes(start, normal1);
         ConnectNodes(normal1, normal2);

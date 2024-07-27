@@ -32,6 +32,13 @@ public class BloodChangeEvent : DR_Event
     public int newBlood;
 }
 
+public class HealthChangeEvent : DR_Event
+{
+    public DR_Entity target;
+    public HealthComponent healthComp;
+    public int delta = 0;
+}
+
 public class ActionEvent : DR_Event
 {
     public DR_Action action;

@@ -18,6 +18,13 @@ public class DR_Map
     {
     }
 
+    public bool GetIsVisible(Vector2Int pos){
+        if (!ValidPosition(pos)){
+            return false;
+        }
+        return IsVisible[pos.y, pos.x];
+    }
+
     public DR_Map(Vector2Int size)
     {
         MapSize = size;

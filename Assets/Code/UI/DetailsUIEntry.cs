@@ -101,10 +101,10 @@ public class DetailsUIEntry : MonoBehaviour
         string entityName = ability.abilityName + ((ability.count > 1) ? (" (" + ability.count + ")") : "");
         string details = ability.GetFormattedDescription();
 
-        details += "\n" + (ability.triggeredByPlayer? "Player-activated" : "Passive");
-
-        if(ability.GetBloodCost() > 0){
-            details += "\nCost: " + ability.GetBloodCost();
+        if (ability.triggeredByPlayer){
+            details += "\n\nCost: " + ability.GetBloodCost();
+        }else{
+            details += "\n\nPassive";
         }
 
         spriteImage.sprite = ability.sprite;

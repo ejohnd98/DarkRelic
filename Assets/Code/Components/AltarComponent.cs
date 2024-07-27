@@ -17,14 +17,37 @@ public class AltarComponent : DR_Component
     [DoNotSerialize]
     public Content itemAltarContent;
 
+    public int GetBloodCost(DR_Entity interactor = null){
+        DR_Entity entity = interactor ?? DR_GameManager.instance.GetPlayer();
+        if (entity == null){
+            return -1;
+        }
+
+        switch (altarType){
+            case AltarType.HEALTH:{
+                HealthComponent healthComp = entity.GetComponent<HealthComponent>();
+                InventoryComponent inventory = entity.GetComponent<InventoryComponent>();
+                return Mathf.Min(healthComp.maxHealth - healthComp.currentHealth, inventory.blood);
+            }
+            case AltarType.ITEM:{
+                // TODO: scale with depth and item multiplier (some relics should cost more)
+                float scaledCost = 20 * Mathf.Pow(1.5f, DR_GameManager.instance.CurrentDungeon.mapIndex);
+                return ((int)(scaledCost / 5)) * 5; //multiple of 5
+            }
+            default:{
+                return -1;
+            }
+        }
+    }
+
     public override string GetDetailsDescription()
     {
         switch (altarType){
             case AltarType.HEALTH:
-                return "Restores health at the cost of blood.";
+                return "Fully replenishes health for an equal blood cost (" + GetBloodCost() + ").\n\nInsufficient blood will partially restore health.";
             
             case AltarType.ITEM:
-                return "Grants a " + itemAltarContent.contentName + " in exchange for blood.";
+                return "Grants " + itemAltarContent.contentName + " for a blood cost of " + GetBloodCost() + ".";
             default:
                 return "unknown altar type!";
         }

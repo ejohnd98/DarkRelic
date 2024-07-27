@@ -29,4 +29,12 @@ public class Content : ContentBase
         components.Add(componentObject);
     }
 
+    public Sprite GetContentSprite(){
+        foreach(DR_Component component in components){
+            if(component is SpriteComponent spriteComp){
+                return spriteComp.GetCurrentSprite();
+            }
+        }
+        return null;
+    }
 }

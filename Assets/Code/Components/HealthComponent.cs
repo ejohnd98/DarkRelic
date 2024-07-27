@@ -10,6 +10,8 @@ public class HealthComponent : DR_Component
     [Copy]
     public int currentHealth = 0;
 
+    public Action<DR_Event> OnHealthChanged;
+
     public HealthComponent(){}
 
     public HealthComponent(int MaxHealth){
@@ -20,16 +22,26 @@ public class HealthComponent : DR_Component
     {
         base.OnComponentAdded();
         currentHealth = maxHealth;
+
+        OnHealthChanged?.Invoke(
+            new HealthChangeEvent(){owner = Entity, healthComp = this}
+        );
     }
 
     public void TakeDamage(int amount){
         currentHealth = Mathf.Clamp(currentHealth-amount, 0, maxHealth);
+        OnHealthChanged?.Invoke(
+            new HealthChangeEvent(){owner = Entity, healthComp = this}
+        );
     }
 
     public int Heal(int amount){
         int newHealth = Mathf.Clamp(currentHealth+amount, 0, maxHealth);
         int recovered = newHealth - currentHealth;
         currentHealth = newHealth;
+        OnHealthChanged?.Invoke(
+            new HealthChangeEvent(){owner = Entity, healthComp = this, delta = recovered}
+        );
         return recovered;
     }
 

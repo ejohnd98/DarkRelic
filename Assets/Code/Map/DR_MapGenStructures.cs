@@ -97,6 +97,8 @@ public class MapGenCell{
 public enum RoomTag{
     START,
     END,
+    RELIC,
+    HEALTH,
 
     NONE
 }

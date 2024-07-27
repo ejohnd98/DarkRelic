@@ -296,14 +296,14 @@ public class AltarAction : DR_Action {
         }
     }
 
-   protected override void Perform(DR_GameManager gm){
+    protected override void Perform(DR_GameManager gm){
         switch (altar.altarType){
             case AltarType.HEALTH:
             {
                 HealthComponent healthComponent = owner.GetComponent<HealthComponent>();
                 InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
 
-                bloodCost = Mathf.Min(healthComponent.maxHealth - healthComponent.currentHealth, inventoryComponent.blood);
+                bloodCost = altar.GetBloodCost(owner);
 
                 healthRestored = healthComponent.Heal(bloodCost);
                 inventoryComponent.SpendBlood(healthRestored);
@@ -314,7 +314,7 @@ public class AltarAction : DR_Action {
             case AltarType.ITEM:
             {
                 InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
-                bloodCost = 10; //TODO: determine this better
+                bloodCost = altar.GetBloodCost(owner);
                 if (inventoryComponent.blood < bloodCost){
                     wasSuccess = false;
                     break;

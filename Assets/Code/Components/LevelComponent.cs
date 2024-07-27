@@ -111,14 +111,14 @@ public class LevelComponent : DR_Component
         {
             strength = 1,
             maxHealth = 5,
-            expGiven = 200
+            expGiven = 100
         };
 
         Stats level50Stats = new()
         {
             strength = 80,
             maxHealth = 400,
-            expGiven = 2000
+            expGiven = 1000
         };
 
         float levelFraction = (level-1) / 100.0f;

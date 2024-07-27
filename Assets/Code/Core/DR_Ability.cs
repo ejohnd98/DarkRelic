@@ -110,8 +110,10 @@ public class BloodBoltAbility : DR_Ability
     //TODO: allow targeting ground
     protected override void SetupInputs(){
         //TODO: cap range? Eventually will want to precompute targets so they can shown through UI
-        //TODO BUG: require visibility too!
-        actionInputs.Add(new ActionInput((Vector2Int pos) => {return DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos) != null;}));
+        actionInputs.Add(new ActionInput((Vector2Int pos) => {
+            return DR_GameManager.instance.CurrentMap.GetIsVisible(pos)
+            && DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos) != null;
+        }));
     }
 
     protected override void OnTrigger(DR_Event e){
