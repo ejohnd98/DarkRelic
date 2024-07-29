@@ -102,9 +102,13 @@ public class DetailsUIEntry : MonoBehaviour
         string details = ability.GetFormattedDescription();
 
         if (ability.triggeredByPlayer){
-            details += "\n\nCost: " + ability.GetBloodCost();
+            details += "\n\nBlood Cost: " + ability.GetBloodCost();
         }else{
             details += "\n\nPassive";
+        }
+
+        if (ability.cooldownLength > 0){
+            details += "\nCooldown: " + ability.cooldownLength;
         }
 
         spriteImage.sprite = ability.sprite;

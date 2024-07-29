@@ -16,6 +16,10 @@ public abstract class DR_Ability
     public int count = 1;
     public int baseBloodCost = 0;
 
+    //TODO: reflect this in UI and ability SO
+    public int cooldownLength = 0; //represents cooldown turns (1 would mean you can use every other turn at most
+    private int cooldown = 0;
+
     public DR_Entity owner;
     public string contentGuid = "";
 
@@ -24,7 +28,18 @@ public abstract class DR_Ability
         // Should only be for init stuff and not every time this ability is picked up
     }
 
+    public virtual void TickCooldown(){
+        if (cooldown > 0){
+            Debug.Log("Tick cooldown on " + owner.Name + ": " + abilityName + " (" + cooldown + "->"+ (cooldown-1) +")");
+            cooldown--;
+        }
+    }
+
     public virtual bool CanBePerformed(){
+        if (cooldown > 0){
+            return false;
+        }
+
         if (owner.GetComponent<AIComponent>() is AIComponent aiComp 
             && aiComp.ignoreAbilityBloodCost){
             return true;
@@ -59,6 +74,9 @@ public abstract class DR_Ability
             }
         }
         
+        if (cooldownLength != 0){
+            cooldown = cooldownLength + 1;
+        }
         OnTrigger(e);
     }
 
@@ -120,6 +138,7 @@ public class BloodBoltAbility : DR_Ability
     public float range = 8; //TODO: move this to base?
     public BloodBoltAbility(){
         baseBloodCost = 1;
+        cooldownLength = 2;
     }
 
     //TODO: allow targeting ground

@@ -33,7 +33,14 @@ public class TurnComponent : DR_Component
     }
 
     public void RecoverDebt(int amount){
-        CurrentDebt = Mathf.Min(CurrentDebt + amount, 0);
+        float newDebt = Mathf.Min(CurrentDebt + amount, 0);
+        
+        // only tick ability cooldown every entity turn ()
+        if (newDebt == 0 && CurrentDebt != 0 && Entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){
+            abilityComponent.TickCooldowns();
+        }
+
+        CurrentDebt = newDebt;
     }
 
     public override void OnComponentRemoved()

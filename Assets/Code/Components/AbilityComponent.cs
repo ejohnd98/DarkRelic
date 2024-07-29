@@ -27,6 +27,13 @@ public class AbilityComponent : DR_Component
         }
     }
 
+    public void TickCooldowns(){
+        foreach(var ability in abilities){
+            ability.TickCooldown();
+        }
+        dirtyFlag = true;
+    }
+
     public void AddAbilityFromContent(AbilityContent content){
         
         //Check if ability already exists on component:

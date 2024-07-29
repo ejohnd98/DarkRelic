@@ -59,6 +59,10 @@ public class AbilityToolbarUI : MonoBehaviour
                     abilityButton.GetComponent<Image>().sprite = passiveAbilityFrame;
                     continue;
                 }
+                if (!ability.CanBePerformed()){
+                    abilityButton.GetComponent<CanvasGroup>().alpha = 0.5f;
+                    continue;
+                }
                 abilityButton.OnMouseDownEvents.AddListener(() => {
                     OnAbilityClicked(entity, ability);
                 });
