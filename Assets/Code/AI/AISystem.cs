@@ -16,11 +16,25 @@ public class AISystem
         if(aiComponent.HasTarget()){
             DR_Entity target = aiComponent.target;
 
-            //Within range:
+            //Within melee range:
             if (entity.DistanceTo(target.Position) == 1){
                 HealthComponent targetHealth = target.GetComponent<HealthComponent>();
                 if (targetHealth.IsAlive()){
                     return new AttackAction(target, entity);
+                }
+            }
+
+            //Can use ability
+            if (entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){
+                foreach (DR_Ability ability in abilityComponent.abilities){
+                    if (ability.CanBePerformed()){
+                        var abilityAction = new AbilityAction(ability, entity);
+                        ActionInput actionInput = abilityAction.GetNextNeededInput();
+                        if (actionInput.GiveInput(target.Position) && !abilityAction.RequiresInput()){
+                            //ability accepts single position as input, and input is valid
+                            return abilityAction;
+                        }
+                    }
                 }
             }
 

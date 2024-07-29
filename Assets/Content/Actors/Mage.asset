@@ -21,6 +21,7 @@ MonoBehaviour:
   - rid: 5068184619078123524
   - rid: 5068184619078123525
   - rid: 5068184619078123527
+  - rid: 5768008967573471233
   references:
     version: 2
     RefIds:
@@ -49,7 +50,6 @@ MonoBehaviour:
       type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
       data:
         key: TurnComponent
-        ActionDebt: 6
         waitingForAction: 0
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
@@ -65,3 +65,11 @@ MonoBehaviour:
       type: {class: AIComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AIComponent
+        ignoreAbilityBloodCost: 1
+    - rid: 5768008967573471233
+      type: {class: AbilityComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: AbilityComponent
+        startingAbilities:
+        - {fileID: 11400000, guid: 19611e4d403ad0646807eb08dcc95924, type: 2}
+        dirtyFlag: 1

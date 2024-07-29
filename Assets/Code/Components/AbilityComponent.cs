@@ -13,6 +13,7 @@ public class AbilityComponent : DR_Component
 
     public AbilityComponent(){}
 
+    [HideInInspector]
     public bool dirtyFlag = true; //Temp for UI
 
     public override void OnComponentAdded()

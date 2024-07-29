@@ -8,6 +8,9 @@ public class AIComponent : DR_Component
 
     public PathResult currentPath;
 
+    [Copy]
+    public bool ignoreAbilityBloodCost = true;
+
     public bool HasTarget(){
         if (target == null){
             return false;

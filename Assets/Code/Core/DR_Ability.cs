@@ -25,26 +25,40 @@ public abstract class DR_Ability
     }
 
     public virtual bool CanBePerformed(){
+        if (owner.GetComponent<AIComponent>() is AIComponent aiComp 
+            && aiComp.ignoreAbilityBloodCost){
+            return true;
+        }
         int bloodCost = GetBloodCost();
         if (bloodCost > 0){
+            if (!owner.HasComponent<InventoryComponent>()){
+                Debug.LogError(owner.Name + " tried to use ability ("+ abilityName +") that requires blood, but has no inventory component!");
+                return false;
+            }
             return owner.GetComponent<InventoryComponent>().blood + owner.GetComponent<HealthComponent>().currentHealth >= bloodCost;
         }
         return true;
     }
 
     public void Trigger(DR_Event e){
-        int bloodCost = GetBloodCost();
-        if (bloodCost > 0){
-            var inventory = owner.GetComponent<InventoryComponent>();
-            int bloodToUse = Mathf.Min(inventory.blood, bloodCost);
-            inventory.SpendBlood(bloodToUse);
-            if (bloodCost - bloodToUse > 0){
-                owner.GetComponent<HealthComponent>().TakeDamage(bloodCost - bloodToUse);
-                if (owner.GetComponent<HealthComponent>().currentHealth <= 0){
-                    Debug.Log("Player tried to use too much blood!");
+        if (owner.GetComponent<AIComponent>() is AIComponent aiComp 
+            && aiComp.ignoreAbilityBloodCost){
+
+        }else{
+            int bloodCost = GetBloodCost();
+            if (bloodCost > 0){
+                var inventory = owner.GetComponent<InventoryComponent>();
+                int bloodToUse = Mathf.Min(inventory.blood, bloodCost);
+                inventory.SpendBlood(bloodToUse);
+                if (bloodCost - bloodToUse > 0){
+                    owner.GetComponent<HealthComponent>().TakeDamage(bloodCost - bloodToUse);
+                    if (owner.GetComponent<HealthComponent>().currentHealth <= 0){
+                        Debug.Log("Player tried to use too much blood!");
+                    }
                 }
             }
         }
+        
         OnTrigger(e);
     }
 
@@ -103,6 +117,7 @@ public class BloodBoltAbility : DR_Ability
 {
     public bool killed = false;
     public DR_Entity target;
+    public float range = 8; //TODO: move this to base?
     public BloodBoltAbility(){
         baseBloodCost = 1;
     }
@@ -112,7 +127,8 @@ public class BloodBoltAbility : DR_Ability
         //TODO: cap range? Eventually will want to precompute targets so they can shown through UI
         actionInputs.Add(new ActionInput((Vector2Int pos) => {
             return DR_GameManager.instance.CurrentMap.GetIsVisible(pos)
-            && DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos) != null;
+            && DR_GameManager.instance.CurrentMap.GetActorAtPosition(pos) != null
+            && (pos - owner.Position).magnitude < range;
         }));
     }
 
@@ -125,7 +141,7 @@ public class BloodBoltAbility : DR_Ability
         relatedEntities.Add(target);
         relatedEntities.Add(owner);
 
-        int baseDamage = Mathf.FloorToInt(owner.GetComponent<LevelComponent>().stats.strength * GetStrengthModifier());
+        int baseDamage = Mathf.CeilToInt(owner.GetComponent<LevelComponent>().stats.strength * GetStrengthModifier());
         var damageEvent = DamageSystem.HandleAttack(DR_GameManager.instance, owner, target, baseDamage);
 
         killed = damageEvent.killed;

@@ -188,7 +188,7 @@ public class AbilityAction : DR_Action {
         return owner.Name + " activated " + ability.abilityName;
     }
 
-   protected override void Perform(DR_GameManager gm){
+    protected override void Perform(DR_GameManager gm){
         if (ability.CanBePerformed()){
             DR_Event abilityEvent = new();
             abilityEvent.owner = owner;
