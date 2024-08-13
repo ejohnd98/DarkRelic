@@ -207,13 +207,15 @@ public class ProjectileAnimation : ActionAnimation {
     Transform projectileObj;
     Vector3 a, b;
     Vector2Int targetPos;
+    Sprite spr;
 
-    public ProjectileAnimation(RenderedAction action, Transform rendererObj, Transform targetRenderObj, float time = 0.2f){
+    public ProjectileAnimation(RenderedAction action, Transform rendererObj, Transform targetRenderObj, float time = 0.2f, Sprite spr = null){
         this.rendererObj = rendererObj;
         this.action = action;
         this.entity = action.originalAction.owner;
         this.length = time;
         this.targetRendererObj = targetRenderObj;
+        this.spr = spr;
 
         AnimStarted += (anim)=>{
             SoundSystem.instance.PlaySound("abilityPlaceholder");
@@ -227,7 +229,7 @@ public class ProjectileAnimation : ActionAnimation {
         a = GameRenderer.instance.EntityObjects[action.originalAction.owner].transform.position;
         b = new Vector3(targetPos.x, targetPos.y, -1);
 
-        projectileObj = FXSpawner.instance.SpawnSprite(new Vector2Int(Mathf.RoundToInt(a.x), Mathf.RoundToInt(a.y)), null, new Color(0.722f, 0.145f, 0.247f));
+        projectileObj = FXSpawner.instance.SpawnSprite(new Vector2Int(Mathf.RoundToInt(a.x), Mathf.RoundToInt(a.y)), spr, new Color(0.722f, 0.145f, 0.247f));
     }
 
     public override void AnimStep(float time){

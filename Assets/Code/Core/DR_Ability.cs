@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+public class AbilityPropertyAttribute : PropertyAttribute { }
+
 public abstract class DR_Ability
 {
     public bool triggeredByPlayer = true;
@@ -135,7 +138,13 @@ public class BloodBoltAbility : DR_Ability
 {
     public bool killed = false;
     public DR_Entity target;
-    public float range = 8; //TODO: move this to base?
+
+    [AbilityProperty]
+    public float range = 8;
+
+    [AbilityProperty]
+    public Sprite projectileSprite;
+
     public BloodBoltAbility(){
         baseBloodCost = 1;
         cooldownLength = 2;

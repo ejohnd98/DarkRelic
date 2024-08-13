@@ -52,6 +52,11 @@ public class AbilityComponent : DR_Component
         ability.sprite = content.abilitySprite;
         ability.abilityName = content.contentName;
         ability.abilityDescription = content.abilityDescription;
+
+        //Copy over properties
+        content.RecreateDictionary(abilityType);
+        content.CopyPropertiesToAbility(ability);
+
         abilities.Add(ability);
         ability.OnAdded();
         dirtyFlag = true;

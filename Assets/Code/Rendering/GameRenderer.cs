@@ -256,7 +256,7 @@ public class GameRenderer : MonoBehaviour
 
             //TODO: more properly determine what animation to use for an ability (specify on ability itself?)
             if (abilityAction.ability is BloodBoltAbility bloodBoltAbility){
-                return new ProjectileAnimation(renderedAction, entityTransform, EntityObjects[bloodBoltAbility.target].transform);
+                return new ProjectileAnimation(renderedAction, entityTransform, EntityObjects[bloodBoltAbility.target].transform, 0.2f, bloodBoltAbility.projectileSprite);
             }
 
             return new AbilityAnimation(renderedAction, entityTransform);
