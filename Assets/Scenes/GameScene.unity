@@ -3939,6 +3939,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5da90d6ea2feca346b52263e4ee5651f, type: 2}
   - {fileID: 11400000, guid: 04e475988e63fc84e889cba4e4f0776e, type: 2}
   - {fileID: 11400000, guid: 601c95c9b77b71f44b8020e88aca5b7b, type: 2}
+  - {fileID: 11400000, guid: 3324922e86fde4748ae343830bbe930a, type: 2}
   relicPickupContentArray:
   - {fileID: 11400000, guid: c71c5d1efbe3ad54ebbd81b6c23dc2cc, type: 2}
   - {fileID: 11400000, guid: 4b6970b498eeb8549ac37aa84e1805e1, type: 2}
@@ -3948,6 +3949,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e6202f6bd355102419dc9aec1c275c66, type: 2}
   - {fileID: 11400000, guid: adddb8fb11ad25b4f9849f82c804bb16, type: 2}
   - {fileID: 11400000, guid: 6431098bfc789704698a9e52856a17a2, type: 2}
+  - {fileID: 11400000, guid: 3ad4f45cafd444a428b0b8ce0cb2d94f, type: 2}
   healthAltarContent: {fileID: 11400000, guid: 64c5dbd6b1226a147ba747fb89846ad1, type: 2}
   itemAltarContent: {fileID: 11400000, guid: 25fe5b1a7fc3cb947939c6bcd6e8a210, type: 2}
   debug_disableFOV: 0

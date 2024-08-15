@@ -118,10 +118,18 @@ public class MoveAction : DR_Action {
             return;
         }
         
+        MoveEvent moveEvent = new MoveEvent {
+            owner = owner,
+            startPos = owner.Position,
+            endPos = pos
+        };
+            
         gm.CurrentMap.MoveActor(owner, pos);
 
         DR_Cell cell = gm.CurrentMap.GetCell(pos);
         cell.CollectBlood(owner);
+
+        owner.OnMove?.Invoke(moveEvent);
     }
 }
 
@@ -258,7 +266,7 @@ public class GoalAction : DR_Action {
         loggable = true;
     }
 
-   protected override void Perform(DR_GameManager gm){
+    protected override void Perform(DR_GameManager gm){
         SoundSystem.instance.PlaySound("altar");
         gm.OnGameWon();
         

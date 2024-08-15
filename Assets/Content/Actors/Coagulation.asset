@@ -10,34 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
-  m_Name: Player
+  m_Name: Coagulation
   m_EditorClassIdentifier: 
-  contentName: Player
-  guid: 0cb0ddc2-929e-43f4-9dbb-6977cf2d80dc
+  contentName: Coagulation
+  guid: 4944ecd5-726c-4e69-9abb-5f4ad1734b0f
   components:
   - rid: 5068184619078123520
   - rid: 5068184619078123521
   - rid: 5068184619078123522
   - rid: 5068184619078123524
-  - rid: 3012876634216988672
   - rid: 5068184619078123525
-  - rid: 5068184619078123526
-  - rid: 8217939458054946816
+  - rid: 5068184619078123527
+  - rid: 6514744179815874560
   references:
     version: 2
     RefIds:
-    - rid: 3012876634216988672
-      type: {class: InventoryComponent, ns: , asm: Assembly-CSharp}
-      data:
-        key: InventoryComponent
-        canCollectBlood: 1
-        blood: 0
-        equippedItems: 0
     - rid: 5068184619078123520
       type: {class: AlignmentComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AlignmentComponent
-        alignment: 0
+        alignment: 1
     - rid: 5068184619078123521
       type: {class: HealthComponent, ns: , asm: Assembly-CSharp}
       data:
@@ -48,12 +40,12 @@ MonoBehaviour:
       type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
       data:
         key: SpriteComponent
-        Sprite: {fileID: -2065779700, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        Sprite: {fileID: 287217585, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
         hasAnimation: 1
         animFrames:
-        - {fileID: -2065779700, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        - {fileID: -35984604, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        animLength: 1
+        - {fileID: 287217585, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        - {fileID: 1450885949, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        animLength: 1.5
     - rid: 5068184619078123524
       type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
       data:
@@ -64,18 +56,20 @@ MonoBehaviour:
       data:
         key: LevelComponent
         level: 1
-        expScale: 1
+        expScale: 0.5
         currentExp: 0
         healthScale: 2
-        strengthScale: 1.5
-        turnLengthScale: 2
-    - rid: 5068184619078123526
-      type: {class: PlayerComponent, ns: , asm: Assembly-CSharp}
+        strengthScale: 0.5
+        turnLengthScale: 4
+    - rid: 5068184619078123527
+      type: {class: AIComponent, ns: , asm: Assembly-CSharp}
       data:
-        key: PlayerComponent
-    - rid: 8217939458054946816
+        key: AIComponent
+        ignoreAbilityBloodCost: 1
+    - rid: 6514744179815874560
       type: {class: AbilityComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AbilityComponent
-        startingAbilities: []
+        startingAbilities:
+        - {fileID: 11400000, guid: d5131a5f79f60b742a9389166c742ed8, type: 2}
         dirtyFlag: 1

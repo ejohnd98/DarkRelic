@@ -31,7 +31,7 @@ public class AltarComponent : DR_Component
             }
             case AltarType.ITEM:{
                 // TODO: scale with depth and item multiplier (some relics should cost more)
-                float scaledCost = 20 * Mathf.Pow(1.5f, DR_GameManager.instance.CurrentDungeon.mapIndex);
+                float scaledCost = 10 * Mathf.Pow(1.6f, DR_GameManager.instance.CurrentDungeon.mapIndex);
                 return ((int)(scaledCost / 5)) * 5; //multiple of 5
             }
             default:{

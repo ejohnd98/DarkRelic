@@ -24,6 +24,11 @@ public class AttackEvent : DR_Event
     public int damageDealt = 0;
 }
 
+public class MoveEvent : DR_Event
+{
+    public Vector2Int startPos, endPos;
+}
+
 public class BloodChangeEvent : DR_Event
 {
     public DR_Entity target;

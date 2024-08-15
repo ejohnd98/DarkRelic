@@ -27,7 +27,7 @@ public class AISystem
             //Can use ability
             if (entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){
                 foreach (DR_Ability ability in abilityComponent.abilities){
-                    if (ability.CanBePerformed()){
+                    if (ability.CanBePerformed() && ability.triggeredByPlayer){
                         var abilityAction = new AbilityAction(ability, entity);
                         ActionInput actionInput = abilityAction.GetNextNeededInput();
                         if (actionInput.GiveInput(target.Position) && !abilityAction.RequiresInput()){

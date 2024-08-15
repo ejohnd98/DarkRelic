@@ -419,3 +419,46 @@ public class TurnSpeedBoostAbility : DR_Ability
         return string.Format("Reduces turn length by {0:0%}.", (1.0f - (Mathf.Pow(0.9f, count))));
     }
 }
+
+public class BarbedAnkletAbility : DR_Ability
+{
+    public BarbedAnkletAbility(){
+        triggeredByPlayer = false;
+    }
+
+    public override void OnAdded()
+    {
+        owner.OnMove += OnTrigger;
+    }
+
+    protected override void OnTrigger(DR_Event e){
+
+        var moveEvent = e as MoveEvent;
+        var gm = DR_GameManager.instance;
+
+        var inventory = owner.GetComponent<InventoryComponent>();
+        var healthComp = owner.GetComponent<HealthComponent>();
+
+        int bloodAmount = count;
+
+        // Take from blood if possible, otherwise inflict damage
+        if (inventory != null && inventory.blood > 0){
+            if (inventory.blood < bloodAmount){
+                bloodAmount -= inventory.blood;
+                inventory.SpendBlood(inventory.blood);
+                healthComp.TakeDamage(bloodAmount);
+            }else{
+                inventory.SpendBlood(bloodAmount);
+            }
+        }else{
+            healthComp.TakeDamage(bloodAmount);
+        }
+
+        gm.CurrentMap.GetCell(moveEvent.startPos).bloodStained = true;
+        gm.CurrentMap.GetCell(moveEvent.endPos).bloodStained = true;
+    }
+
+    public override string GetFormattedDescription(){
+        return string.Format($"Drains {count} blood for every tile walked, leaving them bloodstained.");
+    }
+}
