@@ -49,7 +49,6 @@ MonoBehaviour:
       type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
       data:
         key: TurnComponent
-        ActionDebt: 6
         waitingForAction: 0
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
@@ -58,10 +57,11 @@ MonoBehaviour:
         level: 1
         expScale: 0.5
         currentExp: 0
-        healthScale: 0.5
+        healthScale: 0.4
         strengthScale: 0.5
         turnLengthScale: 3
     - rid: 5068184619078123527
       type: {class: AIComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AIComponent
+        ignoreAbilityBloodCost: 1

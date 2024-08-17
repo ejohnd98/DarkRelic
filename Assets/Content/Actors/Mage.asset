@@ -58,7 +58,7 @@ MonoBehaviour:
         level: 1
         expScale: 0.5
         currentExp: 0
-        healthScale: 0.5
+        healthScale: 0.4
         strengthScale: 0.5
         turnLengthScale: 3
     - rid: 5068184619078123527
