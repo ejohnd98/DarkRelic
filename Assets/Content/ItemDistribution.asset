@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84553524c34b1e34a83fd985273a6209, type: 3}
   m_Name: ItemDistribution
   m_EditorClassIdentifier: 
-  commonItems: []
-  uncommonItems: []
-  rareItems: []
+  commonItems:
+  - Value: {fileID: 11400000, guid: d5131a5f79f60b742a9389166c742ed8, type: 2}
+  accursedItems: []
   unholyItems: []

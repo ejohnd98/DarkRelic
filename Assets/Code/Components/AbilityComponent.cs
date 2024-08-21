@@ -34,6 +34,18 @@ public class AbilityComponent : DR_Component
         dirtyFlag = true;
     }
 
+    public T GetAbility<T>() where T : DR_Ability
+    {
+        foreach (DR_Ability ability in abilities)
+        {
+            if (ability.GetType().Equals(typeof(T)))
+            {
+                return (T)ability;
+            }
+        }
+        return null;
+    }
+
     public void AddAbilityFromContent(AbilityContent content){
         
         //Check if ability already exists on component:

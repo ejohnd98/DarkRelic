@@ -3950,6 +3950,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: adddb8fb11ad25b4f9849f82c804bb16, type: 2}
   - {fileID: 11400000, guid: 6431098bfc789704698a9e52856a17a2, type: 2}
   - {fileID: 11400000, guid: 3ad4f45cafd444a428b0b8ce0cb2d94f, type: 2}
+  - {fileID: 11400000, guid: 83f8ee375e1b7454a9ab8fbb4dd65077, type: 2}
   healthAltarContent: {fileID: 11400000, guid: 64c5dbd6b1226a147ba747fb89846ad1, type: 2}
   itemAltarContent: {fileID: 11400000, guid: 25fe5b1a7fc3cb947939c6bcd6e8a210, type: 2}
   debug_disableFOV: 0

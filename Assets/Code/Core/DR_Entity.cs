@@ -9,6 +9,7 @@ public class DR_Entity
     public Action<DR_Event> OnAttackOther;
     public Action<DR_Event> OnAttacked;
     public Action<DR_Event> OnMove;
+    public Action<DR_Event> OnPickUpBlood;
 
     public string Name = "Untitled Entity";
     public Vector2Int Position;

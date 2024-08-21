@@ -303,7 +303,7 @@ public class CrystalChaliceAbility : DR_Ability
         var bloodEvent = e as BloodChangeEvent;
 
         HealthComponent healthComp = owner.GetComponent<HealthComponent>();
-        int healAmount = Mathf.Max(1, Mathf.FloorToInt(bloodEvent.bloodDelta * GetHealPercent()));
+        int healAmount = Mathf.FloorToInt(bloodEvent.bloodDelta * GetHealPercent());
         healthComp.Heal(healAmount);
     }
 
@@ -313,7 +313,7 @@ public class CrystalChaliceAbility : DR_Ability
 
     public override string GetFormattedDescription(){
         float percent = GetHealPercent();
-        return string.Format("Recover {0:0%} of picked up blood as health.", percent);
+        return string.Format("Recover {0:0%} of picked up blood as health (rounded down).", percent);
     }
 }
 
@@ -454,11 +454,36 @@ public class BarbedAnkletAbility : DR_Ability
             healthComp.TakeDamage(bloodAmount);
         }
 
-        gm.CurrentMap.GetCell(moveEvent.startPos).bloodStained = true;
-        gm.CurrentMap.GetCell(moveEvent.endPos).bloodStained = true;
+        gm.CurrentMap.GetCell(moveEvent.startPos).AddBlood(count);
     }
 
     public override string GetFormattedDescription(){
         return string.Format($"Drains {count} blood for every tile walked, leaving them bloodstained.");
+    }
+}
+
+public class BloodPickupRangeAbility : DR_Ability
+{
+    public BloodPickupRangeAbility(){
+        triggeredByPlayer = false;
+    }
+
+    public void CollectBlood(DR_GameManager gm, Vector2Int pos){
+        DR_Map map = gm.CurrentMap;
+
+        for (int dx = -count; dx <= count; dx++){
+            for (int dy = -count; dy <= count; dy++){
+                Vector2Int offset = new(dx, dy);
+                if (!map.ValidPosition(pos + offset) || offset.magnitude > count){
+                    continue;
+                }
+
+                map.GetCell(pos + offset).CollectBlood(owner);
+            }
+        }
+    }
+
+    public override string GetFormattedDescription(){
+        return string.Format($"Expands blood pick up range by {count} {(count > 1 ? "tiles" : "tile")}.");
     }
 }

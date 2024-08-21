@@ -127,7 +127,16 @@ public class MoveAction : DR_Action {
         gm.CurrentMap.MoveActor(owner, pos);
 
         DR_Cell cell = gm.CurrentMap.GetCell(pos);
-        cell.CollectBlood(owner);
+
+        if (owner.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent
+            && abilityComponent.GetAbility<BloodPickupRangeAbility>() is BloodPickupRangeAbility ability){
+            ability.CollectBlood(gm, pos);
+        }else{
+            cell.CollectBlood(owner);
+        }
+        
+
+        owner.OnPickUpBlood?.Invoke(moveEvent);
 
         owner.OnMove?.Invoke(moveEvent);
     }
