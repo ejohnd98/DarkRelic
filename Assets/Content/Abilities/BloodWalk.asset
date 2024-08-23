@@ -14,6 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentName: Blood Walk
   guid: ae42e2fa-f65f-4a62-983d-de616fce64b0
-  abilityDescription: Move to a visible bloodstained tile
+  abilityType: 1
   abilitySprite: {fileID: -1878333176, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   typeName: BloodWalkAbility
+  intProperties: []
+  floatProperties: []
+  boolProperties: []
+  spriteProperties: []
+  colorProperties: []
+  stringProperties: []

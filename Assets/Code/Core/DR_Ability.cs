@@ -9,9 +9,16 @@ public class AbilityPropertyAttribute : PropertyAttribute { }
 
 public abstract class DR_Ability
 {
+    public enum AbilityType{
+        Common,
+        Rare,
+        Unholy,
+        Cursed
+    }
+
+    public AbilityType abilityType;
     public bool triggeredByPlayer = true;
     public string abilityName = "";
-    public string abilityDescription = ""; //Temp
     public Sprite sprite;
     public List<ActionInput> actionInputs;
     public List<DR_Entity> relatedEntities = new();
@@ -108,7 +115,7 @@ public abstract class DR_Ability
 
     public virtual string GetFormattedDescription(){
         //TODO: get a list of things to insert?
-        return abilityDescription;
+        return "Description not filled out!";
     }
 
     //TODO: need to think about how this can be driven by scriptable objects as that's where the sprite, name, and description would be

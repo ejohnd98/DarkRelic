@@ -307,7 +307,7 @@ public class AltarAction : DR_Action {
                 return owner.Name + " spent " + bloodCost + " blood at the altar to heal " + healthRestored + ".";
             
             case AltarType.ITEM:
-                return owner.Name + " spent " + bloodCost + " blood at the altar to acquire a " + altar.itemAltarContent.name + ".";
+                return owner.Name + " spent " + bloodCost + " blood at the altar to acquire a " + altar.altarAbilityContent.name + ".";
             default:
                 return "unknown altar type!";
         }
@@ -319,6 +319,10 @@ public class AltarAction : DR_Action {
             {
                 HealthComponent healthComponent = owner.GetComponent<HealthComponent>();
                 InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
+                if (!altar.interactable){
+                    wasSuccess = false;
+                    break;
+                }
 
                 bloodCost = altar.GetBloodCost(owner);
 
@@ -332,13 +336,30 @@ public class AltarAction : DR_Action {
             {
                 InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
                 bloodCost = altar.GetBloodCost(owner);
-                if (inventoryComponent.blood < bloodCost){
+                if (inventoryComponent.blood < bloodCost || !altar.interactable){
                     wasSuccess = false;
                     break;
                 }
                 inventoryComponent.SpendBlood(bloodCost);
-                inventoryComponent.AddItemFromContent(altar.itemAltarContent);
+                AbilityComponent abilityComponent = owner.GetComponent<AbilityComponent>();
+                abilityComponent.AddAbilityFromContent(altar.altarAbilityContent);
+                break;
+            }
+            case AltarType.CHEST:
+            {
+                InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
+                bloodCost = altar.GetBloodCost(owner);
+                if (inventoryComponent.blood < bloodCost || !altar.interactable){
+                    wasSuccess = false;
+                    break;
+                }
+                inventoryComponent.SpendBlood(bloodCost);
+                AbilityComponent abilityComponent = owner.GetComponent<AbilityComponent>();
+                abilityComponent.AddAbilityFromContent(altar.altarAbilityContent);
 
+                altar.interactable = false;
+                var spriteComp = altar.Entity.GetComponent<SpriteComponent>();
+                spriteComp.Sprite = spriteComp.animFrames[1]; //super temp way to switch chest sprites
                 break;
             }
             default:

@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
+  m_Name: RareChest
+  m_EditorClassIdentifier: 
+  contentName: Rare Chest
+  guid: 0fee77c8-74ee-435f-a73c-9bd334d81092
+  components:
+  - rid: 3012876423545487360
+  - rid: 3012876423545487361
+  - rid: 3012876423545487362
+  references:
+    version: 2
+    RefIds:
+    - rid: 3012876423545487360
+      type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: SpriteComponent
+        Sprite: {fileID: 416724537, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        hasAnimation: 0
+        animFrames:
+        - {fileID: 416724537, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        - {fileID: 1972450008, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        animLength: 2
+    - rid: 3012876423545487361
+      type: {class: PropComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: PropComponent
+        blocksSight: 0
+        blocksMovement: 1
+    - rid: 3012876423545487362
+      type: {class: AltarComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: AltarComponent
+        altarType: 2
+        chestType: 1
+        altarAbilityContent: {fileID: 0}
+        interactable: 1

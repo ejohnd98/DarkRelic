@@ -63,7 +63,7 @@ public class AbilityComponent : DR_Component
         ability.owner = Entity;
         ability.sprite = content.abilitySprite;
         ability.abilityName = content.contentName;
-        ability.abilityDescription = content.abilityDescription;
+        ability.abilityType = content.abilityType;
 
         //Copy over properties
         content.RecreateDictionary(abilityType);

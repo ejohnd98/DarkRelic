@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentName: Blood Bolt
   guid: 8063037c-2d8b-420e-98bc-4bd8bac937c8
-  abilityDescription: Cast a targeted projectile!
+  abilityType: 1
   abilitySprite: {fileID: -1480307124, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   typeName: BloodBoltAbility
   intProperties: []

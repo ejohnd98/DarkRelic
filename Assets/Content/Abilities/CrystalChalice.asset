@@ -14,6 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentName: Crystal Chalice
   guid: 10e1e880-6f9c-4e81-b957-87e486352347
-  abilityDescription: Heal by a percent of blood picked up
+  abilityType: 0
   abilitySprite: {fileID: -776109517, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   typeName: CrystalChaliceAbility
+  intProperties: []
+  floatProperties: []
+  boolProperties: []
+  spriteProperties: []
+  colorProperties: []
+  stringProperties: []

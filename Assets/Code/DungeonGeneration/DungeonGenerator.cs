@@ -199,6 +199,7 @@ public class DungeonGenerator : MonoBehaviour {
                     break;
                 case RoomTag.RELIC:
                     mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.right).type = MapGenCellType.ITEM_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition()).type = MapGenCellType.ITEM_ALTAR;
                     mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.left).type = MapGenCellType.ITEM_ALTAR;
                     break;
                 case RoomTag.HEALTH:
@@ -279,6 +280,7 @@ public class DungeonGenerator : MonoBehaviour {
             mapBlueprint.GetCell(doorPosB).type = MapGenCellType.DOOR;
         }
 
+        int tempChestIndex = 0;
 
         // Create stairs + door entities
         for (int y = 0; y < mapSize.y; y++) {
@@ -303,17 +305,17 @@ public class DungeonGenerator : MonoBehaviour {
                         newEntity = EntityFactory.CreateEntityFromContent(gm.healthAltarContent);
                         break;
                     case MapGenCellType.ITEM_ALTAR:
-                        newEntity = EntityFactory.CreateEntityFromContent(gm.itemAltarContent);
-                        //Temporarily do this here:
-                        int altarItemIndex = UnityEngine.Random.Range(0, gm.relicPickupContentArray.Count);
-                        newEntity.GetComponent<AltarComponent>().itemAltarContent = gm.relicPickupContentArray[altarItemIndex];
+                        //TODO: this is a chest and not an item altar!
+                        newEntity = EntityFactory.CreateEntityFromContent(gm.itemAltars[tempChestIndex]);
+                        tempChestIndex = (tempChestIndex + 1) % gm.itemAltars.Count;
+                        newEntity.GetComponent<AltarComponent>().altarAbilityContent = LootHandler.instance.GetRandomAbility(newEntity.GetComponent<AltarComponent>().chestType);
                         break;
                     // Temporarily do this here
                     case MapGenCellType.ITEM:
-                        Vector2Int itemPos = new Vector2Int(x,y);
-                        int itemIndex = UnityEngine.Random.Range(0, gm.relicPickupContentArray.Count);
-                        var item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
-                        mapBlueprint.entitiesToPlace.Add(itemPos, item);
+                        //Vector2Int itemPos = new Vector2Int(x,y);
+                        //int itemIndex = UnityEngine.Random.Range(0, gm.relicPickupContentArray.Count);
+                        //var item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
+                        //mapBlueprint.entitiesToPlace.Add(itemPos, item);
                         break;
                 }
 

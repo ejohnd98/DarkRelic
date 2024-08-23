@@ -47,7 +47,7 @@ public class CellObj : MonoBehaviour
 
         if (altar.altarType == AltarType.ITEM){
             altarItem.gameObject.SetActive(true);
-            altarItem.sprite = altar.itemAltarContent.GetContentSprite();
+            altarItem.sprite = altar.altarAbilityContent.abilitySprite;
         }
         // if (altar.altarType == AltarType.HEALTH){
         //     DR_GameManager.instance.GetPlayer().GetComponent<HealthComponent>().OnHealthChanged += UpdateBloodAltarCost;

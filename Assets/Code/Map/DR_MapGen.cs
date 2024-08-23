@@ -428,12 +428,12 @@ public class DR_MapGen
                     case MapGenCellType.ITEM:
                         newCell.bBlocksMovement = false;
                         //very temp item generation:
-                        DR_Entity item = null;
+                        // DR_Entity item = null;
                         
-                        int itemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
-                        item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
+                        // int itemIndex = Random.Range(0, gm.relicPickupContentArray.Count);
+                        // item = EntityFactory.CreateEntityFromContent(gm.relicPickupContentArray[itemIndex]);
                         
-                        NewMap.AddItem(item, new Vector2Int(x,y));
+                        // NewMap.AddItem(item, new Vector2Int(x,y));
                         break;
                     case MapGenCellType.STAIRS_UP:{
                         DR_Entity stairs = EntityFactory.CreateStairs(gm.StairsUpTexture, false);

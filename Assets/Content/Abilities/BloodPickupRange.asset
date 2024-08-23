@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentName: Orb of Blood
   guid: 483b99c9-b1da-43e8-9873-b9b79db82340
-  abilityDescription: 
+  abilityType: 1
   abilitySprite: {fileID: -855666326, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   typeName: BloodPickupRangeAbility
   intProperties: []

@@ -21,7 +21,8 @@ public class KeyValuePairGeneric<T>
 [System.Serializable]
 public class AbilityContent : ContentBase
 {
-    public string abilityDescription; //Temp
+    public DR_Ability.AbilityType abilityType;
+
     public Sprite abilitySprite;
 
     [HideInInspector]

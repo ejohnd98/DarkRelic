@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   contentName: Barbed Anklet
   guid: 9d79f374-1cf5-48cb-85db-10a85c889191
-  abilityDescription: 
+  abilityType: 3
   abilitySprite: {fileID: -424370208, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
   typeName: BarbedAnkletAbility
   intProperties: []
