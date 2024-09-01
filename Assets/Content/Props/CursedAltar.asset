@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
-  m_Name: RareChest
+  m_Name: CursedAltar
   m_EditorClassIdentifier: 
-  contentName: Rare Chest
-  guid: 0fee77c8-74ee-435f-a73c-9bd334d81092
+  contentName: Cursed Altar
+  guid: f7b8efd5-59f7-4212-ae29-9e683bf3b18e
   components:
   - rid: 3012876423545487360
   - rid: 3012876423545487361
@@ -25,7 +25,7 @@ MonoBehaviour:
       type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
       data:
         key: SpriteComponent
-        Sprite: {fileID: 416724537, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        Sprite: {fileID: 1117888440, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
         hasAnimation: 0
         animFrames: []
         animLength: 2
@@ -39,9 +39,9 @@ MonoBehaviour:
       type: {class: AltarComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AltarComponent
-        altarType: 3
-        chestType: 1
-        unusedSprite: {fileID: 416724537, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        usedSprite: {fileID: 1972450008, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        altarType: 2
+        chestType: 3
+        unusedSprite: {fileID: 1117888440, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        usedSprite: {fileID: 0}
         altarAbilityContent: {fileID: 0}
         interactable: 1

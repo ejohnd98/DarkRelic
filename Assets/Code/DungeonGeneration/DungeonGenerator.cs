@@ -205,6 +205,11 @@ public class DungeonGenerator : MonoBehaviour {
                 case RoomTag.HEALTH:
                     mapBlueprint.GetCell(room.GetCenterPosition()).type = MapGenCellType.HEALTH_ALTAR;
                     break;
+                case RoomTag.CURSED:
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.right).type = MapGenCellType.CURSED_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition()).type = MapGenCellType.CURSED_ALTAR;
+                    mapBlueprint.GetCell(room.GetCenterPosition() + Vector2Int.left).type = MapGenCellType.CURSED_ALTAR;
+                    break;
                 default:
                 break;
             }
@@ -277,7 +282,9 @@ public class DungeonGenerator : MonoBehaviour {
                 
 
             mapBlueprint.GetCell(doorPosA).type = MapGenCellType.DOOR;
+            roomA.doors.Add(doorPosA);
             mapBlueprint.GetCell(doorPosB).type = MapGenCellType.DOOR;
+            roomB.doors.Add(doorPosB);
         }
 
         int tempChestIndex = 0;
@@ -309,6 +316,12 @@ public class DungeonGenerator : MonoBehaviour {
                         newEntity = EntityFactory.CreateEntityFromContent(gm.itemAltars[tempChestIndex]);
                         tempChestIndex = (tempChestIndex + 1) % gm.itemAltars.Count;
                         newEntity.GetComponent<AltarComponent>().altarAbilityContent = LootHandler.instance.GetRandomAbility(newEntity.GetComponent<AltarComponent>().chestType);
+                        mapBlueprint.cells[y,x].associatedRoom.altars.Add(newEntity.GetComponent<AltarComponent>());
+                        break;
+                    case MapGenCellType.CURSED_ALTAR:
+                        newEntity = EntityFactory.CreateEntityFromContent(gm.cursedAltar);
+                        newEntity.GetComponent<AltarComponent>().altarAbilityContent = LootHandler.instance.GetRandomAbility(DR_Ability.AbilityType.Cursed);
+                        mapBlueprint.cells[y,x].associatedRoom.altars.Add(newEntity.GetComponent<AltarComponent>());
                         break;
                     // Temporarily do this here
                     case MapGenCellType.ITEM:
@@ -447,6 +460,31 @@ public class DungeonGenerator : MonoBehaviour {
 
             if (!success) {
                 Debug.LogError("CreateMapFromBlueprint: unable to place " + posEntityPair.Value.Name + " at " + posEntityPair.Key);
+            }
+        }
+
+        foreach (var room in mapBlueprint.rooms){
+            newMap.Rooms.Add(room);
+            if (room.roomTag == RoomTag.CURSED){
+                room.OnRoomEntered += (DR_Event e) => {
+                    RoomChangeEvent roomEvent = e as RoomChangeEvent;
+                    if (roomEvent.room.hasPlayerEntered){
+                        return;
+                    }
+
+                    //TODO: room change event shouldn't be called if on a door cell
+                    room.SetDoorState(false);
+                    room.SetDoorCanBeManuallyOpened(false);
+                    
+                    //TODO: open doors when altar is interacted with (need a free altar)
+                    //TOOD; also need a door that the player cannot open
+                };
+
+                foreach (var altar in room.altars){
+                    altar.OnAltarUsed += (DR_Event e) => {
+                        room.SetDoorState(true);
+                    };
+                }
             }
         }
 

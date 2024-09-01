@@ -3945,6 +3945,8 @@ MonoBehaviour:
   itemAltars:
   - {fileID: 11400000, guid: c3100bee60aa9014cbc03d5d40d12e11, type: 2}
   - {fileID: 11400000, guid: 0fe857abd9bbc9a4ea5a00485205f27d, type: 2}
+  - {fileID: 11400000, guid: 25fe5b1a7fc3cb947939c6bcd6e8a210, type: 2}
+  cursedAltar: {fileID: 11400000, guid: 96db4ce733e7d1b408ffcf82b07773f6, type: 2}
   debug_disableFOV: 0
   turnSystem: {fileID: 0}
   blackOverlay: {fileID: 1460941801}

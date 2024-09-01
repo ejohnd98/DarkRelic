@@ -300,8 +300,8 @@ public class GraphGenerator : MonoBehaviour {
         Node normal6 = CreateNode("normal6");
         Node normal7 = CreateNode("normal7");
 
-        Node hub1 = CreateNode("hub1");
-        hub1.Data.roomTag = RoomTag.HEALTH;
+        Node hub1 = CreateNode("hub1Cursed");
+        hub1.Data.roomTag = RoomTag.CURSED;
         Node hub2 = CreateNode("hub2");
         hub2.Data.roomTag = RoomTag.HEALTH;
 

@@ -12,6 +12,7 @@ public class DR_Map
     public bool[,] IsKnown;
 
     public List<DR_Entity> Entities;
+    public List<MapGenRoom> Rooms = new();
 
 
     public DR_Map()
@@ -138,7 +139,30 @@ public class DR_Map
 
         FromCell.Actor = null;
         ToCell.Actor = Actor;
-        Actor.Position = pos;  
+        Actor.Position = pos;
+
+        if (Actor.HasComponent<PlayerComponent>()){
+            if (FromCell.associatedRoom != ToCell.associatedRoom){
+                if (FromCell.associatedRoom != null){
+                    RoomChangeEvent roomLeftEvent = new(){
+                        room = FromCell.associatedRoom,
+                        owner = Actor
+                    };
+                    FromCell.associatedRoom.OnRoomLeft?.Invoke(roomLeftEvent);
+                }
+                if (ToCell.associatedRoom != null){
+                    RoomChangeEvent roomEnteredEvent = new(){
+                        room = ToCell.associatedRoom,
+                        owner = Actor
+                    };
+                    ToCell.associatedRoom.OnRoomEntered?.Invoke(roomEnteredEvent);
+                    if (!ToCell.associatedRoom.hasPlayerEntered ){
+                        ToCell.associatedRoom.hasPlayerEntered = true;
+                    }
+                }
+
+            }
+        }
 
         return true;
     }

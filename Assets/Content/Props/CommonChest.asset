@@ -27,9 +27,7 @@ MonoBehaviour:
         key: SpriteComponent
         Sprite: {fileID: -484025511, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
         hasAnimation: 0
-        animFrames:
-        - {fileID: -484025511, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
-        - {fileID: 1659180800, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        animFrames: []
         animLength: 2
     - rid: 3012876423545487361
       type: {class: PropComponent, ns: , asm: Assembly-CSharp}
@@ -41,7 +39,9 @@ MonoBehaviour:
       type: {class: AltarComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AltarComponent
-        altarType: 2
+        altarType: 3
         chestType: 0
+        unusedSprite: {fileID: -484025511, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        usedSprite: {fileID: 1659180800, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
         altarAbilityContent: {fileID: 0}
         interactable: 1

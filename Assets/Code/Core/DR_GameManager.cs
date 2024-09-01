@@ -33,6 +33,7 @@ public class DR_GameManager : MonoBehaviour
     public List<Content> enemyContentArray;
     public Content healthAltarContent;
     public List<Content> itemAltars;
+    public Content cursedAltar;
 
     public bool debug_disableFOV = false;
 

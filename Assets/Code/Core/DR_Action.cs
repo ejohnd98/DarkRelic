@@ -259,8 +259,12 @@ public class DoorAction : DR_Action {
         return new List<DR_Entity>(){owner, target.Entity};
     }
 
-   protected override void Perform(DR_GameManager gm){
-        target.ToggleOpen();
+    protected override void Perform(DR_GameManager gm){
+        if (!target.canBeManuallyOpened){
+            wasSuccess = false;
+            return;
+        }
+        target.ToggleOpen(owner);
         SoundSystem.instance.PlaySound("door");
         
     }
@@ -294,7 +298,7 @@ public class AltarAction : DR_Action {
     public AltarAction (DR_Entity owner, AltarComponent altar){
         this.owner = owner;
         this.altar = altar;
-        loggable = true;
+        //loggable = true; //TODO: figure out better way to get info from altar for log
     }
 
     public override List<DR_Entity> GetRelatedEntities(){
@@ -303,73 +307,25 @@ public class AltarAction : DR_Action {
 
     public override string GetLogText(){
         switch (altar.altarType){
-            case AltarType.HEALTH:
+            case AltarType.HEALTH_ALTAR:
                 return owner.Name + " spent " + bloodCost + " blood at the altar to heal " + healthRestored + ".";
             
-            case AltarType.ITEM:
-                return owner.Name + " spent " + bloodCost + " blood at the altar to acquire a " + altar.altarAbilityContent.name + ".";
+            case AltarType.ITEM_ALTAR:
+                return owner.Name + " spent " + bloodCost + " blood at the altar to acquire " + altar.altarAbilityContent.name + ".";
+
+            case AltarType.CURSED_ALTAR:
+                return owner.Name + " acquired " + altar.altarAbilityContent.name + " from a cursed altar.";
+            
+            case AltarType.CHEST:
+                return owner.Name + " acquired " + altar.altarAbilityContent.name + " from a chest";
+
             default:
                 return "unknown altar type!";
         }
     }
 
     protected override void Perform(DR_GameManager gm){
-        switch (altar.altarType){
-            case AltarType.HEALTH:
-            {
-                HealthComponent healthComponent = owner.GetComponent<HealthComponent>();
-                InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
-                if (!altar.interactable){
-                    wasSuccess = false;
-                    break;
-                }
-
-                bloodCost = altar.GetBloodCost(owner);
-
-                healthRestored = healthComponent.Heal(bloodCost);
-                inventoryComponent.SpendBlood(healthRestored);
-                wasSuccess = healthRestored > 0;
-                break;
-            }
-            
-            case AltarType.ITEM:
-            {
-                InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
-                bloodCost = altar.GetBloodCost(owner);
-                if (inventoryComponent.blood < bloodCost || !altar.interactable){
-                    wasSuccess = false;
-                    break;
-                }
-                inventoryComponent.SpendBlood(bloodCost);
-                AbilityComponent abilityComponent = owner.GetComponent<AbilityComponent>();
-                abilityComponent.AddAbilityFromContent(altar.altarAbilityContent);
-                break;
-            }
-            case AltarType.CHEST:
-            {
-                InventoryComponent inventoryComponent = owner.GetComponent<InventoryComponent>();
-                bloodCost = altar.GetBloodCost(owner);
-                if (inventoryComponent.blood < bloodCost || !altar.interactable){
-                    wasSuccess = false;
-                    break;
-                }
-                inventoryComponent.SpendBlood(bloodCost);
-                AbilityComponent abilityComponent = owner.GetComponent<AbilityComponent>();
-                abilityComponent.AddAbilityFromContent(altar.altarAbilityContent);
-
-                altar.interactable = false;
-                var spriteComp = altar.Entity.GetComponent<SpriteComponent>();
-                spriteComp.Sprite = spriteComp.animFrames[1]; //super temp way to switch chest sprites
-                break;
-            }
-            default:
-            break;
-        }
-        
-        if (wasSuccess) {
-            SoundSystem.instance.PlaySound("altar");
-        }
-        
+        wasSuccess = altar.Interact(owner);
     }
 }
 

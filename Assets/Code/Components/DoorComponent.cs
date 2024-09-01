@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,6 +11,11 @@ public class DoorComponent : DR_Component
     [Copy]
     bool isOpen = false;
 
+    [Copy]
+    public bool canBeManuallyOpened = true;
+
+    public Action<DR_Event> OnDoorStateChanged;
+
     public DoorComponent(){}
 
     public DoorComponent(Sprite openSpr, Sprite closeSpr, bool open = false){
@@ -18,11 +24,11 @@ public class DoorComponent : DR_Component
         isOpen = open;
     }
 
-    public void ToggleOpen(){
-        SetOpen(!isOpen);
+    public void ToggleOpen(DR_Entity instigator){
+        SetOpen(!isOpen, instigator);
     }
 
-    public void SetOpen(bool open){
+    public void SetOpen(bool open, DR_Entity instigator = null){
         isOpen = open;
         PropComponent propComp = Entity.GetComponent<PropComponent>();
         if(propComp != null){
@@ -33,6 +39,14 @@ public class DoorComponent : DR_Component
         SpriteComponent spriteComp = Entity.GetComponent<SpriteComponent>();
         if(spriteComp != null){
             spriteComp.Sprite = open ? openSprite : closeSprite;
+        }
+        if (instigator != null){
+            DoorEvent doorEvent = new()
+            {
+                owner = instigator,
+                door = this
+            };
+            OnDoorStateChanged?.Invoke(doorEvent);
         }
     }
 

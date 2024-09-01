@@ -44,6 +44,16 @@ public class HealthChangeEvent : DR_Event
     public int delta = 0;
 }
 
+public class RoomChangeEvent : DR_Event
+{
+    public MapGenRoom room;
+}
+
+public class DoorEvent : DR_Event
+{
+    public DoorComponent door;
+}
+
 public class ActionEvent : DR_Event
 {
     public DR_Action action;

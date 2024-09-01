@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
@@ -67,6 +68,7 @@ public enum MapGenCellType{
     STAIRS_DOWN,
     HEALTH_ALTAR,
     ITEM_ALTAR,
+    CURSED_ALTAR,
     GOAL
 }
 
@@ -99,6 +101,7 @@ public enum RoomTag{
     END,
     RELIC,
     HEALTH,
+    CURSED,
 
     NONE
 }
@@ -110,10 +113,36 @@ public class MapGenRoom{
     public string roomLabel = "";
     public RoomTag roomTag = RoomTag.NONE;
 
+    public Action<DR_Event> OnRoomEntered;
+    public Action<DR_Event> OnRoomLeft;
+
+    public List<Vector2Int> doors = new(); //temp, should be actual entities
+    public List<AltarComponent> altars = new();
+
+    public bool hasPlayerEntered = false; //temp
+
     public MapGenRoom(Vector2Int pos, Vector2Int size, MapBlueprint mapBlueprint){
         this.pos = pos;
         this.size = size;
         this.mapBlueprint = mapBlueprint;
+    }
+    
+    public void SetDoorState(bool isOpen){
+        foreach(var doorPos in doors){
+            var doorEntity = DR_GameManager.instance.CurrentMap.GetCell(doorPos).Prop;
+            if (doorEntity != null){
+                doorEntity.GetComponent<DoorComponent>().SetOpen(isOpen);
+            }
+        }
+    }
+
+    public void SetDoorCanBeManuallyOpened(bool canBeManuallyOpened){
+        foreach(var doorPos in doors){
+            var doorEntity = DR_GameManager.instance.CurrentMap.GetCell(doorPos).Prop;
+            if (doorEntity != null){
+                doorEntity.GetComponent<DoorComponent>().canBeManuallyOpened = canBeManuallyOpened;
+            }
+        }
     }
 
     private static readonly Vector2Int[] possibleEnemyPositions = new Vector2Int[] {

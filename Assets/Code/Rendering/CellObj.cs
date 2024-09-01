@@ -33,6 +33,7 @@ public class CellObj : MonoBehaviour
             bloodStainOverlay.gameObject.SetActive(false);
             return;
         }
+        
         //TODO: later could use different sprites depending on amount
         bloodOverlay.gameObject.SetActive(cell.blood > 0);
         bloodStainOverlay.gameObject.SetActive(cell.bloodStained);
@@ -40,31 +41,22 @@ public class CellObj : MonoBehaviour
 
     public void SetAltarItem(AltarComponent altar){
         this.altar = altar;
-
-        // altarPriceCanvas.gameObject.SetActive(true);
-        // altarPrice.gameObject.SetActive(true);
-        // altarPrice.text = altar.GetBloodCost().ToString();
-
-        if (altar.altarType == AltarType.ITEM){
+        if (altar.interactable && (altar.altarType == AltarType.ITEM_ALTAR || altar.altarType == AltarType.CURSED_ALTAR)){
             altarItem.gameObject.SetActive(true);
             altarItem.sprite = altar.altarAbilityContent.abilitySprite;
+            altar.OnAltarUsed += UpdateAltarItemVisibility;
         }
-        // if (altar.altarType == AltarType.HEALTH){
-        //     DR_GameManager.instance.GetPlayer().GetComponent<HealthComponent>().OnHealthChanged += UpdateBloodAltarCost;
-        // }
     }
 
-    public void UpdateBloodAltarCost(DR_Event healthEvent){
-        altarPriceCanvas.gameObject.SetActive(true);
-        altarPrice.gameObject.SetActive(true);
-        altarPrice.text = altar.GetBloodCost().ToString();
+    public void UpdateAltarItemVisibility(DR_Event e){
+        altarItem.gameObject.SetActive(altar.interactable);
     }
 
     void OnDestroy()
     {
-        // if (altar != null && altar.altarType == AltarType.HEALTH){
-        //     DR_GameManager.instance.GetPlayer().GetComponent<HealthComponent>().OnHealthChanged -= UpdateBloodAltarCost;
-        // }
+        if (altar != null){
+            altar.OnAltarUsed -= UpdateAltarItemVisibility;
+        }
     }
 
     public void SetSelected(bool selected){
