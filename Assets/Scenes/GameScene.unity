@@ -3947,6 +3947,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0fe857abd9bbc9a4ea5a00485205f27d, type: 2}
   - {fileID: 11400000, guid: 25fe5b1a7fc3cb947939c6bcd6e8a210, type: 2}
   cursedAltar: {fileID: 11400000, guid: 96db4ce733e7d1b408ffcf82b07773f6, type: 2}
+  doorContent: {fileID: 11400000, guid: 7574ddab84263594e98d4ee12fcdf3bc, type: 2}
+  lockedDoorContent: {fileID: 11400000, guid: 0664ac5d982e1ac44bb57628cd8cc01d, type: 2}
   debug_disableFOV: 0
   turnSystem: {fileID: 0}
   blackOverlay: {fileID: 1460941801}

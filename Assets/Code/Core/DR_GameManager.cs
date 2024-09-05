@@ -34,6 +34,7 @@ public class DR_GameManager : MonoBehaviour
     public Content healthAltarContent;
     public List<Content> itemAltars;
     public Content cursedAltar;
+    public Content doorContent, lockedDoorContent;
 
     public bool debug_disableFOV = false;
 

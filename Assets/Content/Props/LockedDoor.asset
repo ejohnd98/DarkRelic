@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c119802f3d47f8e44a97ee0d189b09d6, type: 3}
+  m_Name: LockedDoor
+  m_EditorClassIdentifier: 
+  contentName: Metal Door
+  guid: fd492b2e-1e30-4227-9d18-98234413d93b
+  components:
+  - rid: 3012876423545487360
+  - rid: 2895086803233275904
+  - rid: 2895086803233275905
+  references:
+    version: 2
+    RefIds:
+    - rid: 2895086803233275904
+      type: {class: DoorComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: DoorComponent
+        openSprite: {fileID: -1198612023, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        closeSprite: {fileID: 61865270, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        isOpen: 1
+        canBeManuallyOpened: 0
+    - rid: 2895086803233275905
+      type: {class: PropComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: PropComponent
+        blocksSight: 0
+        blocksMovement: 0
+    - rid: 3012876423545487360
+      type: {class: SpriteComponent, ns: , asm: Assembly-CSharp}
+      data:
+        key: SpriteComponent
+        Sprite: {fileID: 61865270, guid: 967691888b009ad4dacebeb4afe67cbf, type: 3}
+        hasAnimation: 0
+        animFrames: []
+        animLength: 2

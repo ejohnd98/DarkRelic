@@ -33,6 +33,10 @@ public class EntityFactory : MonoBehaviour
         newEntity.Name = content.contentName;
         newEntity.contentGuid = content.guid;
 
+        foreach(var component in newEntity.ComponentList){
+            component.OnEntityCreatedFromContent();
+        }
+
         return newEntity;
     }
     
@@ -62,10 +66,6 @@ public class EntityFactory : MonoBehaviour
 
     public static DR_Entity CreateDoor(Sprite OpenSprite, Sprite ClosedSprite){
         DR_Entity NewProp = CreateProp(ClosedSprite, "Door");
-
-        NewProp.AddComponent<DoorComponent>(new DoorComponent(OpenSprite, ClosedSprite));
-        NewProp.GetComponent<DoorComponent>().SetOpen(false);
-        
         return NewProp;
     }
 

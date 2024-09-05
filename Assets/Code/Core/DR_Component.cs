@@ -34,6 +34,12 @@ public abstract class DR_Component
         
     }
 
+    // Called after creating entity from content and after all components have been setup
+    public virtual void OnEntityCreatedFromContent()
+    {
+        
+    }
+
     public DR_Entity Entity;
 
     public virtual bool Trigger(DR_GameManager gm, DR_Entity user, DR_Entity target){

@@ -281,9 +281,9 @@ public class DungeonGenerator : MonoBehaviour {
             }
                 
 
-            mapBlueprint.GetCell(doorPosA).type = MapGenCellType.DOOR;
+            mapBlueprint.GetCell(doorPosA).type = roomA.roomTag == RoomTag.CURSED ? MapGenCellType.LOCKED_DOOR : MapGenCellType.DOOR;
             roomA.doors.Add(doorPosA);
-            mapBlueprint.GetCell(doorPosB).type = MapGenCellType.DOOR;
+            mapBlueprint.GetCell(doorPosB).type = roomB.roomTag == RoomTag.CURSED ? MapGenCellType.LOCKED_DOOR : MapGenCellType.DOOR;
             roomB.doors.Add(doorPosB);
         }
 
@@ -296,8 +296,11 @@ public class DungeonGenerator : MonoBehaviour {
                 DR_Entity newEntity = null;
                 
                 switch (mapBlueprint.cells[y, x].type) {
+                    case MapGenCellType.LOCKED_DOOR:
+                        newEntity = EntityFactory.CreateEntityFromContent(gm.lockedDoorContent);
+                        break;
                     case MapGenCellType.DOOR:
-                        newEntity = EntityFactory.CreateDoor(gm.OpenDoorTexture, gm.ClosedDoorTexture);
+                        newEntity = EntityFactory.CreateEntityFromContent(gm.doorContent);
                         break;
                     case MapGenCellType.STAIRS_UP:
                         newEntity = EntityFactory.CreateStairs(gm.StairsUpTexture, false);
@@ -436,6 +439,7 @@ public class DungeonGenerator : MonoBehaviour {
                     }
                     case MapGenCellType.FLOOR:
                     case MapGenCellType.DOOR:
+                    case MapGenCellType.LOCKED_DOOR:
                     case MapGenCellType.STAIRS_UP:
                     case MapGenCellType.STAIRS_DOWN:
                     default: {
@@ -472,7 +476,7 @@ public class DungeonGenerator : MonoBehaviour {
                         return;
                     }
 
-                    //TODO: room change event shouldn't be called if on a door cell
+                    //TODO: room change event shouldn't be called if on a door cell (happens to work for now)
                     room.SetDoorState(false);
                     room.SetDoorCanBeManuallyOpened(false);
                     

@@ -61,6 +61,7 @@ public enum MapGenCellType{
     NOT_SET,
     WALL,
     FLOOR,
+    LOCKED_DOOR,
     DOOR,
     ENEMY,
     ITEM,

@@ -9,7 +9,7 @@ public class DoorComponent : DR_Component
     public Sprite openSprite, closeSprite;
 
     [Copy]
-    bool isOpen = false;
+    public bool isOpen = false;
 
     [Copy]
     public bool canBeManuallyOpened = true;
@@ -18,10 +18,8 @@ public class DoorComponent : DR_Component
 
     public DoorComponent(){}
 
-    public DoorComponent(Sprite openSpr, Sprite closeSpr, bool open = false){
-        openSprite = openSpr;
-        closeSprite = closeSpr;
-        isOpen = open;
+    public override void OnEntityCreatedFromContent(){
+        SetOpen(isOpen);
     }
 
     public void ToggleOpen(DR_Entity instigator){
