@@ -494,3 +494,37 @@ public class BloodPickupRangeAbility : DR_Ability
         return string.Format($"Expands blood pick up range by {count} {(count > 1 ? "tiles" : "tile")}.");
     }
 }
+
+public class DeadlyHealAbility : DR_Ability
+{
+    public DeadlyHealAbility(){
+    }
+
+    public override bool CanBePerformed(){
+        var healthComp = owner.GetComponent<HealthComponent>();
+        if (healthComp.currentHealth >= healthComp.maxHealth){
+            return false;
+        }
+        return base.CanBePerformed();
+    }
+
+    private float GetNewMaxHealthPercent(){
+        return Mathf.Clamp01(0.9f + (Mathf.Log10(count) * 0.15f));
+    }
+
+    protected override void OnTrigger(DR_Event e){
+        relatedEntities.Add(owner);
+
+        var healthComp = owner.GetComponent<HealthComponent>();
+        var levelComp = owner.GetComponent<LevelComponent>();
+
+        levelComp.healthScale *= GetNewMaxHealthPercent();
+        levelComp.UpdateStats();
+
+        healthComp.HealFully();
+    }
+
+    public override string GetFormattedDescription(){
+        return string.Format($"Fully heals but permanently reduces max health by {(1.0f - GetNewMaxHealthPercent()).ToString("P1")}");
+    }
+}
