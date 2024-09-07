@@ -528,3 +528,40 @@ public class DeadlyHealAbility : DR_Ability
         return string.Format($"Fully heals but permanently reduces max health by {(1.0f - GetNewMaxHealthPercent()).ToString("P1")}");
     }
 }
+
+public class DamageMirror : DR_Ability
+{
+    public DamageMirror(){
+        triggeredByPlayer = false;
+        
+    }
+
+    public override void OnAdded(){
+        owner.OnAttacked += OnTrigger;
+    }
+
+    protected override void OnTrigger(DR_Event e)
+    {
+        var attackedEvent = e as AttackEvent;
+        int reflectedDamage = Mathf.FloorToInt(attackedEvent.damageDealt * GetReflectAmount());
+        Debug.Log($"reflected {reflectedDamage} back to {attackedEvent.owner.Name}");
+        attackedEvent.owner.GetComponent<HealthComponent>().TakeDamage(reflectedDamage);
+    }
+
+    private float GetReflectAmount(){
+        return MathF.Pow(1.1f, count) - 1.0f;
+    }
+
+    private float GetStrengthModifier(){
+        return MathF.Pow(0.9f, count);
+    }
+
+    public override void ApplyStatModifiers(StatsModifier statsModifier)
+    {
+        statsModifier.strength.multiplier *= GetStrengthModifier();
+    }
+
+    public override string GetFormattedDescription(){
+        return string.Format($"Reflects {GetReflectAmount().ToString("P1")} of damage back on the attacker, but reduces own strength by {GetStrengthModifier().ToString("P1")}.");
+    }
+}

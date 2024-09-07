@@ -323,7 +323,6 @@ public class DungeonGenerator : MonoBehaviour {
                         break;
                     case MapGenCellType.CURSED_ALTAR:
                         newEntity = EntityFactory.CreateEntityFromContent(gm.cursedAltar);
-                        newEntity.GetComponent<AltarComponent>().altarAbilityContent = LootHandler.instance.GetRandomAbility(DR_Ability.AbilityType.Cursed);
                         mapBlueprint.cells[y,x].associatedRoom.altars.Add(newEntity.GetComponent<AltarComponent>());
                         break;
                     // Temporarily do this here
@@ -470,6 +469,12 @@ public class DungeonGenerator : MonoBehaviour {
         foreach (var room in mapBlueprint.rooms){
             newMap.Rooms.Add(room);
             if (room.roomTag == RoomTag.CURSED){
+
+                var cursedItems = LootHandler.instance.GetRandomAbilities(DR_Ability.AbilityType.Cursed, room.altars.Count);
+                for(int i = 0; i < room.altars.Count; i++){
+                    room.altars[i].altarAbilityContent = cursedItems[i];
+                }
+
                 room.OnRoomEntered += (DR_Event e) => {
                     RoomChangeEvent roomEvent = e as RoomChangeEvent;
                     if (roomEvent.room.hasPlayerEntered){

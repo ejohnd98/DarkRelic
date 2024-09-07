@@ -84,12 +84,20 @@ public class DamageSystem
                 gm.CurrentMap.RemoveActor(target);
             }
 
+            //TODO: should put earlier so that abilities can interfere?
             AttackEvent attackEvent = new AttackEvent {
                 owner = attacker,
                 target = target,
                 damageDealt = damageEvent.GetResultingDamage()
             };
             attacker.OnAttackOther?.Invoke(attackEvent);
+
+            AttackEvent attackedEvent = new AttackEvent {
+                owner = attacker,
+                target = target,
+                damageDealt = damageEvent.GetResultingDamage()
+            };
+            target.OnAttacked?.Invoke(attackedEvent);
         }
 
         return damageEvent;
