@@ -177,9 +177,10 @@ public class BloodBoltAbility : DR_Ability
         relatedEntities.Add(owner);
 
         int baseDamage = Mathf.CeilToInt(owner.GetComponent<LevelComponent>().stats.strength * GetStrengthModifier());
-        var damageEvent = DamageSystem.HandleAttack(DR_GameManager.instance, owner, target, baseDamage);
+        DamageSystem.CreateAttackTransaction(owner, new(){target}, GetStrengthModifier());
 
-        killed = damageEvent.killed;
+        // TODO: have entities handle their own hurt/killed sounds
+        killed = false;//damageEvent.killed;
     }
 
     private float GetStrengthModifier(){
@@ -352,8 +353,10 @@ public class ForecefulEntryAbility : DR_Ability
             int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
             foreach(var cell in gm.CurrentMap.GetAdjacentCells(doorAction.target.Entity.Position)){
                 if (cell.Actor != null && cell.Actor != owner){
-                    DamageSystem.HandleAttack(gm, owner, cell.Actor, Mathf.FloorToInt(baseDamage * 0.5f));
+                    //TODO: replace this
+                    DamageSystem.CreateAttackTransaction(owner, new(){cell.Actor}, 0.5f);
                     cell.AddBlood(1); //Temp just to show SOMETHING 
+                    return;
                 }
             }
         }
@@ -563,5 +566,73 @@ public class DamageMirror : DR_Ability
 
     public override string GetFormattedDescription(){
         return string.Format($"Reflects {GetReflectAmount().ToString("P1")} of damage back on the attacker, but reduces own strength by {GetStrengthModifier().ToString("P1")}.");
+    }
+}
+
+public class ChainLightningAbility : DR_Ability
+{
+    // Possibilities:
+    // Random chance for each attack to also attack an adjacent/nearby enemy (that attack also has a chance, but can't target an enemy already hit by ability?)
+    // OR hit all adjacent enemies from attack but deal % of the damage (might be overpowered as it will still trigger other abilities on a lot of enemies)
+    // 
+
+    public ChainLightningAbility(){
+        triggeredByPlayer = false;
+    }
+
+    public override void OnAdded()
+    {
+        owner.OnAttackTransactionCreated += OnTrigger;
+    }
+
+    protected override void OnTrigger(DR_Event e){
+
+        var attackEvent = e as AttackTransactionEvent;
+        var attackTransaction = attackEvent.attackTransaction;
+
+        int range = 2;
+        var gm = DR_GameManager.instance;
+
+        // Just to test this works, may need adjusting
+        for (int i = 0; i < count; i++){
+
+            List<DR_Entity> possibleTargets = new();
+        
+            foreach(var existingTarget in attackTransaction.targets){
+                for(int dy = -range; dy <= range; dy++){
+                    for(int dx = -range; dx <= range; dx++){
+                        if (Mathf.Abs(dx) + Mathf.Abs(dy) > 2){
+                            continue;
+                        }
+
+                        Vector2Int pos = existingTarget.Position + new Vector2Int(dx,dy);
+                        var possibleTarget = gm.CurrentMap.GetActorAtPosition(pos);
+                        if (possibleTarget != null && possibleTarget != owner
+                            && !attackTransaction.targets.Contains(possibleTarget) 
+                            && !possibleTargets.Contains(possibleTarget)){
+                            
+                            possibleTargets.Add(possibleTarget);
+                        }
+                    }
+                }
+            }
+
+            if (possibleTargets.Count > 0){
+                int randIndex = UnityEngine.Random.Range(0, possibleTargets.Count);
+                Debug.Log($"Adding {possibleTargets[randIndex].Name} to attack targets");
+                attackTransaction.targets.Add(possibleTargets[randIndex]);
+            }else{
+                Debug.Log("Could not find extra target");
+            }
+        }
+    }
+
+    private float GetDamagePercent(){
+        return 0.1f + (0.25f * Mathf.Log(count, 2));
+    }
+
+    public override string GetFormattedDescription(){
+        float percent = GetDamagePercent();
+        return string.Format("TBD {0:0%}", percent);
     }
 }

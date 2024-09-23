@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+//WIP
+public class AttackTransaction
+{
+    public DR_Entity instigator;
+    public List<DR_Entity> targets;
+}
+
 public class DamageEvent
 {
     public DR_Entity attacker;
     public DR_Entity target;
     public DR_Entity item;
-
-    public UnityEvent OnAttack, OnKill;
-    //TODO: OnCrit, OnMiss
 
     int baseDamage = 0;
     public float multiplier = 1.0f;
@@ -23,9 +27,6 @@ public class DamageEvent
         this.target = target;
         this.item = item;
         this.baseDamage = baseDamage;
-
-        OnAttack = new UnityEvent();
-        OnKill = new UnityEvent();
     }
 
     public int GetResultingDamage(){
@@ -43,6 +44,39 @@ public class DamageEvent
 
 public class DamageSystem
 {
+
+    public static void CreateAttackTransaction(DR_Entity instigator, List<DR_Entity> targets, float baseDamageMod = 1.0f){
+        AttackTransaction attackTransaction = new AttackTransaction();
+        attackTransaction.instigator = instigator;
+        attackTransaction.targets = targets;
+
+        //1: ask any abilities for additional targets
+        AttackTransactionEvent startEvent = new AttackTransactionEvent {
+            attackTransaction = attackTransaction
+        };
+
+        instigator.OnAttackTransactionCreated?.Invoke(startEvent);
+
+        foreach(var target in attackTransaction.targets){
+            int damage = Mathf.CeilToInt(instigator.GetComponent<LevelComponent>().stats.strength * baseDamageMod);
+            HandleAttack(DR_GameManager.instance, instigator, target, damage);
+        }
+
+        //Rather than pass the transaction around using events, trying out iterating through abilities and calling a function directly
+
+        //TODO: create initial damageEvents, iterate through abilities and add callbacks?
+        // When creating a damageEvent, first loop through abilities to register any callbacks
+        // Here we can check if ability should be applied (like if adjacent enemies for chain lightning already exist in targets, do not)
+
+        // Have function to request a new target be added, with damage multiplier maybe (to be called from abilities)
+
+        // Will probably have to loop through target abilities as well, for stuff like damage mirror (adds instigator as target)
+
+        // this may create additional damage events if chain lightning ability is active for example
+    }
+
+
+    // OLD
     public static DamageEvent HandleAttack(DR_GameManager gm, DR_Entity attacker, DR_Entity target, int damage)
     {
         // add a flag to allow blood splatter on any attack? Bludgeon ability would just always set this to true
@@ -61,9 +95,6 @@ public class DamageSystem
             
             targetHealthComp.TakeDamage(damageEvent.GetResultingDamage());
 
-            damageEvent.OnAttack?.Invoke();
-
-
             if(!targetHealthComp.IsAlive()){
                 damageEvent.killed = true;
 
@@ -72,8 +103,6 @@ public class DamageSystem
                 if (targetLevel != null && attackerLevel != null){
                     attackerLevel.GiveExp(targetLevel.stats.expGiven);
                 }
-
-                damageEvent.OnKill?.Invoke();
 
                 //Handle blood
                 DR_Cell cell = gm.CurrentMap.GetCell(target.Position);

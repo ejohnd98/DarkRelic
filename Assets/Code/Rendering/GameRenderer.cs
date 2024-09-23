@@ -188,7 +188,7 @@ public class GameRenderer : MonoBehaviour
                             yield return new WaitForSeconds(0.1f);
                         }
 
-                        LogSystem.instance.AddDamageLog(attack.damageEvent);
+                        //LogSystem.instance.AddDamageLog(attack.damageEvent);
                         
                     }else{
                         LogSystem.instance.AddLog(actionsToBeRendered[i].originalAction);

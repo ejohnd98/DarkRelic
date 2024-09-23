@@ -24,6 +24,11 @@ public class AttackEvent : DR_Event
     public int damageDealt = 0;
 }
 
+public class AttackTransactionEvent : DR_Event
+{
+    public AttackTransaction attackTransaction;
+}
+
 public class MoveEvent : DR_Event
 {
     public Vector2Int startPos, endPos;

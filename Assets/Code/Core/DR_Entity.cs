@@ -11,6 +11,10 @@ public class DR_Entity
     public Action<DR_Event> OnMove;
     public Action<DR_Event> OnPickUpBlood;
 
+    // WIP attack refactor
+    public Action<DR_Event> OnAttackTransactionCreated;
+    //public Action<DR_Event> OnAttacked;
+
     public string Name = "Untitled Entity";
     public Vector2Int Position;
     public int id = -1;

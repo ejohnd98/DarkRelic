@@ -77,5 +77,6 @@ MonoBehaviour:
       type: {class: AbilityComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AbilityComponent
-        startingAbilities: []
+        startingAbilities:
+        - {fileID: 11400000, guid: c60158b677a80204a9d6e0aa0d88df80, type: 2}
         dirtyFlag: 1

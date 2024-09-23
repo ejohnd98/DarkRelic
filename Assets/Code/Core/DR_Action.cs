@@ -163,9 +163,9 @@ public class AttackAction : DR_Action {
         return owner.Name + " attacked " + target.Name + "!";
     }
 
-   protected override void Perform(DR_GameManager gm){
-        int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
-        damageEvent = DamageSystem.HandleAttack(gm, owner, target, baseDamage);
+    protected override void Perform(DR_GameManager gm){
+        //int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
+        DamageSystem.CreateAttackTransaction(owner, new(){target});
 
         //TODO: check if this is still needed here
         if (!target.GetComponent<HealthComponent>().IsAlive()){
