@@ -3893,9 +3893,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1484776820}
   - component: {fileID: 1484776819}
+  - component: {fileID: 1484776823}
   - component: {fileID: 1484776821}
   - component: {fileID: 1484776822}
-  - component: {fileID: 1484776823}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -4028,6 +4028,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 99887da2b604b12449b44465f38e1c6c, type: 2}
   - {fileID: 11400000, guid: 43e3041e8ba6de649afbd1842b8f9c5f, type: 2}
   - {fileID: 11400000, guid: 8ecccdc110d842741b9301b5b9d67c92, type: 2}
+  - {fileID: 11400000, guid: c60158b677a80204a9d6e0aa0d88df80, type: 2}
 --- !u!1 &1495742247
 GameObject:
   m_ObjectHideFlags: 0
