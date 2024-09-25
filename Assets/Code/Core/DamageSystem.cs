@@ -45,34 +45,23 @@ public class DamageEvent
 public class DamageSystem
 {
 
+    // TODO: pass in originating action here so any animations can be added to it?
     public static void CreateAttackTransaction(DR_Entity instigator, List<DR_Entity> targets, float baseDamageMod = 1.0f){
         AttackTransaction attackTransaction = new AttackTransaction();
         attackTransaction.instigator = instigator;
         attackTransaction.targets = targets;
 
-        //1: ask any abilities for additional targets
         AttackTransactionEvent startEvent = new AttackTransactionEvent {
             attackTransaction = attackTransaction
         };
 
+        // Targets may be expanded upon by this
         instigator.OnAttackTransactionCreated?.Invoke(startEvent);
 
         foreach(var target in attackTransaction.targets){
             int damage = Mathf.CeilToInt(instigator.GetComponent<LevelComponent>().stats.strength * baseDamageMod);
             HandleAttack(DR_GameManager.instance, instigator, target, damage);
         }
-
-        //Rather than pass the transaction around using events, trying out iterating through abilities and calling a function directly
-
-        //TODO: create initial damageEvents, iterate through abilities and add callbacks?
-        // When creating a damageEvent, first loop through abilities to register any callbacks
-        // Here we can check if ability should be applied (like if adjacent enemies for chain lightning already exist in targets, do not)
-
-        // Have function to request a new target be added, with damage multiplier maybe (to be called from abilities)
-
-        // Will probably have to loop through target abilities as well, for stuff like damage mirror (adds instigator as target)
-
-        // this may create additional damage events if chain lightning ability is active for example
     }
 
 

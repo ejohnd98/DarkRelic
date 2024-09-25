@@ -36,6 +36,16 @@ public abstract class DR_Action {
     public bool loggable = false;
     public DR_Entity owner;
 
+    // TODO: create a list of animations to be rendered alongside this action.
+    // will need to pass this action along then to abilities and such
+    // OR could maybe have a static "current action" thing going on, but that seems potentially fragile
+    // Might be a worthwhile shortcut, but could instead can go through the "owner" entity's turn component and get the current action that way?
+    // That way there's not need to pass the action around in events. No entity should ever need to be executing two actions at the exact same time.
+
+    // Things to consider though: ability triggered on player when an enemy attacks. I guess that should be added to the enemy's action then?
+    // Also, timing. May become more obvious once I look at the existing animations used by the renderer (ie maybe can define timing in normalized 0-1 values?)
+
+
     // Right now this is only used for additional inputs not given when
     // the action is created (ie. requires further input from player)
     public List<ActionInput> actionInputs = new List<ActionInput>();
