@@ -147,8 +147,16 @@ public class GameRenderer : MonoBehaviour
                 if (canAddActionToList){
 
                     Vector2Int nextActionPos = nextAction.originalAction.owner.Position;
-                    //Skip rendering action if entity not visible (could be made more robust as actions can affect multiple spaces)
-                    if (!currentRenderedMap.IsVisible[nextActionPos.y, nextActionPos.x] 
+
+                    //Skip rendering action if affected entities not visible
+                    bool areEntitiesVisible = false;
+                    foreach(var affectedEntity in nextAction.originalAction.GetRelatedEntities()){
+                        if (currentRenderedMap.GetIsVisible(affectedEntity.Position)){
+                            areEntitiesVisible = true;
+                            break;
+                        }
+                    }
+                    if (!areEntitiesVisible 
                             && !DR_GameManager.instance.debug_disableFOV
                             && !nextAction.originalAction.owner.HasComponent<PlayerComponent>()){
                         actionQueue.Dequeue();
@@ -169,9 +177,15 @@ public class GameRenderer : MonoBehaviour
 
             for (int i = 0; i < actionsToBeRendered.Count; i++)
             {
-                var anim = CreateActionAnimation(actionsToBeRendered[i]);
+                ActionAnimation anim = null; //CreateActionAnimation(actionsToBeRendered[i]);
+                if (actionsToBeRendered[i].originalAction.animations.Count > 0){
+                    //TODO: queue up all animations
+                    anim = actionsToBeRendered[i].originalAction.animations[0];
+                }
 
                 if (anim != null){
+                    anim.SetupWithRenderer(this, actionsToBeRendered[i]);
+                    
                     activeAnimations.Add(anim);
                     anim.StartAnim();
 
@@ -208,61 +222,14 @@ public class GameRenderer : MonoBehaviour
         currentlyUpdating = false;
 
         currentRenderedMap = DR_GameManager.instance.CurrentMap;
+
+        //TODO: fix bug where props are showing up on next floor after taking stairs (just need to ClearAllObjects when doing this maybe?)
         if (createTiles){
             CreateTiles();
         }else{
             UpdateTiles();
         }
         UpdateEntities();
-    }
-
-    private ActionAnimation CreateActionAnimation(RenderedAction renderedAction){
-
-        var action = renderedAction.originalAction;
-        if (action is StairAction stairAction){
-            //TODO: messy
-            return new StairAnimation(renderedAction);
-        }
-        // With any luck as long as the anims move everything to where they're supposed to be, this will be good enough for keeping map in sync
-        // Stuff going out of or coming into visibility MIGHT need special care though
-        GameObject entityObj;
-        EntityObjects.TryGetValue(renderedAction.originalAction.owner, out entityObj);
-        if (entityObj == null){
-            return null;
-        }
-        
-
-        Transform entityTransform = entityObj.transform;
-        Vector2Int startPos = new(Mathf.RoundToInt(entityTransform.position.x), Mathf.RoundToInt(entityTransform.position.y));
-
-        
-        if (action is MoveAction moveAction){
-            Vector2Int endPos = moveAction.pos;
-            return new MoveAnimation(renderedAction, entityTransform, startPos, endPos);
-        }
-        if (action is AttackAction attackAction){
-
-            GameObject targetEntityObj;
-            EntityObjects.TryGetValue(attackAction.target, out targetEntityObj);
-            if (targetEntityObj == null){
-                Debug.LogError("CreateActionAnimation: Could not get targeted entity obj for attack anim");
-                return null;
-            }
-            Transform targetEntityTransform = targetEntityObj.transform;
-            Vector2Int endPos = new(Mathf.RoundToInt(targetEntityTransform.position.x), Mathf.RoundToInt(targetEntityTransform.position.y));
-            return new AttackAnimation(renderedAction, entityTransform, targetEntityTransform, startPos, endPos);
-        }
-        if (action is AbilityAction abilityAction){
-
-            //TODO: more properly determine what animation to use for an ability (specify on ability itself?)
-            if (abilityAction.ability is BloodBoltAbility bloodBoltAbility){
-                return new ProjectileAnimation(renderedAction, entityTransform, EntityObjects[bloodBoltAbility.target].transform, 0.2f, bloodBoltAbility.projectileSprite);
-            }
-
-            return new AbilityAnimation(renderedAction, entityTransform);
-        }
-
-        return null;
     }
 
     private static string ActionListToString(List<RenderedAction> list){

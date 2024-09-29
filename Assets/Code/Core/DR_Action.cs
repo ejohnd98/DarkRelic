@@ -44,6 +44,7 @@ public abstract class DR_Action {
 
     // Things to consider though: ability triggered on player when an enemy attacks. I guess that should be added to the enemy's action then?
     // Also, timing. May become more obvious once I look at the existing animations used by the renderer (ie maybe can define timing in normalized 0-1 values?)
+    public List<ActionAnimation> animations = new();
 
 
     // Right now this is only used for additional inputs not given when
@@ -110,7 +111,6 @@ public abstract class DR_Action {
 
 public class MoveAction : DR_Action {
     public Vector2Int pos = Vector2Int.zero;
-    MoveAnimation moveAnim;
 
     public MoveAction (DR_Entity entity, int x, int y){
         this.owner = entity;
@@ -133,6 +133,7 @@ public class MoveAction : DR_Action {
             startPos = owner.Position,
             endPos = pos
         };
+        animations.Add(new MoveAnimation(owner, owner.Position, pos));
             
         gm.CurrentMap.MoveActor(owner, pos);
 
@@ -154,7 +155,6 @@ public class MoveAction : DR_Action {
 
 public class AttackAction : DR_Action {
     public DR_Entity target;
-    public AttackAnimation attackAnim;
 
     public bool killed = false;
     public DamageEvent damageEvent;
@@ -177,19 +177,13 @@ public class AttackAction : DR_Action {
         //int baseDamage = owner.GetComponent<LevelComponent>().stats.strength;
         DamageSystem.CreateAttackTransaction(owner, new(){target});
 
+        animations.Add(new AttackAnimation(owner, target, owner.Position, target.Position));
+
         //TODO: check if this is still needed here
         if (!target.GetComponent<HealthComponent>().IsAlive()){
             killed = true;
             gm.CurrentMap.RemoveActor(target);
         }
-
-        // var test = new TestEvent
-        // {
-        //     owner = owner
-        // };
-        //DR_EventSystem.TestEvent(test);
-
-        
     }
 }
 
@@ -220,6 +214,14 @@ public class AbilityAction : DR_Action {
             DR_Event abilityEvent = new();
             abilityEvent.owner = owner;
             ability.Trigger(abilityEvent);
+
+            // Very temp. animations should come from abilities themselves
+            if (ability is BloodBoltAbility bloodBoltAbility){
+                animations.Add(new ProjectileAnimation(owner, bloodBoltAbility.target, owner.Position, bloodBoltAbility.target.Position, 0.2f, bloodBoltAbility.projectileSprite));
+            }else{
+                animations.Add(new AbilityAnimation(owner));
+            }
+
             wasSuccess = true;
         }else{
             wasSuccess = false;
@@ -241,7 +243,7 @@ public class StairAction : DR_Action {
         return owner.Name + (stairs.goesDeeper ? " descended down a set of stairs." : " climbed up a set of stairs.");
     }
 
-   protected override void Perform(DR_GameManager gm){
+    protected override void Perform(DR_GameManager gm){
         if (!stairs.goesDeeper && gm.CurrentDungeon.mapIndex == 0){
             wasSuccess = false;
             
@@ -251,7 +253,7 @@ public class StairAction : DR_Action {
         //TODO: might be a bug here where you can quickly go up before the renderer has moved down, causing it to go up from what was originally on screen
         DR_Map dest = gm.CurrentDungeon.GetNextMap(stairs.goesDeeper);
         gm.MoveLevels(gm.CurrentMap, dest, stairs.goesDeeper, true);
-
+        animations.Add(new StairAnimation(owner));
         
         //TODO: create animation and wait for DR_GameManager.instance.isFadeActive
     }
