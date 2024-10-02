@@ -264,7 +264,7 @@ public class AbilityAnimation : ActionAnimation {
 
     public override void AnimStart()
     {
-        FXSpawner.instance.SpawnParticleFX(VectorUtility.V2toV2I(owner.transform.position), new Color(0.9f, 0.9f, 1.0f));
+        FXSpawner.instance.SpawnParticleFX(VectorUtility.V2toV2I(owner.transform != null ? owner.transform.position : owner.entity.Position), new Color(0.9f, 0.9f, 1.0f));
     }
 }
 

@@ -10,6 +10,8 @@ public class TurnSystem : MonoBehaviour
 
     DR_GameManager gm = null;
 
+    public DR_Action currentAction = null;
+
     public TurnSystem(){
         EligibleEntities = new List<TurnComponent>();
         CanAct = new List<TurnComponent>();
@@ -129,8 +131,10 @@ public class TurnSystem : MonoBehaviour
             return;
         }
 
+        currentAction = action;
         action.PerformAction(gm);
         TurnEnd(gm, turnTaker, action.wasSuccess);
+        currentAction = null;
     }
 
     void TurnEnd(DR_GameManager gm, DR_Entity turnTaker, bool actionSucceeded){

@@ -621,6 +621,9 @@ public class ChainLightningAbility : DR_Ability
                 int randIndex = UnityEngine.Random.Range(0, possibleTargets.Count);
                 Debug.Log($"Adding {possibleTargets[randIndex].Name} to attack targets");
                 attackTransaction.targets.Add(possibleTargets[randIndex]);
+
+                //TEMP TEST:
+                gm.turnSystem.currentAction.animations.Add(new AbilityAnimation(possibleTargets[randIndex]));
             }else{
                 Debug.Log("Could not find extra target");
             }

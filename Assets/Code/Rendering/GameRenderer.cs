@@ -177,38 +177,35 @@ public class GameRenderer : MonoBehaviour
 
             for (int i = 0; i < actionsToBeRendered.Count; i++)
             {
-                ActionAnimation anim = null; //CreateActionAnimation(actionsToBeRendered[i]);
-                if (actionsToBeRendered[i].originalAction.animations.Count > 0){
-                    //TODO: queue up all animations
-                    anim = actionsToBeRendered[i].originalAction.animations[0];
-                }
-
-                if (anim != null){
-                    anim.SetupWithRenderer(this, actionsToBeRendered[i]);
-                    
-                    activeAnimations.Add(anim);
-                    anim.StartAnim();
-
-                    if (anim.action.originalAction is StairAction){
-                        createTiles = true;
-                    }
-
-                    
-                    if (anim.action.originalAction is AttackAction attack){
-                        if (attack.killed && i != actionsToBeRendered.Count - 1)
-                        {
-                            // Briefly pause anim if killed and there are more actions to be performed
-                            // This is a hacky attempt to prevent move anims from overlapping with death FX
-                            yield return new WaitForSeconds(0.1f);
-                        }
-
-                        //LogSystem.instance.AddDamageLog(attack.damageEvent);
+                foreach(var anim in actionsToBeRendered[i].originalAction.animations){
+                    if (anim != null){
+                        anim.SetupWithRenderer(this, actionsToBeRendered[i]);
                         
+                        activeAnimations.Add(anim);
+                        anim.StartAnim();
+
+                        if (anim.action.originalAction is StairAction){
+                            createTiles = true;
+                        }
+                        
+                        if (anim.action.originalAction is AttackAction attack){
+                            if (attack.killed && i != actionsToBeRendered.Count - 1)
+                            {
+                                //TODO: this delay might not work great as an action's animations list is not currently ordered in any way.
+
+                                // Briefly pause anim if killed and there are more actions to be performed
+                                // This is a hacky attempt to prevent move anims from overlapping with death FX
+                                yield return new WaitForSeconds(0.1f);
+                            }
+
+                            //LogSystem.instance.AddDamageLog(attack.damageEvent);
+                            
+                        }else{
+                            LogSystem.instance.AddLog(actionsToBeRendered[i].originalAction);
+                        }
                     }else{
                         LogSystem.instance.AddLog(actionsToBeRendered[i].originalAction);
                     }
-                }else{
-                    LogSystem.instance.AddLog(actionsToBeRendered[i].originalAction);
                 }
             }
 
