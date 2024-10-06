@@ -669,16 +669,55 @@ public class SpiderWebAbility : DR_Ability
     }
 
     protected override void OnTrigger(DR_Event e){
-        Debug.Log("SpiderWebAbility Triggered with input: " + actionInputs[0].inputValue);
+        Vector2Int centerPos = actionInputs[0].inputValue;
+        Debug.Log("SpiderWebAbility Triggered with input: " + centerPos);
 
         DR_Entity owner = e.owner;
         var gm  =  DR_GameManager.instance;
 
         // Not actually ignoring the player
-        targets = gm.CurrentMap.GetEntitiesInRadius(actionInputs[0].inputValue, GetWebRadius());
+        targets = gm.CurrentMap.GetEntitiesInRadius(centerPos, GetWebRadius());
 
         relatedEntities.Add(owner);
         relatedEntities.AddRange(targets);
+
+        // draw all targets towards center:
+
+        bool movedTarget;
+        int tempLimit = 500;
+
+        do{
+            movedTarget = false;
+            foreach(var target in targets){
+                Vector2Int diff = centerPos - target.Position;
+                if (diff == Vector2Int.zero){
+                    continue;
+                }
+
+                Vector2Int dirX = new(Math.Sign(diff.x), 0);
+                Vector2Int dirY = new(0, Math.Sign(diff.y));
+
+                bool canMoveX = dirX.magnitude != 0 && gm.CurrentMap.CanMoveActor(target, target.Position + dirX);
+                bool canMoveY = dirY.magnitude != 0 && gm.CurrentMap.CanMoveActor(target, target.Position + dirY);
+
+                if (canMoveX && (!canMoveY || (canMoveY && (dirX.magnitude > dirY.magnitude)))){
+                    //Move X
+                    gm.CurrentMap.MoveActor(target, target.Position + dirX);
+                    movedTarget = true;
+                }else if (canMoveY){
+                    //Move Y
+                    gm.CurrentMap.MoveActor(target, target.Position + dirY);
+                    movedTarget = true;
+                }else{
+                    //Could not move
+                }
+            }
+            tempLimit--;
+
+        }while(movedTarget && tempLimit > 0);
+        if (tempLimit < 1){
+            Debug.LogAssertion("tempLimit is " + tempLimit);
+        }
 
         //TEMP TEST:
         foreach(var target in targets){
