@@ -639,3 +639,58 @@ public class ChainLightningAbility : DR_Ability
         return string.Format("TBD {0:0%}", percent);
     }
 }
+
+public class SpiderWebAbility : DR_Ability
+{
+    public bool killed = false;
+    public List<DR_Entity> targets;
+
+    [AbilityProperty]
+    public float range = 8;
+
+    [AbilityProperty]
+    public Sprite projectileSprite;
+
+    public SpiderWebAbility(){
+        baseBloodCost = 1;
+        cooldownLength = 2;
+    }
+
+    //TODO: allow targeting ground
+    protected override void SetupInputs(){
+        actionInputs.Add(new ActionInput((Vector2Int pos) => {
+            return DR_GameManager.instance.CurrentMap.GetIsVisible(pos)
+            && (pos - owner.Position).magnitude <= range;
+        }));
+    }
+
+    private int GetWebRadius(){
+        return 2 + count;
+    }
+
+    protected override void OnTrigger(DR_Event e){
+        Debug.Log("SpiderWebAbility Triggered with input: " + actionInputs[0].inputValue);
+
+        DR_Entity owner = e.owner;
+        var gm  =  DR_GameManager.instance;
+
+        // Not actually ignoring the player
+        targets = gm.CurrentMap.GetEntitiesInRadius(actionInputs[0].inputValue, GetWebRadius());
+
+        relatedEntities.Add(owner);
+        relatedEntities.AddRange(targets);
+
+        //TEMP TEST:
+        foreach(var target in targets){
+            gm.turnSystem.currentAction.animations.Add(new AbilityAnimation(target));
+        }
+
+        //TODO: debuffs
+    }
+
+    public override string GetFormattedDescription(){
+        //TODO: allow mousing over statuses referenced here so that they can be read about on the item itself
+        // OR: in description, add a legend kind of like FEH does below regular description (probably makes more sense to do this)
+        return string.Format($"Draws all entities in a {GetWebRadius()} radius to the center of the targeted space and inflicts WEB");
+    }
+}

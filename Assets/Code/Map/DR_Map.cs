@@ -242,6 +242,31 @@ public class DR_Map
         return Vector2Int.zero;
     }
 
+    public List<DR_Entity> GetEntitiesInRadius(Vector2Int center, int radius, List<DR_Entity> ignoreList = null){
+        ignoreList = ignoreList ?? new();
+        List<DR_Entity> result = new();
+
+        for(int dy = -radius; dy <= radius; dy++){
+            for(int dx = -radius; dx <= radius; dx++){
+                Vector2Int pos = center + new Vector2Int(dx,dy);
+                if (!ValidPosition(pos)){
+                    continue;
+                }
+
+                if ((pos - center).sqrMagnitude > radius*radius){
+                    continue;
+                }
+
+                DR_Entity entity = GetActorAtPosition(pos);
+                if (entity != null && !ignoreList.Contains(entity)){
+                    result.Add(entity);
+                }
+            }
+        }
+
+        return result;
+    }
+
     public DR_Cell GetCell(Vector2Int pos){
         if (!ValidPosition(pos)){
             return null;
