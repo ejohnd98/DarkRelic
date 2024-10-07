@@ -37,7 +37,7 @@ public class AbilityContent : ContentBase
         foreach (FieldInfo targetField in abilityType.GetFields())
         {
             // Check if this should be copied
-            if (!Attribute.IsDefined(targetField, typeof(AbilityPropertyAttribute))){
+            if (!Attribute.IsDefined(targetField, typeof(CopyAttribute))){
                 continue;
             }
 
@@ -65,7 +65,7 @@ public class AbilityContent : ContentBase
         // Fill defaults first
         foreach (FieldInfo field in abilityType.GetFields())
         {
-            if (Attribute.IsDefined(field, typeof(AbilityPropertyAttribute)))
+            if (Attribute.IsDefined(field, typeof(CopyAttribute)))
             {
                 propertyValues[field.Name] = field.GetValue(Activator.CreateInstance(abilityType));
             }

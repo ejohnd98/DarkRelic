@@ -40,6 +40,10 @@ public class TurnComponent : DR_Component
             abilityComponent.TickCooldowns();
         }
 
+        if (Entity.GetComponent<HealthComponent>() is HealthComponent health){
+            health.TickStatusEffects(amount);
+        }
+
         CurrentDebt = newDebt;
     }
 

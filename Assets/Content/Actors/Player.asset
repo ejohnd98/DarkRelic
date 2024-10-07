@@ -79,4 +79,5 @@ MonoBehaviour:
         key: AbilityComponent
         startingAbilities:
         - {fileID: 11400000, guid: e999a9a396b269741a253ac421aff2e3, type: 2}
+        - {fileID: 11400000, guid: 19611e4d403ad0646807eb08dcc95924, type: 2}
         dirtyFlag: 1

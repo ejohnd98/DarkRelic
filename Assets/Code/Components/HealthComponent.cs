@@ -12,6 +12,22 @@ public class HealthComponent : DR_Component
 
     public Action<DR_Event> OnHealthChanged;
 
+    //TODO: should this be in its own component or elsewhere?
+    public List<StatusEffect> statusEffects = new();
+
+    public void TickStatusEffects(float amount){
+        foreach(var effect in statusEffects){
+            effect.Tick(amount);
+        }
+    }
+
+    public void AddStatusEffect(StatusEffect statusEffect){
+        //TODO: make the same as abilities (probably move into own component too)
+        // for now testing here and assuming we won't have duplicates
+        statusEffect.owner = Entity;
+        statusEffects.Add(statusEffect);
+    }
+
     public HealthComponent(){}
 
     public HealthComponent(int MaxHealth){

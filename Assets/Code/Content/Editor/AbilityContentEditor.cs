@@ -48,7 +48,7 @@ public class AbilityContentEditor : Editor
         contentObject.RecreateDictionary(abilityType);
         foreach (FieldInfo field in abilityType.GetFields())
         {
-            if (Attribute.IsDefined(field, typeof(AbilityPropertyAttribute)))
+            if (Attribute.IsDefined(field, typeof(CopyAttribute)))
             {
                 if (contentObject.propertyValues.TryGetValue(field.Name, out object value))
                 {
