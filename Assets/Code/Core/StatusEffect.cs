@@ -43,4 +43,12 @@ public class TestStatusEffect : StatusEffect
 
     // First test: Bleed
     // damages flat amount (for now?) OnTick. Puts blood onto ground
+    public override void OnTick()
+    {
+        base.OnTick();
+        var animAction = new AnimAction();
+        animAction.relatedEntities.Add(owner);
+        animAction.animations.Add(new AbilityAnimation(owner));
+        GameRenderer.instance.AddAction(animAction);
+    }
 }

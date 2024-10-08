@@ -245,26 +245,17 @@ public class AbilityAnimation : ActionAnimation {
     public AbilityAnimation(DR_Entity entity, float time = 0.25f){
         owner = new(entity);
         length = time;
+        ignoreTimer = true;
 
         AnimStarted += (anim)=>{
-            SoundSystem.instance.PlaySound("abilityPlaceholder");
-        };
-    }
-
-    public AbilityAnimation(RenderedAction action, Transform rendererObj, float time = 0.25f){
-        this.rendererObj = rendererObj;
-        this.action = action;
-        this.owner = new(action.originalAction.owner);
-        this.length = time;
-
-        AnimStarted += (anim)=>{
-            SoundSystem.instance.PlaySound("abilityPlaceholder");
+            //SoundSystem.instance.PlaySound("abilityPlaceholder");
         };
     }
 
     public override void AnimStart()
     {
         FXSpawner.instance.SpawnParticleFX(VectorUtility.V2toV2I(owner.transform != null ? owner.transform.position : owner.entity.Position), new Color(0.9f, 0.9f, 1.0f));
+        StopAnim();
     }
 }
 

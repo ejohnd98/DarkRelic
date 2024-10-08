@@ -17,10 +17,20 @@ public class RenderedAction {
     }
 
     public override string ToString(){
+        if (originalAction.owner == null){
+            return "[empty owner]: " + originalAction.GetType().Name;
+        }
         return originalAction.owner.Name + ": " + originalAction.GetType().Name;
     }
 
     public bool OverlapsWith(RenderedAction other){
+        if (originalAction is AnimAction animAction && animAction.canOverlapOtherAnims){
+            return false;
+        }
+        if (other.originalAction is AnimAction animAction2 && animAction2.canOverlapOtherAnims){
+            return false;
+        }
+
         List<DR_Entity> relatedEntities = originalAction.GetRelatedEntities();
 
         foreach (DR_Entity entity in other.originalAction.GetRelatedEntities()){
@@ -145,9 +155,6 @@ public class GameRenderer : MonoBehaviour
                 }
 
                 if (canAddActionToList){
-
-                    Vector2Int nextActionPos = nextAction.originalAction.owner.Position;
-
                     //Skip rendering action if affected entities not visible
                     bool areEntitiesVisible = false;
                     foreach(var affectedEntity in nextAction.originalAction.GetRelatedEntities()){
@@ -158,7 +165,8 @@ public class GameRenderer : MonoBehaviour
                     }
                     if (!areEntitiesVisible 
                             && !DR_GameManager.instance.debug_disableFOV
-                            && !nextAction.originalAction.owner.HasComponent<PlayerComponent>()){
+                            && (nextAction.originalAction.owner == null 
+                                || !nextAction.originalAction.owner.HasComponent<PlayerComponent>())){
                         actionQueue.Dequeue();
                         continue;
                     }

@@ -83,6 +83,9 @@ public abstract class DR_Action {
     }
 
     public void PerformAction(DR_GameManager gm){
+        if (owner == null){
+            Debug.LogAssertion("owner is null on " + GetType().ToString() + "!");
+        }
         ActionEvent actionEvent= new ActionEvent();
         actionEvent.owner = owner;
         actionEvent.action = this;
@@ -106,6 +109,16 @@ public abstract class DR_Action {
 
     public virtual List<DR_Entity> GetRelatedEntities(){
         return new List<DR_Entity>(){owner};
+    }
+}
+
+public class AnimAction : DR_Action {
+    // Possibly temp. Use this to pass animations to renderer without needing a pre-existing action
+    public bool canOverlapOtherAnims = true;
+    public List<DR_Entity> relatedEntities = new();
+
+    public override List<DR_Entity> GetRelatedEntities(){
+        return relatedEntities;
     }
 }
 
@@ -201,7 +214,6 @@ public class AbilityAction : DR_Action {
     }
 
     public override List<DR_Entity> GetRelatedEntities(){
-        //TODO: implement this method on ability as well?
         return ability.GetRelatedEntities();
     }
 
