@@ -34,6 +34,9 @@ public class DamageEvent
     }
 
     public string GetLogText(){
+        if (attacker == null){
+            return target.Name + " took " + GetResultingDamage() + " damage.";
+        }
         if (!killed){
             return attacker.Name + " dealt " + GetResultingDamage() + " damage to " + target.Name;
         }else{
@@ -44,9 +47,16 @@ public class DamageEvent
 
 public class DamageSystem
 {
+    public static void CreateAttackTransaction(List<DR_Entity> targets, int damage){
+        CreateAttackTransactionInternal(null, targets, damage);
+    }
 
-    // TODO: pass in originating action here so any animations can be added to it?
     public static void CreateAttackTransaction(DR_Entity instigator, List<DR_Entity> targets, float baseDamageMod = 1.0f){
+        int damage = Mathf.CeilToInt(instigator.GetComponent<LevelComponent>().stats.strength * baseDamageMod);
+        CreateAttackTransactionInternal(instigator, targets, damage);
+    }
+
+    private static void CreateAttackTransactionInternal(DR_Entity instigator, List<DR_Entity> targets, int damage){
         AttackTransaction attackTransaction = new AttackTransaction();
         attackTransaction.instigator = instigator;
         attackTransaction.targets = targets;
@@ -56,41 +66,38 @@ public class DamageSystem
         };
 
         // Targets may be expanded upon by this
-        instigator.OnAttackTransactionCreated?.Invoke(startEvent);
+        if (instigator != null){
+            instigator.OnAttackTransactionCreated?.Invoke(startEvent);
+        }
 
         foreach(var target in attackTransaction.targets){
-            int damage = Mathf.CeilToInt(instigator.GetComponent<LevelComponent>().stats.strength * baseDamageMod);
             HandleAttack(DR_GameManager.instance, instigator, target, damage);
         }
     }
 
-
-    // OLD
-    public static DamageEvent HandleAttack(DR_GameManager gm, DR_Entity attacker, DR_Entity target, int damage)
+    private static DamageEvent HandleAttack(DR_GameManager gm, DR_Entity attacker, DR_Entity target, int damage)
     {
-        // add a flag to allow blood splatter on any attack? Bludgeon ability would just always set this to true
-
-
         var targetHealthComp = target.GetComponent<HealthComponent>();
         int modifiedDamage = damage;
         DamageEvent damageEvent = new DamageEvent(attacker, target, modifiedDamage);
 
         if(targetHealthComp != null){
             //Debug testing
-            if (attacker.HasComponent<PlayerComponent>() && Input.GetKey(KeyCode.LeftShift)) {
+            if (attacker != null && attacker.HasComponent<PlayerComponent>() && Input.GetKey(KeyCode.LeftShift)) {
                 damageEvent.addedDamage = 999;
             }
-            
             
             targetHealthComp.TakeDamage(damageEvent.GetResultingDamage());
 
             if(!targetHealthComp.IsAlive()){
                 damageEvent.killed = true;
 
-                LevelComponent targetLevel = target.GetComponent<LevelComponent>();
-                LevelComponent attackerLevel = attacker.GetComponent<LevelComponent>();
-                if (targetLevel != null && attackerLevel != null){
-                    attackerLevel.GiveExp(targetLevel.stats.expGiven);
+                if (attacker != null){
+                    LevelComponent targetLevel = target.GetComponent<LevelComponent>();
+                    LevelComponent attackerLevel = attacker.GetComponent<LevelComponent>();
+                    if (targetLevel != null && attackerLevel != null){
+                        attackerLevel.GiveExp(targetLevel.stats.expGiven);
+                    }
                 }
 
                 //Handle blood
@@ -108,7 +115,10 @@ public class DamageSystem
                 target = target,
                 damageDealt = damageEvent.GetResultingDamage()
             };
-            attacker.OnAttackOther?.Invoke(attackEvent);
+            
+            if (attacker != null){
+                attacker.OnAttackOther?.Invoke(attackEvent);
+            }
 
             AttackEvent attackedEvent = new AttackEvent {
                 owner = attacker,

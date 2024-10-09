@@ -242,6 +242,7 @@ public class AttackAnimation : ActionAnimation {
 
 public class AbilityAnimation : ActionAnimation {
 
+    public Color color = new Color(0.9f, 0.9f, 1.0f);
     public AbilityAnimation(DR_Entity entity, float time = 0.25f){
         owner = new(entity);
         length = time;
@@ -254,7 +255,7 @@ public class AbilityAnimation : ActionAnimation {
 
     public override void AnimStart()
     {
-        FXSpawner.instance.SpawnParticleFX(VectorUtility.V2toV2I(owner.transform != null ? owner.transform.position : owner.entity.Position), new Color(0.9f, 0.9f, 1.0f));
+        FXSpawner.instance.SpawnParticleFX(VectorUtility.V2toV2I(owner.transform != null ? owner.transform.position : owner.entity.Position), color);
         StopAnim();
     }
 }

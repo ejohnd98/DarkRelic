@@ -39,8 +39,8 @@ public class TurnSystem : MonoBehaviour
             EligibleEntities.Add(turnComp);
             if(turnComp.CanTakeTurn()){
 
-                // TODO implement initiative or something. For now player always takes priority
-                if (turnComp.Entity.HasComponent<PlayerComponent>()){
+                // TODO: originally gave player priority but it doesn't seem needed?
+                if (false && turnComp.Entity.HasComponent<PlayerComponent>()){
                     CanAct.Insert(0, turnComp);
                 }else{
                     CanAct.Add(turnComp);

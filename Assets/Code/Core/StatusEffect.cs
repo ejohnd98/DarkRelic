@@ -52,3 +52,20 @@ public class TestStatusEffect : StatusEffect
         GameRenderer.instance.AddAction(animAction);
     }
 }
+
+public class BleedStatusEffect : StatusEffect
+{
+    public override void OnTick()
+    {
+        base.OnTick();
+
+        DamageSystem.CreateAttackTransaction(new(){owner}, 1);
+
+        var animAction = new AnimAction();
+        animAction.relatedEntities.Add(owner);
+        var anim = new AbilityAnimation(owner);
+        ColorUtility.TryParseHtmlString("#b8253f", out anim.color); //TODO: define colors used in palette somewhere
+        animAction.animations.Add(anim);
+        GameRenderer.instance.AddAction(animAction);
+    }
+}

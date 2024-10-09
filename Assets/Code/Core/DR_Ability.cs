@@ -415,6 +415,9 @@ public class DamageMirror : DR_Ability
     protected override void OnTrigger(DR_Event e)
     {
         var attackedEvent = e as AttackEvent;
+        if (attackedEvent.owner == null){
+            return;
+        }
         int reflectedDamage = Mathf.FloorToInt(attackedEvent.damageDealt * GetReflectAmount());
         Debug.Log($"reflected {reflectedDamage} back to {attackedEvent.owner.Name}");
         attackedEvent.owner.GetComponent<HealthComponent>().TakeDamage(reflectedDamage);
@@ -555,6 +558,12 @@ public class SpiderWebAbility : DR_Ability
         bool movedTarget;
         int tempLimit = 500;
 
+        Dictionary<DR_Entity, MoveAnimation> moveAnimDict = new();
+        foreach(var target in targets){
+            var moveAnim = new MoveAnimation(target, target.Position, target.Position, 0.1f);
+            moveAnimDict[target] = moveAnim;
+        }
+
         do{
             movedTarget = false;
             foreach(var target in targets){
@@ -572,6 +581,7 @@ public class SpiderWebAbility : DR_Ability
                 if (canMoveX && (!canMoveY || (canMoveY && (dirX.magnitude > dirY.magnitude)))){
                     //Move X
                     gm.CurrentMap.MoveActor(target, target.Position + dirX);
+                    
                     movedTarget = true;
                 }else if (canMoveY){
                     //Move Y
@@ -588,14 +598,22 @@ public class SpiderWebAbility : DR_Ability
             Debug.LogAssertion("tempLimit is " + tempLimit);
         }
 
+        foreach(var target in targets){
+            moveAnimDict[target].end = VectorUtility.V2ItoV2(target.Position);
+            gm.turnSystem.currentAction.animations.Add(moveAnimDict[target]);
+        }
+
         //TODO: debuffs
         foreach(var target in targets){
-            target.GetComponent<HealthComponent>().AddStatusEffect(new TestStatusEffect());
+            target.GetComponent<HealthComponent>().AddStatusEffect(new BleedStatusEffect());
+
+            //Extremely temp
+            target.GetComponent<TurnComponent>().CurrentDebt -= 20;
         }
 
         //TODO: TEMP Anim TEST:
         foreach(var target in targets){
-            gm.turnSystem.currentAction.animations.Add(new AbilityAnimation(target));
+            //gm.turnSystem.currentAction.animations.Add(new AbilityAnimation(target));
         }
     }
 

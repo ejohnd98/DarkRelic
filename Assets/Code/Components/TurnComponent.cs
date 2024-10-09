@@ -9,7 +9,7 @@ public class TurnComponent : DR_Component
     public Action<DR_Event> OnActionStart;
     public Action<DR_Event> OnActionEnd;
 
-    float CurrentDebt = 0.0f;
+    public float CurrentDebt = 0.0f;
 
     [DoNotSerialize][HideInInspector]
     public bool waitingForAction = false;
