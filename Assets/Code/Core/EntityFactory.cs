@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EntityFactory : MonoBehaviour
+public class EntityFactory
 {
     public static DR_Entity CreateEntityFromContent(Content content)
     {

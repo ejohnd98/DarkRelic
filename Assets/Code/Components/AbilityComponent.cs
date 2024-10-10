@@ -74,13 +74,10 @@ public class AbilityComponent : DR_Component
         dirtyFlag = true;
     }
 
-    public StatsModifier GetStatsModifier(){
-        StatsModifier statsModifier = new();
+    public void ApplyStatsModifiers(StatsModifier statsModifier){
 
         foreach(var ability in abilities){
             ability.ApplyStatModifiers(statsModifier);
         }
-
-        return statsModifier;
     }
 }

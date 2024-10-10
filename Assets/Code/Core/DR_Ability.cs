@@ -92,11 +92,18 @@ public class BloodWalkAbility : DR_Ability
             Debug.LogAssertion("BloodWalkAbility failed to execute!");
             return;
         }
+
+        MoveEvent moveEvent = new MoveEvent {
+            owner = owner,
+            startPos = owner.Position,
+            endPos = pos
+        };
         
         gm.CurrentMap.MoveActor(owner, pos);
 
         DR_Cell cell = gm.CurrentMap.GetCell(pos);
         cell.CollectBlood(owner);
+        owner.OnMove?.Invoke(moveEvent);
     }
 }
 
@@ -502,13 +509,8 @@ public class ChainLightningAbility : DR_Ability
         }
     }
 
-    private float GetDamagePercent(){
-        return 0.1f + (0.25f * Mathf.Log(count, 2));
-    }
-
     public override string GetFormattedDescription(){
-        float percent = GetDamagePercent();
-        return string.Format("TBD {0:0%}", percent);
+        return string.Format("Spreads attack to {0} target(s) within two spaces of any other targets (WIP).", count);
     }
 }
 
@@ -651,6 +653,6 @@ public class BloodlustAbility : DR_Ability
     }
 
     public override string GetFormattedDescription(){
-        return string.Format("Increases strength by {0:0%} while on bloodstained tiles. Reduces by {1:0%} otherwise.", (1.0f - GetStatModifier(true)), (1.0f - GetStatModifier(false)));
+        return string.Format("Increases strength by {0:0%} while on bloodstained tiles. Reduces by {1:0%} otherwise.", (GetStatModifier(true) - 1.0f), (1.0f - GetStatModifier(false)));
     }
 }

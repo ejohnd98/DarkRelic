@@ -94,15 +94,17 @@ public class LevelComponent : DR_Component
     }
 
     public void UpdateStats() {
-
         stats = GetLevelStats(level, this);
+        StatsModifier modifier = new();
 
         if (Entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){
-            StatsModifier modifier = abilityComponent.GetStatsModifier();
-            stats = modifier.GetResultingStats(stats);
+            abilityComponent.ApplyStatsModifiers(modifier);
         }
-        
+
         HealthComponent healthComponent = Entity.GetComponent<HealthComponent>();
+        healthComponent.ApplyStatsModifiers(modifier);
+
+        stats = modifier.GetResultingStats(stats);
         healthComponent.SetMaxHealth(stats.maxHealth);
     }
 

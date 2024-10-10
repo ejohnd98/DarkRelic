@@ -16,16 +16,38 @@ public class HealthComponent : DR_Component
     public List<StatusEffect> statusEffects = new();
 
     public void TickStatusEffects(float amount){
-        foreach(var effect in statusEffects){
-            effect.Tick(amount);
+        for (int i = 0; i < statusEffects.Count; i++){
+            StatusEffect effect = statusEffects[i];
+            effect.Tick(amount, out bool removed);
+            if (removed){
+                i--;
+            }
+        }
+    }
+
+    public void ApplyStatsModifiers(StatsModifier statsModifier){
+
+        foreach(var statusEffect in statusEffects){
+            statusEffect.ApplyStatModifiers(statsModifier);
         }
     }
 
     public void AddStatusEffect(StatusEffect statusEffect){
-        //TODO: make the same as abilities (probably move into own component too)
-        // for now testing here and assuming we won't have duplicates
+        var t = statusEffect.GetType();
+
+        foreach (var effect in statusEffects){
+            if (effect.GetType() == t){
+                // for now, don't allow duplicates and just return
+                return;
+            }
+        }
         statusEffect.owner = Entity;
         statusEffects.Add(statusEffect);
+    }
+
+    public void RemoveStatusEffect(StatusEffect statusEffect)
+    {
+        statusEffects.Remove(statusEffect);
     }
 
     public HealthComponent(){}

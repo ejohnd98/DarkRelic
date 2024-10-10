@@ -8,6 +8,8 @@ public abstract class StatusEffect : DR_EffectBase
 {
     public float tickRate = 4.0f;
     public float counter = 0.0f;
+    protected int timesTicked = 0;
+    protected int tickDuration = -1;
 
     // Possible types of statuses:
     // on added/removed (does not tick)
@@ -15,11 +17,17 @@ public abstract class StatusEffect : DR_EffectBase
     // on some event (moved, attacked, attack, opened door, ability used, etc)
 
 
-    public void Tick(float amount){
+    public void Tick(float amount, out bool removed){
+        removed = false;
         counter += amount;
         if (counter >= tickRate){
             counter -= tickRate;
             OnTick();
+            timesTicked++;
+        }
+        if (tickDuration >= 0 && timesTicked >= tickDuration){
+            owner.GetComponent<HealthComponent>().RemoveStatusEffect(this);
+            removed = true;
         }
     }
 
@@ -55,11 +63,18 @@ public class TestStatusEffect : StatusEffect
 
 public class BleedStatusEffect : StatusEffect
 {
+    public BleedStatusEffect(){
+        tickDuration = 3;
+    }
+
     public override void OnTick()
     {
         base.OnTick();
 
         DamageSystem.CreateAttackTransaction(new(){owner}, 1);
+
+        //TODO: try out dropping 1:1 health lost to blood on ground instead of doing it manually
+        DR_GameManager.instance.CurrentMap.GetCell(owner.Position).AddBlood(1);
 
         var animAction = new AnimAction();
         animAction.relatedEntities.Add(owner);
