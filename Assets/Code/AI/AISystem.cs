@@ -24,26 +24,31 @@ public class AISystem
                 }
             }
 
-            //Can use ability
-            if (entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){
-                foreach (DR_Ability ability in abilityComponent.abilities){
-                    if (ability.CanBePerformed() && ability.triggeredByPlayer){
-                        var abilityAction = new AbilityAction(ability, entity);
-                        ActionInput actionInput = abilityAction.GetNextNeededInput();
-                        if (actionInput.GiveInput(target.Position) && !abilityAction.RequiresInput()){
-                            //ability accepts single position as input, and input is valid
-                            return abilityAction;
+            //TODO: TEMP: do not use abilities while not visible
+            if (gm.CurrentMap.GetIsVisible(entity.Position)){
+                //Can use ability
+                if (entity.GetComponent<AbilityComponent>() is AbilityComponent abilityComponent){
+                    foreach (DR_Ability ability in abilityComponent.abilities){
+                        if (ability.CanBePerformed() && ability.triggeredByPlayer){
+                            var abilityAction = new AbilityAction(ability, entity);
+                            ActionInput actionInput = abilityAction.GetNextNeededInput();
+                            if (actionInput.GiveInput(target.Position) && !abilityAction.RequiresInput()){
+                                //ability accepts single position as input, and input is valid
+                                return abilityAction;
+                            }
                         }
                     }
                 }
             }
+
+            
 
             //TODO: should optimize this to not throw away whole path each time
             //Not within range:
 
             aiComponent.currentPath = Pathfinding.FindPath(gm.CurrentMap, entity.Position, target.Position);
 
-            if (aiComponent.HasPath()){
+            if (aiComponent.HasPath() && CanMove(entity)){
                 Vector2Int nextPos = aiComponent.currentPath.AdvanceStep();
                 if (gm.CurrentMap.CanMoveActor(entity, nextPos)){
                     return new MoveAction(entity, nextPos);
@@ -58,5 +63,9 @@ public class AISystem
     public static DR_Entity DetermineTarget(DR_GameManager gm, DR_Entity entity){
         //TODO: elaborate on this
         return MapHelpers.GetClosestEntity(gm, entity, 10);
+    }
+
+    public static bool CanMove(DR_Entity entity){
+        return !entity.GetComponent<HealthComponent>().HasStatusEffect(typeof(WebStatusEffect));
     }
 }

@@ -48,6 +48,10 @@ public class BloodBoltAbility : DR_Ability
         int baseDamage = Mathf.CeilToInt(owner.GetComponent<LevelComponent>().stats.strength * GetStrengthModifier());
         DamageSystem.CreateAttackTransaction(owner, new(){target}, GetStrengthModifier());
 
+        //TODO; this should be added to all affected targets, not just the original
+        // possibly add a list of statuses to inflict (the abovefunction should return the transaction probably)
+        target.GetComponent<HealthComponent>().AddStatusEffect(new BleedStatusEffect());
+
         // TODO: have entities handle their own hurt/killed sounds
         killed = false;//damageEvent.killed;
     }
@@ -605,17 +609,8 @@ public class SpiderWebAbility : DR_Ability
             gm.turnSystem.currentAction.animations.Add(moveAnimDict[target]);
         }
 
-        //TODO: debuffs
         foreach(var target in targets){
-            target.GetComponent<HealthComponent>().AddStatusEffect(new BleedStatusEffect());
-
-            //Extremely temp
-            target.GetComponent<TurnComponent>().CurrentDebt -= 20;
-        }
-
-        //TODO: TEMP Anim TEST:
-        foreach(var target in targets){
-            //gm.turnSystem.currentAction.animations.Add(new AbilityAnimation(target));
+            target.GetComponent<HealthComponent>().AddStatusEffect(new WebStatusEffect());
         }
     }
 

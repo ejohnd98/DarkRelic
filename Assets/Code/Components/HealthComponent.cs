@@ -50,6 +50,16 @@ public class HealthComponent : DR_Component
         statusEffects.Remove(statusEffect);
     }
 
+    // Temp (probably)
+    public bool HasStatusEffect(Type statusType){
+        foreach (var status in statusEffects){
+            if (status.GetType() == statusType){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public HealthComponent(){}
 
     public HealthComponent(int MaxHealth){

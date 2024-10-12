@@ -354,6 +354,14 @@ public class GameRenderer : MonoBehaviour
             }else{
                 EntityObjects[Entity].GetComponent<SpriteRenderer>().sprite = spriteComponent.Sprite;
             }
+
+            // TODO: AWFUL temp visualization of a single status condition
+            // Should be adding and removing this from entities during actions maybe instead
+            if (Entity.HasComponent<HealthComponent>()){
+                bool hasWeb = Entity.GetComponent<HealthComponent>().HasStatusEffect(typeof(WebStatusEffect));
+                EntityObjects[Entity].GetComponent<CellObj>().webOverlayTemp.gameObject.SetActive(hasWeb);
+            }
+            
             
 
             if (!isVisible && isKnown && !DR_GameManager.instance.debug_disableFOV){

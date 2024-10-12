@@ -11,6 +11,7 @@ public class CellObj : MonoBehaviour
     public SpriteRenderer overlayRenderer;
     public SpriteRenderer bloodStainOverlay;
     public SpriteRenderer bloodOverlay;
+    public SpriteRenderer webOverlayTemp;
     public SpriteRenderer altarItem;
     public Canvas altarPriceCanvas;
     public TextMeshProUGUI altarPrice;

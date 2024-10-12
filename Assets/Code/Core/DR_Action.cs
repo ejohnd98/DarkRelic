@@ -136,7 +136,8 @@ public class MoveAction : DR_Action {
     }
 
     protected override void Perform(DR_GameManager gm){
-        if(!gm.CurrentMap.CanMoveActor(owner, pos)){
+        if(!gm.CurrentMap.CanMoveActor(owner, pos)
+            || owner.GetComponent<HealthComponent>().HasStatusEffect(typeof(WebStatusEffect))){
             wasSuccess = false;
             return;
         }

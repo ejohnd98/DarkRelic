@@ -64,6 +64,7 @@ public class TestStatusEffect : StatusEffect
 public class BleedStatusEffect : StatusEffect
 {
     public BleedStatusEffect(){
+        tickRate = 2.0f;
         tickDuration = 3;
     }
 
@@ -82,5 +83,13 @@ public class BleedStatusEffect : StatusEffect
         ColorUtility.TryParseHtmlString("#b8253f", out anim.color); //TODO: define colors used in palette somewhere
         animAction.animations.Add(anim);
         GameRenderer.instance.AddAction(animAction);
+    }
+}
+
+public class WebStatusEffect : StatusEffect
+{
+    public WebStatusEffect(){
+        tickRate = 2.0f;
+        tickDuration = 8;
     }
 }
