@@ -50,6 +50,10 @@ public class AbilityContent : ContentBase
         }
     }
 
+    public override Sprite GetContentSprite(){
+        return abilitySprite;
+    }
+
     private void CreateLists(){
         intProperties = new();
         floatProperties = new();

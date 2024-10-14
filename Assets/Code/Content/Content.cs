@@ -15,6 +15,10 @@ public class ContentBase : ScriptableObject
             guid = System.Guid.NewGuid().ToString();
         }
     }
+
+    public virtual Sprite GetContentSprite(){
+        return null;
+    }
 }
 
 [CreateAssetMenu(fileName = "NewContent", menuName = "DR Content")]
@@ -29,7 +33,7 @@ public class Content : ContentBase
         components.Add(componentObject);
     }
 
-    public Sprite GetContentSprite(){
+    public override Sprite GetContentSprite(){
         foreach(DR_Component component in components){
             if(component is SpriteComponent spriteComp){
                 return spriteComp.GetCurrentSprite();

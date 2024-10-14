@@ -302,7 +302,7 @@ public class GameRenderer : MonoBehaviour
         EntityObjects.Clear();
     }
 
-    private void UpdateEntities(){
+    public void UpdateEntities(){
         foreach(DR_Entity entity in currentRenderedMap.Entities){
             bool isVisible = currentRenderedMap.IsVisible[entity.Position.y, entity.Position.x] || DR_GameManager.instance.debug_disableFOV;
             if (isVisible && !EntityObjects.ContainsKey(entity)){
@@ -428,8 +428,8 @@ public class GameRenderer : MonoBehaviour
         if (renderedPlayer != null){
             DesiredPos.x = renderedPlayer.position.x;
             DesiredPos.y = renderedPlayer.position.y;
+            DesiredPos += cameraOffset;
         }
-        DesiredPos += cameraOffset;
         
         if (forcePos){
             MainCamera.transform.position = DesiredPos;

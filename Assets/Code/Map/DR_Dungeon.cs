@@ -7,6 +7,7 @@ public class DR_Dungeon
     public List<DR_Map> maps;
     public int mapIndex = 0;
     public string name = "Untitled Dungeon";
+    public DungeonGenInfo dungeonGenInfo;
 
     public DR_Dungeon(){
         maps = new List<DR_Map>();

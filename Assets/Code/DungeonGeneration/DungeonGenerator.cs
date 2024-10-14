@@ -117,7 +117,8 @@ public class DungeonGenerator : MonoBehaviour {
         DungeonGenInfo dungeonGenInfo = new DungeonGenInfo();
         DR_Dungeon dungeon = new DR_Dungeon
         {
-            name = "Balance Test Dungeon"
+            name = "Balance Test Dungeon",
+            dungeonGenInfo = dungeonGenInfo
         };
 
         for (int i = 0; i < dungeonGenInfo.floors; i++) {
