@@ -5398,7 +5398,10 @@ MonoBehaviour:
   - {fileID: 8300000, guid: b83f370a1acf2c54da7ee1494d4f8170, type: 3}
   - {fileID: 8300000, guid: 652441dca4fe6764eba7dbba90f88806, type: 3}
   - {fileID: 8300000, guid: 1f9e7f55403f01641aab8d2554508ead, type: 3}
-  variantSfxList: []
+  - {fileID: 8300000, guid: 57a1a7b0be685134a9020f85d2d3a8c7, type: 3}
+  variantSfxList:
+  - name: 
+    sounds: []
 --- !u!4 &1759956583
 Transform:
   m_ObjectHideFlags: 0

@@ -85,6 +85,7 @@ public class AltarComponent : DR_Component
                 if (healthRestored == 0){
                     return false;
                 }
+                SoundSystem.instance.PlaySound("altar");
                 break;
             }
             
@@ -93,12 +94,14 @@ public class AltarComponent : DR_Component
                 inventoryComponent.SpendBlood(bloodCost);
                 abilityComponent.AddAbilityFromContent(altarAbilityContent);
                 interactable = false;
+                SoundSystem.instance.PlaySound("relic");
                 break;
             }
             case AltarType.CURSED_ALTAR:
             {
                 abilityComponent.AddAbilityFromContent(altarAbilityContent);
                 interactable = false;
+                SoundSystem.instance.PlaySound("cursedRelic");
                 break;
             }
             case AltarType.CHEST:
@@ -109,13 +112,12 @@ public class AltarComponent : DR_Component
                 interactable = false;
                 var spriteComp = Entity.GetComponent<SpriteComponent>();
                 spriteComp.Sprite = usedSprite;
+                SoundSystem.instance.PlaySound("relic");
                 break;
             }
             default:
             break;
         }
-
-        SoundSystem.instance.PlaySound("altar");
         OnAltarUsed?.Invoke(new(){owner = other});
 
         return true;
