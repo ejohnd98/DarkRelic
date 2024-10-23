@@ -270,7 +270,7 @@ public class GameRenderer : MonoBehaviour
         UpdateTiles();
     }
 
-    private void UpdateTiles(){
+    public void UpdateTiles(){
         foreach (var (pos, obj) in CellObjects){
             Sprite CellSprite = FogTexture;
             if (currentRenderedMap.IsVisible[pos.y, pos.x] || DR_GameManager.instance.debug_disableFOV){

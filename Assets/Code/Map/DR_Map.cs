@@ -167,6 +167,15 @@ public class DR_Map
         return true;
     }
 
+    //Mostly debug thing
+    public void ClearBlood(){
+        for (int y = 0; y < MapSize.y; y++){
+            for (int x = 0; x < MapSize.x; x++){
+                Cells[y,x].ClearBlood();
+            }
+        }
+    }
+
     public void ClearVisible(){
         for (int y = 0; y < MapSize.y; y++){
             for (int x = 0; x < MapSize.x; x++){

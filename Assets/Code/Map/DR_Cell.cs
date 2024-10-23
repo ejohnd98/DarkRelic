@@ -41,6 +41,16 @@ public class DR_Cell
         bloodStained = true;
     }
 
+    public void ClearBlood(){
+        blood = 0;
+        bloodStained = false;
+    }
+
+    public void SetBlood(int finalAmount){
+        blood = finalAmount;
+        bloodStained = true;
+    }
+
     public void CollectBlood(DR_Entity collector){
         if (blood > 0){
             if (collector.GetComponent<InventoryComponent>() is InventoryComponent inventory && inventory.canCollectBlood){

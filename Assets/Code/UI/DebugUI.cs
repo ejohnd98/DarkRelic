@@ -16,6 +16,8 @@ public class DebugUI : MonoBehaviour
     List<GameObject> Buttons;
 
     private bool waitingForInput = false;
+    private bool usingBloodBrush = false;
+    private int bloodBrushAmount = 0;
     private Content contentWaitingForInput = null;
 
     private void Start() {
@@ -71,8 +73,37 @@ public class DebugUI : MonoBehaviour
         }
     }
 
+    public void CleanAllBlood(){
+        DR_GameManager.instance.CurrentMap.ClearBlood();
+        GameRenderer.instance.UpdateTiles();
+        SoundSystem.instance.PlaySound("addBlood");
+        SoundSystem.instance.PlaySound("wizardSound");
+    }
+
+    public void StartBloodBrush(int amount){
+        usingBloodBrush = true;
+        bloodBrushAmount = amount;
+
+        CancelButton.gameObject.SetActive(true);
+        waitingForInput = true;
+        Cursor.SetCursor(UISystem.instance.targetingCursorTexture, Vector2.zero, CursorMode.ForceSoftware);
+        ToggleMenu();
+    }
+
+    void PlaceBlood(Vector2Int pos){
+        var currentMap = DR_GameManager.instance.CurrentMap;
+        if (bloodBrushAmount <= -1){
+            currentMap.GetCell(pos).ClearBlood();
+            return;
+        }
+        SoundSystem.instance.PlaySound("addBlood");
+        currentMap.GetCell(pos).SetBlood(bloodBrushAmount);
+        GameRenderer.instance.UpdateTiles();
+    }
+
     public void StopPlacingContent(){
         waitingForInput = false;
+        usingBloodBrush = false;
         contentWaitingForInput = null;
         CancelButton.gameObject.SetActive(false);
         Cursor.SetCursor(UISystem.instance.cursorTexture, Vector2.zero, CursorMode.ForceSoftware);
@@ -110,6 +141,42 @@ public class DebugUI : MonoBehaviour
         GameRenderer.instance.UpdateEntities();
     }
 
+    public void SetBlood(int finalValue){
+        var playerInventory = DR_GameManager.instance.GetPlayer().GetComponent<InventoryComponent>();
+        playerInventory.blood = finalValue;
+        UISystem.instance.RefreshInventoryUI();
+    }
+
+    public void ChangeBlood(int delta){
+        var playerInventory = DR_GameManager.instance.GetPlayer().GetComponent<InventoryComponent>();
+        if (delta > 0){
+            playerInventory.AddBlood(delta);
+        }else{
+            playerInventory.SpendBlood(delta);
+        }
+        UISystem.instance.RefreshInventoryUI();
+    }
+
+    public void SetHealthPercent(float percent){
+        var playerHealth = DR_GameManager.instance.GetPlayer().GetComponent<HealthComponent>();
+        int desiredHealth = Mathf.CeilToInt(playerHealth.maxHealth * percent);
+        playerHealth.currentHealth = desiredHealth;
+        UISystem.instance.RefreshInventoryUI();
+    }
+
+    public void LevelUp(){
+        var playerLevel = DR_GameManager.instance.GetPlayer().GetComponent<LevelComponent>();
+        playerLevel.AdvanceLevel();
+        UISystem.instance.RefreshInventoryUI();
+        SoundSystem.instance.PlaySound("wizardSound");
+    }
+
+    public void ToggleFOV(){
+        DR_GameManager.instance.debug_disableFOV = !DR_GameManager.instance.debug_disableFOV;
+        GameRenderer.instance.FullyUpdateRenderer(true);
+        SoundSystem.instance.PlaySound("wizardSound");
+    }
+
     void Update()
     {
         if (!waitingForInput){
@@ -122,7 +189,11 @@ public class DebugUI : MonoBehaviour
         //TODO: this is still getting called when clicking the cancel button
         if (Input.GetMouseButtonDown(0) && DR_InputHandler.instance.mouseIsInWorld){
             Vector2Int MousePos = DR_InputHandler.instance.mouseWorldPosition;
-            PlaceContent(contentWaitingForInput, MousePos);
+            if (usingBloodBrush){
+                PlaceBlood(MousePos);
+            }else{
+                PlaceContent(contentWaitingForInput, MousePos);
+            }
         }
     }
 }

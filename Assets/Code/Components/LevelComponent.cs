@@ -74,7 +74,7 @@ public class LevelComponent : DR_Component
 
     public void AdvanceLevel(){
         int requiredExp = GetRequiredExpForLevelUp(level);
-        currentExp-=requiredExp;
+        currentExp = Mathf.Max(currentExp - requiredExp, 0);
 
         level++;
         UpdateStats();

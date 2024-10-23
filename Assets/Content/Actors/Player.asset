@@ -58,6 +58,7 @@ MonoBehaviour:
       type: {class: TurnComponent, ns: , asm: Assembly-CSharp}
       data:
         key: TurnComponent
+        CurrentDebt: 0
         waitingForAction: 0
     - rid: 5068184619078123525
       type: {class: LevelComponent, ns: , asm: Assembly-CSharp}
@@ -77,7 +78,5 @@ MonoBehaviour:
       type: {class: AbilityComponent, ns: , asm: Assembly-CSharp}
       data:
         key: AbilityComponent
-        startingAbilities:
-        - {fileID: 11400000, guid: e999a9a396b269741a253ac421aff2e3, type: 2}
-        - {fileID: 11400000, guid: 19611e4d403ad0646807eb08dcc95924, type: 2}
+        startingAbilities: []
         dirtyFlag: 1
